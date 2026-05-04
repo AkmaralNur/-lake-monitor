@@ -7,32 +7,62 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background:#0a1628; color:white; font-family:Arial; }
-header { background:#0d1f3c; padding:20px; text-align:center; border-bottom:2px solid #00d4ff; }
-header h1 { color:#00d4ff; font-size:32px; }
-header p { color:#88aacc; margin-top:5px; }
+body { background:#0a1628; color:white; font-family:Arial; overflow-x:hidden; }
+
+header { background:#0d1f3c; padding:20px; text-align:center; border-bottom:2px solid #00d4ff; position:relative; overflow:hidden; }
+header::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(ellipse at center, #00d4ff11 0%, transparent 70%); animation: headerGlow 4s ease-in-out infinite; }
+@keyframes headerGlow { 0%,100%{opacity:0.5} 50%{opacity:1} }
+header h1 { color:#00d4ff; font-size:32px; position:relative; }
+header p { color:#88aacc; margin-top:5px; position:relative; }
+
 .status { display:inline-block; width:10px; height:10px; border-radius:50%; background:#00ff88; margin-right:8px; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
 .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; padding:20px; max-width:1200px; margin:auto; }
-.card { background:#1a2a4a; border-radius:15px; padding:20px; text-align:center; border:1px solid #00d4ff33; transition: transform 0.2s; }
-.card:hover { transform: translateY(-5px); }
+
+.card { background:#1a2a4a; border-radius:15px; padding:20px; text-align:center; border:1px solid #00d4ff33; transition: transform 0.3s, box-shadow 0.3s; animation: fadeIn 0.5s ease-out; position:relative; overflow:hidden; }
+.card::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg, transparent, #00d4ff11, transparent); animation: shimmer 3s infinite; }
+@keyframes shimmer { 0%{left:-100%} 100%{left:100%} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.card:hover { transform: translateY(-8px); box-shadow: 0 10px 30px #00d4ff33; }
 .card .icon { font-size:32px; margin-bottom:10px; }
-.card .value { font-size:40px; font-weight:bold; color:#00d4ff; }
+.card .value { font-size:40px; font-weight:bold; color:#00d4ff; transition: all 0.5s; }
+.card .value.updated { animation: valueUpdate 0.5s ease; }
+@keyframes valueUpdate { 0%{transform:scale(1.2);color:#00ff88} 100%{transform:scale(1);color:#00d4ff} }
 .card .unit { font-size:14px; color:#88aacc; }
 .card .label { font-size:13px; color:#88aacc; margin-top:8px; }
+
 .wqi-section { margin:0 20px 20px; }
-.wqi-card { background:#1a2a4a; border-radius:15px; padding:30px; text-align:center; border:1px solid #00d4ff33; max-width:1200px; margin:auto; }
+.wqi-card { background:#1a2a4a; border-radius:15px; padding:30px; text-align:center; border:1px solid #00d4ff33; max-width:1200px; margin:auto; position:relative; overflow:hidden; }
 .wqi-card h2 { color:#00d4ff; font-size:22px; margin-bottom:15px; }
-.wqi-score { font-size:80px; font-weight:bold; }
+.wqi-score { font-size:80px; font-weight:bold; transition: all 1s; }
 .wqi-label { font-size:22px; margin-top:5px; }
 .wqi-bar { background:#0a1628; border-radius:10px; height:20px; margin:15px auto; max-width:400px; overflow:hidden; }
-.wqi-fill { height:100%; border-radius:10px; transition: width 1s; }
+.wqi-fill { height:100%; border-radius:10px; transition: width 1.5s ease; }
+
 .charts { max-width:1200px; margin:0 auto 20px; padding:0 20px; display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-.chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
+.chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; transition: box-shadow 0.3s; }
+.chart-card:hover { box-shadow: 0 5px 20px #00d4ff22; }
 .chart-card h3 { color:#00d4ff; margin-bottom:15px; font-size:15px; }
+
+.history-section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
+.history-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
+.history-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
+.history-table { width:100%; border-collapse:collapse; font-size:13px; }
+.history-table th { color:#00d4ff; padding:10px; border-bottom:1px solid #00d4ff33; text-align:center; }
+.history-table td { padding:8px 10px; border-bottom:1px solid #ffffff11; text-align:center; color:#88aacc; }
+.history-table tr:hover td { background:#ffffff08; color:white; }
+.history-table tr:first-child td { color:white; font-weight:bold; }
+
+.btn-clear { background:#ff444433; border:1px solid #ff4444; color:#ff4444; padding:8px 15px; border-radius:8px; cursor:pointer; font-size:12px; float:right; transition: all 0.3s; }
+.btn-clear:hover { background:#ff4444; color:white; }
+
 .last-update { text-align:center; color:#88aacc; font-size:12px; padding:10px; }
 footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-top:1px solid #00d4ff22; }
-@media(max-width:600px) { .charts { grid-template-columns:1fr; } }
+
+.wave { position:fixed; bottom:0; left:0; width:100%; opacity:0.05; pointer-events:none; }
+
+@media(max-width:600px) { .charts { grid-template-columns:1fr; } header h1 { font-size:22px; } .card .value { font-size:30px; } }
 </style>
 </head>
 <body>
@@ -105,6 +135,26 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
   </div>
 </div>
 
+<div class="history-section">
+  <div class="history-card">
+    <h3>📋 Журнал измерений <button class="btn-clear" onclick="clearHistory()">Очистить историю</button></h3>
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Время</th>
+          <th>Вода °C</th>
+          <th>Воздух °C</th>
+          <th>Влажность %</th>
+          <th>TDS ppm</th>
+          <th>Свет люкс</th>
+          <th>ИКВ</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody"></tbody>
+    </table>
+  </div>
+</div>
+
 <div class="last-update">Последнее обновление: <span id="lastUpdate">--</span></div>
 
 <footer>
@@ -115,13 +165,15 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 const CHANNEL_ID = '3368346';
 const READ_KEY = '839C3D2TM2EPJ0KK';
 const MAX_POINTS = 20;
+const STORAGE_KEY = 'lake_monitor_history';
 
 const chartOptions = {
   plugins: { legend: { labels: { color: '#88aacc' } } },
   scales: {
     x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } },
     y: { ticks: { color: '#88aacc' } }
-  }
+  },
+  animation: { duration: 1000 }
 };
 
 const tempChart = new Chart(document.getElementById('tempChart'), {
@@ -157,6 +209,55 @@ const lightChart = new Chart(document.getElementById('lightChart'), {
   options: chartOptions
 });
 
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch { return []; }
+}
+
+function saveHistory(entry) {
+  let history = loadHistory();
+  history.unshift(entry);
+  if (history.length > 100) history = history.slice(0, 100);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+}
+
+function clearHistory() {
+  if (confirm('Очистить всю историю измерений?')) {
+    localStorage.removeItem(STORAGE_KEY);
+    renderHistory();
+  }
+}
+
+function renderHistory() {
+  const history = loadHistory();
+  const tbody = document.getElementById('historyBody');
+  tbody.innerHTML = '';
+  history.slice(0, 50).forEach((entry, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${entry.time}</td>
+      <td>${entry.waterTemp}</td>
+      <td>${entry.airTemp}</td>
+      <td>${entry.humidity}</td>
+      <td>${entry.tds}</td>
+      <td>${entry.light}</td>
+      <td style="color:${entry.wqi >= 80 ? '#00ff88' : entry.wqi >= 60 ? '#ffdd00' : '#ff4444'}">${entry.wqi}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateValue(id, newVal) {
+  const el = document.getElementById(id);
+  if (el.textContent !== newVal) {
+    el.textContent = newVal;
+    el.classList.remove('updated');
+    void el.offsetWidth;
+    el.classList.add('updated');
+  }
+}
+
 async function fetchData() {
   try {
     const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_POINTS}`;
@@ -166,14 +267,19 @@ async function fetchData() {
     if (!feeds || feeds.length === 0) return;
 
     const last = feeds[feeds.length - 1];
-    document.getElementById('waterTemp').textContent = parseFloat(last.field1).toFixed(1);
-    document.getElementById('airTemp').textContent = parseFloat(last.field3).toFixed(1);
-    document.getElementById('humidity').textContent = parseFloat(last.field4).toFixed(1);
-    document.getElementById('tds').textContent = parseFloat(last.field2).toFixed(0);
-    document.getElementById('light').textContent = parseFloat(last.field5).toFixed(0);
-
+    const wt = parseFloat(last.field1).toFixed(1);
+    const tds = parseFloat(last.field2).toFixed(0);
+    const at = parseFloat(last.field3).toFixed(1);
+    const hum = parseFloat(last.field4).toFixed(1);
+    const light = parseFloat(last.field5).toFixed(0);
     const wqi = parseFloat(last.field6) || 0;
-    document.getElementById('wqiScore').textContent = wqi;
+
+    updateValue('waterTemp', wt);
+    updateValue('airTemp', at);
+    updateValue('humidity', hum);
+    updateValue('tds', tds);
+    updateValue('light', light);
+    updateValue('wqiScore', wqi);
     document.getElementById('wqiFill').style.width = wqi + '%';
 
     let wqiColor = '#00ff88';
@@ -187,36 +293,35 @@ async function fetchData() {
     document.getElementById('wqiLabel').textContent = wqiLabel;
     document.getElementById('wqiFill').style.background = wqiColor;
 
-    const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString('ru-RU'));
-    const waterTemps = feeds.map(f => parseFloat(f.field1) || 0);
-    const tdsValues = feeds.map(f => parseFloat(f.field2) || 0);
-    const airTemps = feeds.map(f => parseFloat(f.field3) || 0);
-    const humValues = feeds.map(f => parseFloat(f.field4) || 0);
-    const lightValues = feeds.map(f => parseFloat(f.field5) || 0);
+    const now = new Date().toLocaleString('ru-RU');
+    saveHistory({ time: now, waterTemp: wt, airTemp: at, humidity: hum, tds, light, wqi });
+    renderHistory();
 
+    const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString('ru-RU'));
     tempChart.data.labels = labels;
-    tempChart.data.datasets[0].data = waterTemps;
-    tempChart.data.datasets[1].data = airTemps;
+    tempChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field1) || 0);
+    tempChart.data.datasets[1].data = feeds.map(f => parseFloat(f.field3) || 0);
     tempChart.update();
 
     humChart.data.labels = labels;
-    humChart.data.datasets[0].data = humValues;
+    humChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field4) || 0);
     humChart.update();
 
     tdsChart.data.labels = labels;
-    tdsChart.data.datasets[0].data = tdsValues;
+    tdsChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field2) || 0);
     tdsChart.update();
 
     lightChart.data.labels = labels;
-    lightChart.data.datasets[0].data = lightValues;
+    lightChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field5) || 0);
     lightChart.update();
 
-    document.getElementById('lastUpdate').textContent = new Date().toLocaleString('ru-RU');
+    document.getElementById('lastUpdate').textContent = now;
   } catch(e) {
     console.error('Ошибка:', e);
   }
 }
 
+renderHistory();
 fetchData();
 setInterval(fetchData, 15000);
 </script>
