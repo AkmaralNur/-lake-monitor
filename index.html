@@ -9,30 +9,30 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#0a1628; color:white; font-family:Arial; overflow-x:hidden; }
 header { background:#0d1f3c; padding:20px; text-align:center; border-bottom:2px solid #00d4ff; position:relative; overflow:hidden; }
-header::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(ellipse at center, #00d4ff11 0%, transparent 70%); animation: headerGlow 4s ease-in-out infinite; }
+header::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:radial-gradient(ellipse at center, #00d4ff11 0%, transparent 70%); animation:headerGlow 4s ease-in-out infinite; }
 @keyframes headerGlow { 0%,100%{opacity:0.5} 50%{opacity:1} }
 header h1 { color:#00d4ff; font-size:32px; position:relative; }
 header p { color:#88aacc; margin-top:5px; position:relative; }
 .header-bottom { display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:10px; position:relative; }
-.status { display:inline-block; width:10px; height:10px; border-radius:50%; background:#00ff88; margin-right:8px; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
 .uptime { background:#1a2a4a; border:1px solid #00d4ff33; border-radius:10px; padding:8px 20px; font-size:13px; color:#00d4ff; }
 .notif-btn { background:#1a2a4a; border:1px solid #ffdd0033; border-radius:10px; padding:8px 20px; font-size:13px; color:#ffdd00; cursor:pointer; transition:all 0.3s; }
 .notif-btn:hover { background:#ffdd0022; }
 .notif-btn.active { border-color:#00ff88; color:#00ff88; background:#00ff8811; }
-.alert-banner { display:none; background:#ff444422; border:1px solid #ff4444; border-radius:10px; padding:12px 20px; margin:10px 20px; text-align:center; color:#ff4444; font-weight:bold; animation: blink 1s infinite; }
+.status { display:inline-block; width:10px; height:10px; border-radius:50%; background:#00ff88; margin-right:8px; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+.alert-banner { display:none; background:#ff444422; border:1px solid #ff4444; border-radius:10px; padding:12px 20px; margin:10px 20px; text-align:center; color:#ff4444; font-weight:bold; animation:blink 1s infinite; }
 .alert-banner.show { display:block; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.7} }
 .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; padding:20px; max-width:1200px; margin:auto; }
-.card { background:#1a2a4a; border-radius:15px; padding:20px; text-align:center; border:1px solid #00d4ff33; transition: transform 0.3s, box-shadow 0.3s; animation: fadeIn 0.5s ease-out; position:relative; overflow:hidden; }
-.card::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg, transparent, #00d4ff11, transparent); animation: shimmer 3s infinite; }
+.card { background:#1a2a4a; border-radius:15px; padding:20px; text-align:center; border:1px solid #00d4ff33; transition:transform 0.3s,box-shadow 0.3s; animation:fadeIn 0.5s ease-out; position:relative; overflow:hidden; }
+.card::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,#00d4ff11,transparent); animation:shimmer 3s infinite; }
 @keyframes shimmer { 0%{left:-100%} 100%{left:100%} }
 @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-.card:hover { transform: translateY(-8px); box-shadow: 0 10px 30px #00d4ff33; }
+.card:hover { transform:translateY(-8px); box-shadow:0 10px 30px #00d4ff33; }
 .card .icon { font-size:32px; margin-bottom:5px; }
 .card .value-row { display:flex; align-items:center; justify-content:center; gap:8px; }
-.card .value { font-size:40px; font-weight:bold; color:#00d4ff; transition: all 0.5s; }
-.card .value.updated { animation: valueUpdate 0.5s ease; }
+.card .value { font-size:40px; font-weight:bold; color:#00d4ff; transition:all 0.5s; }
+.card .value.updated { animation:valueUpdate 0.5s ease; }
 @keyframes valueUpdate { 0%{transform:scale(1.2);color:#00ff88} 100%{transform:scale(1);color:#00d4ff} }
 .trend { font-size:24px; font-weight:bold; }
 .trend.up { color:#ff4444; }
@@ -47,13 +47,27 @@ header p { color:#88aacc; margin-top:5px; position:relative; }
 .wqi-section { margin:0 20px 20px; }
 .wqi-card { background:#1a2a4a; border-radius:15px; padding:30px; text-align:center; border:1px solid #00d4ff33; max-width:1200px; margin:auto; }
 .wqi-card h2 { color:#00d4ff; font-size:22px; margin-bottom:15px; }
-.wqi-score { font-size:80px; font-weight:bold; transition: all 1s; }
+.wqi-score { font-size:80px; font-weight:bold; transition:all 1s; }
 .wqi-label { font-size:22px; margin-top:5px; }
 .wqi-bar { background:#0a1628; border-radius:10px; height:20px; margin:15px auto; max-width:400px; overflow:hidden; }
-.wqi-fill { height:100%; border-radius:10px; transition: width 1.5s ease; }
-.who-table-section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
-.who-table-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
-.who-table-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
+.wqi-fill { height:100%; border-radius:10px; transition:width 1.5s ease; }
+.section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
+.section-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
+.section-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
+.tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+.tab { padding:10px 20px; border-radius:10px; cursor:pointer; font-size:14px; border:1px solid #00d4ff33; color:#88aacc; transition:all 0.3s; background:#0a1628; }
+.tab.active { background:#00d4ff22; border-color:#00d4ff; color:#00d4ff; font-weight:bold; }
+.tab:hover { border-color:#00d4ff; color:#00d4ff; }
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px; }
+.stat-card { background:#0a1628; border-radius:10px; padding:15px; border:1px solid #00d4ff22; text-align:center; }
+.stat-card .stat-label { font-size:12px; color:#88aacc; margin-bottom:8px; }
+.stat-row { display:flex; justify-content:space-around; }
+.stat-item { text-align:center; }
+.stat-item .stat-val { font-size:18px; font-weight:bold; }
+.stat-item .stat-name { font-size:10px; color:#88aacc; }
+.min-val { color:#00d4ff; }
+.max-val { color:#ff4444; }
+.avg-val { color:#00ff88; }
 .who-table { width:100%; border-collapse:collapse; font-size:13px; }
 .who-table th { color:#00d4ff; padding:10px; border-bottom:1px solid #00d4ff33; text-align:center; }
 .who-table td { padding:10px; border-bottom:1px solid #ffffff11; text-align:center; }
@@ -62,14 +76,8 @@ header p { color:#88aacc; margin-top:5px; position:relative; }
 .charts { max-width:1200px; margin:0 auto 20px; padding:0 20px; display:grid; grid-template-columns:1fr 1fr; gap:15px; }
 .chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
 .chart-card h3 { color:#00d4ff; margin-bottom:15px; font-size:15px; }
-.wqi-chart-section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
-.wqi-chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
-.wqi-chart-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
-.history-section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
-.history-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
-.history-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
 .btn-row { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
-.btn { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; transition: all 0.3s; border:none; }
+.btn { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; transition:all 0.3s; border:none; }
 .btn-csv { background:#00d4ff22; border:1px solid #00d4ff; color:#00d4ff; }
 .btn-csv:hover { background:#00d4ff; color:#0a1628; }
 .btn-clear { background:#ff444422; border:1px solid #ff4444; color:#ff4444; }
@@ -78,6 +86,7 @@ header p { color:#88aacc; margin-top:5px; position:relative; }
 .history-table th { color:#00d4ff; padding:10px; border-bottom:1px solid #00d4ff33; text-align:center; }
 .history-table td { padding:8px 10px; border-bottom:1px solid #ffffff11; text-align:center; color:#88aacc; }
 .history-table tr:hover td { background:#ffffff08; color:white; }
+.loading { text-align:center; color:#88aacc; padding:20px; font-size:13px; }
 .last-update { text-align:center; color:#88aacc; font-size:12px; padding:10px; }
 footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-top:1px solid #00d4ff22; }
 @media(max-width:600px) { .charts { grid-template-columns:1fr; } header h1 { font-size:22px; } .card .value { font-size:28px; } }
@@ -161,49 +170,41 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
   </div>
 </div>
 
-<div class="wqi-chart-section">
-  <div class="wqi-chart-card">
-    <h3>📈 История индекса качества воды (ИКВ)</h3>
-    <canvas id="wqiChart" height="80"></canvas>
+<!-- АНАЛИЗ ПО ПЕРИОДАМ -->
+<div class="section">
+  <div class="section-card">
+    <h3>📊 Анализ по периодам</h3>
+    <div class="tabs">
+      <div class="tab active" onclick="switchPeriod('day', this)">📅 Сегодня</div>
+      <div class="tab" onclick="switchPeriod('week', this)">📆 Неделя</div>
+      <div class="tab" onclick="switchPeriod('month', this)">🗓️ Месяц</div>
+    </div>
+    <div id="periodLoading" class="loading">Загрузка данных...</div>
+    <div id="periodContent" style="display:none">
+      <div class="stats-grid" id="statsGrid"></div>
+      <canvas id="periodChart" height="80"></canvas>
+    </div>
   </div>
 </div>
 
-<div class="who-table-section">
-  <div class="who-table-card">
-    <h3>📊 Сравнение с нормами ВОЗ</h3>
+<!-- НОРМЫ ВОЗ -->
+<div class="section">
+  <div class="section-card">
+    <h3>🏥 Сравнение с нормами ВОЗ</h3>
     <table class="who-table">
       <thead>
-        <tr>
-          <th>Показатель</th>
-          <th>Норма ВОЗ</th>
-          <th>Текущее значение</th>
-          <th>Статус</th>
-        </tr>
+        <tr><th>Показатель</th><th>Норма ВОЗ</th><th>Текущее</th><th>Статус</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Температура воды</td>
-          <td>до 25°C</td>
-          <td id="whoTableWater">--</td>
-          <td id="whoTableWaterStatus">--</td>
-        </tr>
-        <tr>
-          <td>TDS (минерализация)</td>
-          <td>до 500 ppm</td>
-          <td id="whoTableTds">--</td>
-          <td id="whoTableTdsStatus">--</td>
-        </tr>
-        <tr>
-          <td>Влажность воздуха</td>
-          <td>40-70%</td>
-          <td id="whoTableHum">--</td>
-          <td id="whoTableHumStatus">--</td>
-        </tr>
+        <tr><td>Температура воды</td><td>до 25°C</td><td id="whoTableWater">--</td><td id="whoTableWaterStatus">--</td></tr>
+        <tr><td>TDS (минерализация)</td><td>до 500 ppm</td><td id="whoTableTds">--</td><td id="whoTableTdsStatus">--</td></tr>
+        <tr><td>Влажность воздуха</td><td>40-70%</td><td id="whoTableHum">--</td><td id="whoTableHumStatus">--</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
+<!-- ГРАФИКИ -->
 <div class="charts">
   <div class="chart-card">
     <h3>🌡️ История температуры</h3>
@@ -218,13 +219,14 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
     <canvas id="tdsChart"></canvas>
   </div>
   <div class="chart-card">
-    <h3>☀️ История освещённости</h3>
-    <canvas id="lightChart"></canvas>
+    <h3>📈 История ИКВ</h3>
+    <canvas id="wqiChart"></canvas>
   </div>
 </div>
 
-<div class="history-section">
-  <div class="history-card">
+<!-- ЖУРНАЛ -->
+<div class="section">
+  <div class="section-card">
     <h3>📋 Журнал измерений</h3>
     <div class="btn-row">
       <button class="btn btn-csv" onclick="exportCSV()">📥 Скачать CSV (Excel)</button>
@@ -232,15 +234,7 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
     </div>
     <table class="history-table">
       <thead>
-        <tr>
-          <th>Время</th>
-          <th>Вода °C</th>
-          <th>Воздух °C</th>
-          <th>Влажность %</th>
-          <th>TDS ppm</th>
-          <th>Свет люкс</th>
-          <th>ИКВ</th>
-        </tr>
+        <tr><th>Время</th><th>Вода °C</th><th>Воздух °C</th><th>Влажность %</th><th>TDS ppm</th><th>Свет</th><th>ИКВ</th></tr>
       </thead>
       <tbody id="historyBody"></tbody>
     </table>
@@ -248,43 +242,41 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 </div>
 
 <div class="last-update">Последнее обновление: <span id="lastUpdate">--</span></div>
-
-<footer>
-  Система мониторинга озера • ESP32 • ThingSpeak • Сделано в Кыргызстане 🇰🇬
-</footer>
+<footer>Система мониторинга озера • ESP32 • ThingSpeak • Кыргызстан 🇰🇬</footer>
 
 <script>
 const CHANNEL_ID = '3368346';
 const READ_KEY = '839C3D2TM2EPJ0KK';
-const MAX_POINTS = 20;
+const WRITE_KEY = 'EJVBVY1FPMIBPQUX';
 const STORAGE_KEY = 'lake_monitor_history';
 const START_TIME = Date.now();
 let notificationsEnabled = false;
 let lastAlertTime = 0;
+let currentPeriod = 'day';
+let periodChart = null;
 
 // Uptime
 setInterval(() => {
-  const elapsed = Math.floor((Date.now() - START_TIME) / 1000);
-  const h = Math.floor(elapsed / 3600).toString().padStart(2,'0');
-  const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2,'0');
-  const s = (elapsed % 60).toString().padStart(2,'0');
+  const e = Math.floor((Date.now()-START_TIME)/1000);
+  const h = Math.floor(e/3600).toString().padStart(2,'0');
+  const m = Math.floor((e%3600)/60).toString().padStart(2,'0');
+  const s = (e%60).toString().padStart(2,'0');
   document.getElementById('uptime').textContent = `${h}:${m}:${s}`;
 }, 1000);
 
 // Уведомления
 async function toggleNotifications() {
   if (!('Notification' in window)) { alert('Браузер не поддерживает уведомления'); return; }
-  if (Notification.permission === 'denied') { alert('Уведомления заблокированы в браузере'); return; }
   if (Notification.permission !== 'granted') {
-    const perm = await Notification.requestPermission();
-    if (perm !== 'granted') return;
+    const p = await Notification.requestPermission();
+    if (p !== 'granted') return;
   }
   notificationsEnabled = !notificationsEnabled;
   const btn = document.getElementById('notifBtn');
   if (notificationsEnabled) {
     btn.textContent = '🔔 Уведомления включены';
     btn.classList.add('active');
-    new Notification('Мониторинг озера', { body: 'Уведомления включены! Вы будете получать оповещения о превышении норм.', icon: '🌊' });
+    new Notification('Мониторинг озера', { body: 'Уведомления включены!' });
   } else {
     btn.textContent = '🔔 Включить уведомления';
     btn.classList.remove('active');
@@ -300,130 +292,207 @@ function sendAlert(message) {
   banner.classList.add('show');
   setTimeout(() => banner.classList.remove('show'), 10000);
   if (notificationsEnabled && Notification.permission === 'granted') {
-    new Notification('⚠️ Предупреждение - Мониторинг озера', { body: message });
+    new Notification('⚠️ Предупреждение', { body: message });
   }
 }
 
 // Графики
-const chartOptions = {
-  plugins: { legend: { labels: { color: '#88aacc' } } },
-  scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } },
-  animation: { duration: 1000 }
+const chartOpts = {
+  plugins: { legend: { labels: { color:'#88aacc' } } },
+  scales: { x: { ticks: { color:'#88aacc', maxTicksLimit:6 } }, y: { ticks: { color:'#88aacc' } } },
+  animation: { duration:1000 }
 };
 
 const tempChart = new Chart(document.getElementById('tempChart'), {
-  type: 'line',
-  data: { labels: [], datasets: [
-    { label: 'Вода °C', data: [], borderColor: '#00d4ff', backgroundColor: '#00d4ff22', tension: 0.4, fill: true },
-    { label: 'Воздух °C', data: [], borderColor: '#ff8800', backgroundColor: '#ff880022', tension: 0.4, fill: true }
-  ]},
-  options: chartOptions
+  type:'line', data:{ labels:[], datasets:[
+    { label:'Вода °C', data:[], borderColor:'#00d4ff', backgroundColor:'#00d4ff22', tension:0.4, fill:true },
+    { label:'Воздух °C', data:[], borderColor:'#ff8800', backgroundColor:'#ff880022', tension:0.4, fill:true }
+  ]}, options:chartOpts
 });
 
 const humChart = new Chart(document.getElementById('humChart'), {
-  type: 'line',
-  data: { labels: [], datasets: [{ label: 'Влажность %', data: [], borderColor: '#00ff88', backgroundColor: '#00ff8822', tension: 0.4, fill: true }]},
-  options: chartOptions
+  type:'line', data:{ labels:[], datasets:[
+    { label:'Влажность %', data:[], borderColor:'#00ff88', backgroundColor:'#00ff8822', tension:0.4, fill:true }
+  ]}, options:chartOpts
 });
 
 const tdsChart = new Chart(document.getElementById('tdsChart'), {
-  type: 'line',
-  data: { labels: [], datasets: [{ label: 'TDS ppm', data: [], borderColor: '#ff4444', backgroundColor: '#ff444422', tension: 0.4, fill: true }]},
-  options: chartOptions
-});
-
-const lightChart = new Chart(document.getElementById('lightChart'), {
-  type: 'line',
-  data: { labels: [], datasets: [{ label: 'Освещённость люкс', data: [], borderColor: '#ffdd00', backgroundColor: '#ffdd0022', tension: 0.4, fill: true }]},
-  options: chartOptions
+  type:'line', data:{ labels:[], datasets:[
+    { label:'TDS ppm', data:[], borderColor:'#ff4444', backgroundColor:'#ff444422', tension:0.4, fill:true }
+  ]}, options:chartOpts
 });
 
 const wqiChart = new Chart(document.getElementById('wqiChart'), {
-  type: 'line',
-  data: { labels: [], datasets: [{
-    label: 'ИКВ',
-    data: [],
-    borderColor: '#00ff88',
-    backgroundColor: '#00ff8822',
-    tension: 0.4,
-    fill: true,
-    pointBackgroundColor: function(ctx) {
-      const v = ctx.dataset.data[ctx.dataIndex];
-      if (v >= 80) return '#00ff88';
-      if (v >= 60) return '#ffdd00';
-      if (v >= 40) return '#ff8800';
-      return '#ff4444';
-    },
-    pointRadius: 5
-  }]},
-  options: {
-    plugins: { legend: { labels: { color: '#88aacc' } },
-      annotation: { annotations: [{
-        type: 'line', yMin: 80, yMax: 80,
-        borderColor: '#00ff8844', borderWidth: 1, borderDash: [5,5]
-      }]}
-    },
-    scales: {
-      x: { ticks: { color: '#88aacc', maxTicksLimit: 8 } },
-      y: { min: 0, max: 100, ticks: { color: '#88aacc' } }
-    },
-    animation: { duration: 1000 }
-  }
+  type:'line', data:{ labels:[], datasets:[
+    { label:'ИКВ', data:[], borderColor:'#00ff88', backgroundColor:'#00ff8822', tension:0.4, fill:true, pointRadius:4,
+      pointBackgroundColor: ctx => { const v=ctx.dataset.data[ctx.dataIndex]; return v>=80?'#00ff88':v>=60?'#ffdd00':'#ff4444'; }
+    }
+  ]}, options:{ ...chartOpts, scales:{ x:{ ticks:{color:'#88aacc',maxTicksLimit:6} }, y:{ min:0, max:100, ticks:{color:'#88aacc'} } } }
 });
 
-// История
+// История localStorage
 function loadHistory() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
   catch { return []; }
 }
 
 function saveHistory(entry) {
-  let history = loadHistory();
-  history.unshift(entry);
-  if (history.length > 200) history = history.slice(0, 200);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  let h = loadHistory();
+  h.unshift(entry);
+  if (h.length > 500) h = h.slice(0,500);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
 }
 
 function clearHistory() {
-  if (confirm('Очистить всю историю измерений?')) {
+  if (confirm('Очистить всю историю?')) {
     localStorage.removeItem(STORAGE_KEY);
     renderHistory();
   }
 }
 
 function exportCSV() {
-  const history = loadHistory();
-  if (history.length === 0) { alert('История пуста!'); return; }
-  let csv = 'Время,Температура воды °C,Температура воздуха °C,Влажность %,TDS ppm,Освещённость люкс,ИКВ\n';
-  history.forEach(e => { csv += `${e.time},${e.waterTemp},${e.airTemp},${e.humidity},${e.tds},${e.light},${e.wqi}\n`; });
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
+  const h = loadHistory();
+  if (!h.length) { alert('История пуста!'); return; }
+  let csv = 'Время,Вода °C,Воздух °C,Влажность %,TDS ppm,Свет люкс,ИКВ\n';
+  h.forEach(e => { csv += `${e.time},${e.waterTemp},${e.airTemp},${e.humidity},${e.tds},${e.light},${e.wqi}\n`; });
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
-  a.href = url;
-  a.download = `lake_monitor_${new Date().toLocaleDateString('ru-RU').replace(/\./g,'-')}.csv`;
+  a.href = URL.createObjectURL(blob);
+  a.download = `lake_${new Date().toLocaleDateString('ru-RU').replace(/\./g,'-')}.csv`;
   a.click();
 }
 
 function renderHistory() {
-  const history = loadHistory();
+  const h = loadHistory();
   const tbody = document.getElementById('historyBody');
   tbody.innerHTML = '';
-  history.slice(0, 50).forEach(entry => {
+  h.slice(0,50).forEach(e => {
+    const c = e.wqi>=80?'#00ff88':e.wqi>=60?'#ffdd00':'#ff4444';
     const tr = document.createElement('tr');
-    const wqiColor = entry.wqi >= 80 ? '#00ff88' : entry.wqi >= 60 ? '#ffdd00' : '#ff4444';
-    tr.innerHTML = `<td>${entry.time}</td><td>${entry.waterTemp}</td><td>${entry.airTemp}</td><td>${entry.humidity}</td><td>${entry.tds}</td><td>${entry.light}</td><td style="color:${wqiColor}">${entry.wqi}</td>`;
+    tr.innerHTML = `<td>${e.time}</td><td>${e.waterTemp}</td><td>${e.airTemp}</td><td>${e.humidity}</td><td>${e.tds}</td><td>${e.light}</td><td style="color:${c}">${e.wqi}</td>`;
     tbody.appendChild(tr);
   });
 }
 
+// Анализ по периодам
+async function switchPeriod(period, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentPeriod = period;
+  await loadPeriodData(period);
+}
+
+async function loadPeriodData(period) {
+  document.getElementById('periodLoading').style.display = 'block';
+  document.getElementById('periodContent').style.display = 'none';
+
+  const results = period === 'day' ? 960 : period === 'week' ? 6720 : 8000;
+  const days = period === 'day' ? 1 : period === 'week' ? 7 : 30;
+  const start = new Date(Date.now() - days * 24 * 3600 * 1000).toISOString();
+
+  try {
+    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${results}&start=${start}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const feeds = data.feeds || [];
+
+    if (feeds.length === 0) {
+      document.getElementById('periodLoading').textContent = 'Нет данных за этот период';
+      return;
+    }
+
+    const wt = feeds.map(f => parseFloat(f.field1)).filter(v => !isNaN(v));
+    const tds = feeds.map(f => parseFloat(f.field2)).filter(v => !isNaN(v));
+    const at = feeds.map(f => parseFloat(f.field3)).filter(v => !isNaN(v));
+    const hum = feeds.map(f => parseFloat(f.field4)).filter(v => !isNaN(v));
+    const wqi = feeds.map(f => parseFloat(f.field6)).filter(v => !isNaN(v));
+
+    const stats = [
+      { label: '💧 Температура воды', vals: wt, unit: '°C' },
+      { label: '🌡️ Температура воздуха', vals: at, unit: '°C' },
+      { label: '💨 Влажность', vals: hum, unit: '%' },
+      { label: '🔬 TDS', vals: tds, unit: 'ppm' },
+      { label: '📈 ИКВ', vals: wqi, unit: '' },
+    ];
+
+    const grid = document.getElementById('statsGrid');
+    grid.innerHTML = '';
+    stats.forEach(s => {
+      if (!s.vals.length) return;
+      const min = Math.min(...s.vals).toFixed(1);
+      const max = Math.max(...s.vals).toFixed(1);
+      const avg = (s.vals.reduce((a,b)=>a+b,0)/s.vals.length).toFixed(1);
+      const div = document.createElement('div');
+      div.className = 'stat-card';
+      div.innerHTML = `
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-row">
+          <div class="stat-item"><div class="stat-val min-val">${min}${s.unit}</div><div class="stat-name">Мин</div></div>
+          <div class="stat-item"><div class="stat-val avg-val">${avg}${s.unit}</div><div class="stat-name">Среднее</div></div>
+          <div class="stat-item"><div class="stat-val max-val">${max}${s.unit}</div><div class="stat-name">Макс</div></div>
+        </div>`;
+      grid.appendChild(div);
+    });
+
+    // График периода
+    let labels, wtData, atData, wqiData;
+    if (period === 'day') {
+      labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}));
+      wtData = feeds.map(f => parseFloat(f.field1)||null);
+      atData = feeds.map(f => parseFloat(f.field3)||null);
+      wqiData = feeds.map(f => parseFloat(f.field6)||null);
+    } else {
+      // Группируем по дням
+      const byDay = {};
+      feeds.forEach(f => {
+        const day = new Date(f.created_at).toLocaleDateString('ru-RU');
+        if (!byDay[day]) byDay[day] = { wt:[], at:[], wqi:[] };
+        if (f.field1) byDay[day].wt.push(parseFloat(f.field1));
+        if (f.field3) byDay[day].at.push(parseFloat(f.field3));
+        if (f.field6) byDay[day].wqi.push(parseFloat(f.field6));
+      });
+      labels = Object.keys(byDay);
+      wtData = labels.map(d => byDay[d].wt.length ? (byDay[d].wt.reduce((a,b)=>a+b,0)/byDay[d].wt.length).toFixed(1) : null);
+      atData = labels.map(d => byDay[d].at.length ? (byDay[d].at.reduce((a,b)=>a+b,0)/byDay[d].at.length).toFixed(1) : null);
+      wqiData = labels.map(d => byDay[d].wqi.length ? (byDay[d].wqi.reduce((a,b)=>a+b,0)/byDay[d].wqi.length).toFixed(1) : null);
+    }
+
+    if (periodChart) periodChart.destroy();
+    periodChart = new Chart(document.getElementById('periodChart'), {
+      type: 'line',
+      data: { labels, datasets: [
+        { label:'Вода °C', data:wtData, borderColor:'#00d4ff', backgroundColor:'#00d4ff11', tension:0.4, fill:false },
+        { label:'Воздух °C', data:atData, borderColor:'#ff8800', backgroundColor:'#ff880011', tension:0.4, fill:false },
+        { label:'ИКВ', data:wqiData, borderColor:'#00ff88', backgroundColor:'#00ff8811', tension:0.4, fill:false, yAxisID:'y2' }
+      ]},
+      options: {
+        plugins: { legend: { labels: { color:'#88aacc' } } },
+        scales: {
+          x: { ticks: { color:'#88aacc', maxTicksLimit:10 } },
+          y: { ticks: { color:'#88aacc' }, position:'left' },
+          y2: { ticks: { color:'#00ff88' }, position:'right', min:0, max:100, grid: { drawOnChartArea:false } }
+        },
+        animation: { duration:1000 }
+      }
+    });
+
+    document.getElementById('periodLoading').style.display = 'none';
+    document.getElementById('periodContent').style.display = 'block';
+  } catch(e) {
+    document.getElementById('periodLoading').textContent = 'Ошибка загрузки данных';
+    console.error(e);
+  }
+}
+
+// Тренды
 function getTrend(history, field) {
-  if (history.length < 3) return { symbol: '→', cls: 'stable' };
-  const vals = history.slice(0, 5).map(h => parseFloat(h[field])).filter(v => !isNaN(v));
-  if (vals.length < 2) return { symbol: '→', cls: 'stable' };
-  const diff = vals[0] - vals[vals.length - 1];
-  if (diff > 0.3) return { symbol: '↑', cls: 'up' };
-  if (diff < -0.3) return { symbol: '↓', cls: 'down' };
-  return { symbol: '→', cls: 'stable' };
+  if (history.length < 3) return { symbol:'→', cls:'stable' };
+  const vals = history.slice(0,5).map(h => parseFloat(h[field])).filter(v => !isNaN(v));
+  if (vals.length < 2) return { symbol:'→', cls:'stable' };
+  const diff = vals[0] - vals[vals.length-1];
+  if (diff > 0.3) return { symbol:'↑', cls:'up' };
+  if (diff < -0.3) return { symbol:'↓', cls:'down' };
+  return { symbol:'→', cls:'stable' };
 }
 
 function setTrend(id, trend) {
@@ -434,19 +503,12 @@ function setTrend(id, trend) {
 
 function whoCheck(value, ok, statusId, tableValueId, tableStatusId) {
   const el = document.getElementById(statusId);
-  const tvEl = document.getElementById(tableValueId);
-  const tsEl = document.getElementById(tableStatusId);
-  if (ok) {
-    el.textContent = '✓ Норма';
-    el.className = 'who-status who-ok';
-    if (tvEl) tvEl.textContent = value;
-    if (tsEl) tsEl.innerHTML = '<span class="badge-ok">✓ Норма</span>';
-  } else {
-    el.textContent = '⚠ Превышение';
-    el.className = 'who-status who-warn';
-    if (tvEl) tvEl.textContent = value;
-    if (tsEl) tsEl.innerHTML = '<span class="badge-warn">⚠ Превышение</span>';
-  }
+  const tv = document.getElementById(tableValueId);
+  const ts = document.getElementById(tableStatusId);
+  el.textContent = ok ? '✓ Норма' : '⚠ Превышение';
+  el.className = 'who-status ' + (ok ? 'who-ok' : 'who-warn');
+  if (tv) tv.textContent = value;
+  if (ts) ts.innerHTML = ok ? '<span class="badge-ok">✓ Норма</span>' : '<span class="badge-warn">⚠ Превышение</span>';
 }
 
 function updateValue(id, newVal) {
@@ -461,13 +523,13 @@ function updateValue(id, newVal) {
 
 async function fetchData() {
   try {
-    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_POINTS}`;
+    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=20`;
     const res = await fetch(url);
     const data = await res.json();
     const feeds = data.feeds;
-    if (!feeds || feeds.length === 0) return;
+    if (!feeds || !feeds.length) return;
 
-    const last = feeds[feeds.length - 1];
+    const last = feeds[feeds.length-1];
     const wt = parseFloat(last.field1).toFixed(1);
     const tds = parseFloat(last.field2).toFixed(0);
     const at = parseFloat(last.field3).toFixed(1);
@@ -483,13 +545,11 @@ async function fetchData() {
     updateValue('wqiScore', wqi);
     document.getElementById('wqiFill').style.width = wqi + '%';
 
-    // Проверка алертов
-    if (parseFloat(wt) > 25) sendAlert(`Температура воды превышает норму ВОЗ: ${wt}°C (норма до 25°C)`);
-    if (parseFloat(tds) > 500) sendAlert(`TDS превышает норму ВОЗ: ${tds} ppm (норма до 500 ppm)`);
-    if (wqi < 60) sendAlert(`Индекс качества воды низкий: ${wqi} (удовлетворительно)`);
+    if (parseFloat(wt) > 25) sendAlert(`Температура воды: ${wt}°C (норма до 25°C)`);
+    if (parseFloat(tds) > 500) sendAlert(`TDS: ${tds} ppm (норма до 500 ppm)`);
+    if (wqi < 60) sendAlert(`ИКВ низкий: ${wqi}`);
 
-    let wqiColor = '#00ff88';
-    let wqiLabel = 'Отлично 🟢';
+    let wqiColor = '#00ff88', wqiLabel = 'Отлично 🟢';
     if (wqi < 80) { wqiColor = '#ffdd00'; wqiLabel = 'Хорошо 🟡'; }
     if (wqi < 60) { wqiColor = '#ff8800'; wqiLabel = 'Удовлетворительно 🟠'; }
     if (wqi < 40) { wqiColor = '#ff4444'; wqiLabel = 'Плохо 🔴'; }
@@ -498,12 +558,12 @@ async function fetchData() {
     document.getElementById('wqiLabel').textContent = wqiLabel;
     document.getElementById('wqiFill').style.background = wqiColor;
 
-    whoCheck(wt + '°C', parseFloat(wt) <= 25, 'whoWater', 'whoTableWater', 'whoTableWaterStatus');
-    whoCheck(tds + ' ppm', parseFloat(tds) <= 500, 'whoTds', 'whoTableTds', 'whoTableTdsStatus');
-    whoCheck(hum + '%', parseFloat(hum) >= 40 && parseFloat(hum) <= 70, 'whoHum', 'whoTableHum', 'whoTableHumStatus');
+    whoCheck(wt+'°C', parseFloat(wt)<=25, 'whoWater', 'whoTableWater', 'whoTableWaterStatus');
+    whoCheck(tds+' ppm', parseFloat(tds)<=500, 'whoTds', 'whoTableTds', 'whoTableTdsStatus');
+    whoCheck(hum+'%', parseFloat(hum)>=40&&parseFloat(hum)<=70, 'whoHum', 'whoTableHum', 'whoTableHumStatus');
 
     const now = new Date().toLocaleString('ru-RU');
-    saveHistory({ time: now, waterTemp: wt, airTemp: at, humidity: hum, tds, light, wqi });
+    saveHistory({ time:now, waterTemp:wt, airTemp:at, humidity:hum, tds, light, wqi });
     renderHistory();
 
     const history = loadHistory();
@@ -515,26 +575,20 @@ async function fetchData() {
 
     const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString('ru-RU'));
     tempChart.data.labels = labels;
-    tempChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field1) || 0);
-    tempChart.data.datasets[1].data = feeds.map(f => parseFloat(f.field3) || 0);
+    tempChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field1)||0);
+    tempChart.data.datasets[1].data = feeds.map(f => parseFloat(f.field3)||0);
     tempChart.update();
 
     humChart.data.labels = labels;
-    humChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field4) || 0);
+    humChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field4)||0);
     humChart.update();
 
     tdsChart.data.labels = labels;
-    tdsChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field2) || 0);
+    tdsChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field2)||0);
     tdsChart.update();
 
-    lightChart.data.labels = labels;
-    lightChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field5) || 0);
-    lightChart.update();
-
-    // ИКВ график из истории
-    const wqiHistory = history.slice(0, 20).reverse();
-    wqiChart.data.labels = wqiHistory.map(h => h.time.split(',')[1]?.trim() || h.time);
-    wqiChart.data.datasets[0].data = wqiHistory.map(h => h.wqi);
+    wqiChart.data.labels = labels;
+    wqiChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field6)||0);
     wqiChart.update();
 
     document.getElementById('lastUpdate').textContent = now;
@@ -545,6 +599,7 @@ async function fetchData() {
 
 renderHistory();
 fetchData();
+loadPeriodData('day');
 setInterval(fetchData, 15000);
 </script>
 </body>
