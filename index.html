@@ -22,24 +22,30 @@ header p { color:#88aacc; margin-top:5px; position:relative; }
 .alert-banner { display:none; background:#ff444422; border:1px solid #ff4444; border-radius:10px; padding:12px 20px; margin:10px 20px; text-align:center; color:#ff4444; font-weight:bold; }
 .alert-banner.show { display:block; animation:blink 1s infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.7} }
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; padding:20px; max-width:1200px; margin:auto; }
-.card { background:#1a2a4a; border-radius:15px; padding:20px; text-align:center; border:1px solid #00d4ff33; transition:transform 0.3s,box-shadow 0.3s; position:relative; overflow:hidden; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:15px; padding:20px; max-width:1200px; margin:auto; }
+.card { background:#1a2a4a; border-radius:15px; padding:15px; text-align:center; border:1px solid #00d4ff33; transition:transform 0.3s,box-shadow 0.3s; position:relative; overflow:hidden; }
 .card::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,#00d4ff11,transparent); animation:shimmer 3s infinite; }
 @keyframes shimmer { 0%{left:-100%} 100%{left:100%} }
 .card:hover { transform:translateY(-8px); box-shadow:0 10px 30px #00d4ff33; }
-.card .icon { font-size:32px; margin-bottom:5px; }
+.card .icon { font-size:28px; margin-bottom:5px; }
 .card .value-row { display:flex; align-items:center; justify-content:center; gap:8px; }
-.card .value { font-size:40px; font-weight:bold; color:#00d4ff; transition:all 0.5s; }
+.card .value { font-size:34px; font-weight:bold; color:#00d4ff; transition:all 0.5s; }
 .card .value.updated { animation:valueUpdate 0.5s ease; }
 @keyframes valueUpdate { 0%{transform:scale(1.2);color:#00ff88} 100%{transform:scale(1);color:#00d4ff} }
-.trend { font-size:24px; font-weight:bold; }
-.trend.up { color:#ff4444; } .trend.down { color:#00ff88; } .trend.stable { color:#ffdd00; }
-.card .unit { font-size:14px; color:#88aacc; }
-.card .label { font-size:13px; color:#88aacc; margin-top:5px; }
+.trend { font-size:20px; font-weight:bold; }
+.trend.up{color:#ff4444} .trend.down{color:#00ff88} .trend.stable{color:#ffdd00}
+.card .unit { font-size:13px; color:#88aacc; }
+.card .label { font-size:12px; color:#88aacc; margin-top:5px; }
 .who-status { font-size:11px; padding:3px 8px; border-radius:10px; margin-top:6px; display:inline-block; }
 .who-ok { background:#00ff8822; color:#00ff88; border:1px solid #00ff8844; }
 .who-warn { background:#ff444422; color:#ff4444; border:1px solid #ff444444; }
 .who-norm { font-size:10px; color:#88aacc; margin-top:3px; }
+.derived-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:15px; padding:0 20px 20px; max-width:1200px; margin:auto; }
+.derived-card { background:#1a2a4a; border-radius:15px; padding:15px; text-align:center; border:1px solid #9b59b633; }
+.derived-card .icon { font-size:24px; margin-bottom:5px; }
+.derived-card .value { font-size:28px; font-weight:bold; color:#9b59b6; }
+.derived-card .unit { font-size:12px; color:#88aacc; }
+.derived-card .label { font-size:11px; color:#88aacc; margin-top:5px; }
 .wqi-section { margin:0 20px 20px; }
 .wqi-card { background:#1a2a4a; border-radius:15px; padding:30px; text-align:center; border:1px solid #00d4ff33; max-width:1200px; margin:auto; }
 .wqi-card h2 { color:#00d4ff; font-size:22px; margin-bottom:15px; }
@@ -50,46 +56,30 @@ header p { color:#88aacc; margin-top:5px; position:relative; }
 .section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
 .section-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
 .section-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
-
-/* Индикатор риска для рыб */
 .fish-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; }
 .fish-card { border-radius:12px; padding:20px; text-align:center; border:2px solid; }
-.fish-safe { background:#00ff8811; border-color:#00ff88; }
-.fish-warn { background:#ffdd0011; border-color:#ffdd00; }
-.fish-danger { background:#ff444411; border-color:#ff4444; }
+.fish-safe{background:#00ff8811;border-color:#00ff88} .fish-warn{background:#ffdd0011;border-color:#ffdd00} .fish-danger{background:#ff444411;border-color:#ff4444}
 .fish-icon { font-size:40px; margin-bottom:10px; }
 .fish-title { font-size:16px; font-weight:bold; margin-bottom:5px; }
 .fish-desc { font-size:12px; color:#88aacc; }
 .fish-status { font-size:18px; font-weight:bold; margin-top:10px; }
-
-/* Норма питьё vs купание */
 .water-use-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
 .water-use-card { border-radius:12px; padding:20px; background:#0a1628; border:1px solid #00d4ff22; }
 .water-use-card h4 { color:#00d4ff; margin-bottom:12px; font-size:15px; }
 .use-param { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #ffffff11; font-size:13px; }
-.use-param:last-child { border-bottom:none; }
-.use-val { color:#88aacc; }
-.use-ok { color:#00ff88; }
-.use-warn { color:#ff4444; }
+.use-param:last-child{border-bottom:none}
+.use-ok{color:#00ff88} .use-warn{color:#ff4444}
 .use-result { text-align:center; padding:15px; border-radius:10px; margin-top:15px; font-size:16px; font-weight:bold; }
-.result-ok { background:#00ff8822; color:#00ff88; }
-.result-warn { background:#ff444422; color:#ff4444; }
-
-/* Аномалии */
+.result-ok{background:#00ff8822;color:#00ff88} .result-warn{background:#ff444422;color:#ff4444}
 .anomaly-list { max-height:200px; overflow-y:auto; }
 .anomaly-item { display:flex; gap:10px; align-items:center; padding:10px; border-bottom:1px solid #ffffff11; font-size:13px; }
 .anomaly-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
 .anomaly-time { color:#88aacc; min-width:80px; }
-.anomaly-text { color:white; }
-
-/* Рейтинг дней */
 .rating-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-.rating-list { }
 .rating-item { display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #ffffff11; font-size:13px; }
 .rating-rank { font-size:20px; margin-right:10px; }
 .rating-date { color:#88aacc; }
 .rating-score { font-weight:bold; padding:4px 10px; border-radius:8px; }
-
 .tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
 .tab { padding:10px 20px; border-radius:10px; cursor:pointer; font-size:14px; border:1px solid #00d4ff33; color:#88aacc; transition:all 0.3s; background:#0a1628; }
 .tab.active { background:#00d4ff22; border-color:#00d4ff; color:#00d4ff; font-weight:bold; }
@@ -100,21 +90,21 @@ header p { color:#88aacc; margin-top:5px; position:relative; }
 .stat-item { text-align:center; }
 .stat-item .stat-val { font-size:18px; font-weight:bold; }
 .stat-item .stat-name { font-size:10px; color:#88aacc; }
-.min-val { color:#00d4ff; } .max-val { color:#ff4444; } .avg-val { color:#00ff88; }
+.min-val{color:#00d4ff} .max-val{color:#ff4444} .avg-val{color:#00ff88}
 .who-table { width:100%; border-collapse:collapse; font-size:13px; }
 .who-table th { color:#00d4ff; padding:10px; border-bottom:1px solid #00d4ff33; text-align:center; }
 .who-table td { padding:10px; border-bottom:1px solid #ffffff11; text-align:center; }
-.badge-ok { background:#00ff8822; color:#00ff88; padding:4px 10px; border-radius:10px; border:1px solid #00ff8844; }
-.badge-warn { background:#ff444422; color:#ff4444; padding:4px 10px; border-radius:10px; border:1px solid #ff444444; }
+.badge-ok{background:#00ff8822;color:#00ff88;padding:4px 10px;border-radius:10px;border:1px solid #00ff8844}
+.badge-warn{background:#ff444422;color:#ff4444;padding:4px 10px;border-radius:10px;border:1px solid #ff444444}
 .charts { max-width:1200px; margin:0 auto 20px; padding:0 20px; display:grid; grid-template-columns:1fr 1fr; gap:15px; }
 .chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
 .chart-card h3 { color:#00d4ff; margin-bottom:15px; font-size:15px; }
 .btn-row { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
 .btn { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; transition:all 0.3s; border:none; }
-.btn-csv { background:#00d4ff22; border:1px solid #00d4ff; color:#00d4ff; }
-.btn-csv:hover { background:#00d4ff; color:#0a1628; }
-.btn-clear { background:#ff444422; border:1px solid #ff4444; color:#ff4444; }
-.btn-clear:hover { background:#ff4444; color:white; }
+.btn-csv{background:#00d4ff22;border:1px solid #00d4ff;color:#00d4ff}
+.btn-csv:hover{background:#00d4ff;color:#0a1628}
+.btn-clear{background:#ff444422;border:1px solid #ff4444;color:#ff4444}
+.btn-clear:hover{background:#ff4444;color:white}
 .history-table { width:100%; border-collapse:collapse; font-size:12px; }
 .history-table th { color:#00d4ff; padding:10px; border-bottom:1px solid #00d4ff33; text-align:center; }
 .history-table td { padding:8px 10px; border-bottom:1px solid #ffffff11; text-align:center; color:#88aacc; }
@@ -122,7 +112,7 @@ header p { color:#88aacc; margin-top:5px; position:relative; }
 .loading { text-align:center; color:#88aacc; padding:20px; font-size:13px; }
 .last-update { text-align:center; color:#88aacc; font-size:12px; padding:10px; }
 footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-top:1px solid #00d4ff22; }
-@media(max-width:600px) { .charts{grid-template-columns:1fr} .water-use-grid{grid-template-columns:1fr} .rating-grid{grid-template-columns:1fr} header h1{font-size:22px} .card .value{font-size:28px} }
+@media(max-width:600px){.charts{grid-template-columns:1fr}.water-use-grid{grid-template-columns:1fr}.rating-grid{grid-template-columns:1fr}header h1{font-size:22px}.card .value{font-size:26px}}
 </style>
 </head>
 <body>
@@ -138,6 +128,7 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 
 <div class="alert-banner" id="alertBanner"></div>
 
+<!-- ОСНОВНЫЕ ДАТЧИКИ -->
 <div class="grid">
   <div class="card">
     <div class="icon">💧</div>
@@ -161,7 +152,7 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
   <div class="card">
     <div class="icon">🔬</div>
     <div class="value-row"><div class="value" id="tds">--</div><div class="trend" id="trendTds">→</div></div>
-    <div class="unit">ppm</div><div class="label">Качество воды TDS</div>
+    <div class="unit">ppm</div><div class="label">TDS качество воды</div>
     <div class="who-norm">Норма ВОЗ: до 500 ppm</div>
     <div class="who-status" id="whoTds">--</div>
   </div>
@@ -172,6 +163,41 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
   </div>
 </div>
 
+<!-- ПРОИЗВОДНЫЕ ПОКАЗАТЕЛИ -->
+<div class="derived-grid">
+  <div class="derived-card">
+    <div class="icon">🌫️</div>
+    <div class="value" id="dewPoint">--</div>
+    <div class="unit">°C</div>
+    <div class="label">Точка росы</div>
+  </div>
+  <div class="derived-card">
+    <div class="icon">🌊</div>
+    <div class="value" id="thermalFlux">--</div>
+    <div class="unit">°C</div>
+    <div class="label">Тепловой поток</div>
+  </div>
+  <div class="derived-card">
+    <div class="icon">💦</div>
+    <div class="value" id="evaporation">--</div>
+    <div class="unit">мм/день</div>
+    <div class="label">Испарение</div>
+  </div>
+  <div class="derived-card">
+    <div class="icon">😊</div>
+    <div class="value" id="comfortIndex">--</div>
+    <div class="unit">/ 100</div>
+    <div class="label">Комфорт у воды</div>
+  </div>
+  <div class="derived-card">
+    <div class="icon">🌿</div>
+    <div class="value" id="eutroIndex">--</div>
+    <div class="unit">/ 100</div>
+    <div class="label">Риск эвтрофикации</div>
+  </div>
+</div>
+
+<!-- WQI -->
 <div class="wqi-section">
   <div class="wqi-card">
     <h2>Индекс качества воды (ИКВ)</h2>
@@ -181,15 +207,15 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
   </div>
 </div>
 
-<!-- ИНДИКАТОР РИСКА ДЛЯ РЫБ -->
+<!-- РИСК ДЛЯ РЫБ -->
 <div class="section">
   <div class="section-card">
     <h3>🐟 Индикатор риска для водных обитателей</h3>
-    <div class="fish-grid" id="fishGrid">
+    <div class="fish-grid">
       <div class="fish-card fish-safe">
         <div class="fish-icon">🐟</div>
         <div class="fish-title">Рыба</div>
-        <div class="fish-desc">Оптимальная температура 15-25°C, TDS до 500 ppm</div>
+        <div class="fish-desc">Оптимум 15-25°C, TDS до 500 ppm</div>
         <div class="fish-status" id="fishStatus">Загрузка...</div>
       </div>
       <div class="fish-card fish-safe">
@@ -200,31 +226,31 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
       </div>
       <div class="fish-card fish-safe">
         <div class="fish-icon">🦠</div>
-        <div class="fish-title">Риск цветения воды</div>
-        <div class="fish-desc">Высокая температура + высокий TDS = риск водорослей</div>
+        <div class="fish-title">Риск цветения</div>
+        <div class="fish-desc">Температура + TDS + свет</div>
         <div class="fish-status" id="algaeStatus">Загрузка...</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- НОРМА ПИТЬЁ vs КУПАНИЕ -->
+<!-- ПИТЬЁ vs КУПАНИЕ -->
 <div class="section">
   <div class="section-card">
     <h3>🚰 Пригодность воды: питьё vs купание</h3>
     <div class="water-use-grid">
       <div class="water-use-card">
-        <h4>🚰 Для питья (стандарт ВОЗ)</h4>
-        <div class="use-param"><span>Температура</span><span class="use-val" id="drinkTemp">--</span></div>
-        <div class="use-param"><span>TDS</span><span class="use-val" id="drinkTds">--</span></div>
-        <div class="use-param"><span>Мутность</span><span class="use-ok">н/д</span></div>
+        <h4>🚰 Для питья (ВОЗ)</h4>
+        <div class="use-param"><span>Температура</span><span id="drinkTemp" class="use-ok">--</span></div>
+        <div class="use-param"><span>TDS</span><span id="drinkTds" class="use-ok">--</span></div>
+        <div class="use-param"><span>Точка росы</span><span id="drinkDew" class="use-ok">--</span></div>
         <div class="use-result" id="drinkResult">Загрузка...</div>
       </div>
       <div class="water-use-card">
-        <h4>🏊 Для купания (стандарт ВОЗ)</h4>
-        <div class="use-param"><span>Температура</span><span class="use-val" id="swimTemp">--</span></div>
-        <div class="use-param"><span>TDS</span><span class="use-val" id="swimTds">--</span></div>
-        <div class="use-param"><span>ИКВ</span><span class="use-val" id="swimWqi">--</span></div>
+        <h4>🏊 Для купания (ВОЗ)</h4>
+        <div class="use-param"><span>Температура</span><span id="swimTemp" class="use-ok">--</span></div>
+        <div class="use-param"><span>TDS</span><span id="swimTds" class="use-ok">--</span></div>
+        <div class="use-param"><span>ИКВ</span><span id="swimWqi" class="use-ok">--</span></div>
         <div class="use-result" id="swimResult">Загрузка...</div>
       </div>
     </div>
@@ -235,9 +261,7 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 <div class="section">
   <div class="section-card">
     <h3>⚡ Обнаруженные аномалии</h3>
-    <div class="anomaly-list" id="anomalyList">
-      <div class="loading">Анализ данных...</div>
-    </div>
+    <div class="anomaly-list" id="anomalyList"><div class="loading">Анализ...</div></div>
   </div>
 </div>
 
@@ -246,14 +270,8 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
   <div class="section-card">
     <h3>🏆 Рейтинг дней по качеству воды</h3>
     <div class="rating-grid">
-      <div>
-        <h4 style="color:#00ff88;margin-bottom:10px;font-size:14px;">🥇 Лучшие дни</h4>
-        <div id="bestDays"><div class="loading">Загрузка...</div></div>
-      </div>
-      <div>
-        <h4 style="color:#ff4444;margin-bottom:10px;font-size:14px;">⚠️ Худшие дни</h4>
-        <div id="worstDays"><div class="loading">Загрузка...</div></div>
-      </div>
+      <div><h4 style="color:#00ff88;margin-bottom:10px;font-size:14px">🥇 Лучшие дни</h4><div id="bestDays"><div class="loading">Загрузка...</div></div></div>
+      <div><h4 style="color:#ff4444;margin-bottom:10px;font-size:14px">⚠️ Худшие дни</h4><div id="worstDays"><div class="loading">Загрузка...</div></div></div>
     </div>
   </div>
 </div>
@@ -263,7 +281,6 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
   <div class="section-card">
     <h3>🔗 Корреляция: Температура воды vs TDS</h3>
     <canvas id="correlationChart" height="100"></canvas>
-    <p style="color:#88aacc;font-size:12px;margin-top:10px;text-align:center" id="correlationDesc">Каждая точка — одно измерение. Показывает зависимость между температурой и качеством воды.</p>
   </div>
 </div>
 
@@ -273,15 +290,6 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
     <h3>🔮 Прогноз температуры воды на 24 часа</h3>
     <canvas id="forecastChart" height="80"></canvas>
     <p style="color:#88aacc;font-size:12px;margin-top:10px;text-align:center">Пунктирная линия — прогноз на основе текущего тренда</p>
-  </div>
-</div>
-
-<!-- СЕЗОННОЕ СРАВНЕНИЕ -->
-<div class="section">
-  <div class="section-card">
-    <h3>📅 Сезонное сравнение (текущий vs предыдущий месяц)</h3>
-    <canvas id="seasonChart" height="80"></canvas>
-    <p style="color:#88aacc;font-size:12px;margin-top:10px;text-align:center" id="seasonDesc">Загрузка данных за два месяца...</p>
   </div>
 </div>
 
@@ -310,8 +318,9 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
       <thead><tr><th>Показатель</th><th>Норма ВОЗ</th><th>Текущее</th><th>Статус</th></tr></thead>
       <tbody>
         <tr><td>Температура воды</td><td>до 25°C</td><td id="whoTableWater">--</td><td id="whoTableWaterStatus">--</td></tr>
-        <tr><td>TDS (минерализация)</td><td>до 500 ppm</td><td id="whoTableTds">--</td><td id="whoTableTdsStatus">--</td></tr>
+        <tr><td>TDS</td><td>до 500 ppm</td><td id="whoTableTds">--</td><td id="whoTableTdsStatus">--</td></tr>
         <tr><td>Влажность воздуха</td><td>40-70%</td><td id="whoTableHum">--</td><td id="whoTableHumStatus">--</td></tr>
+        <tr><td>Точка росы</td><td>ниже темп. воздуха</td><td id="whoTableDew">--</td><td id="whoTableDewStatus">--</td></tr>
       </tbody>
     </table>
   </div>
@@ -323,6 +332,8 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
   <div class="chart-card"><h3>💨 История влажности</h3><canvas id="humChart"></canvas></div>
   <div class="chart-card"><h3>🔬 История TDS</h3><canvas id="tdsChart"></canvas></div>
   <div class="chart-card"><h3>📈 История ИКВ</h3><canvas id="wqiChart"></canvas></div>
+  <div class="chart-card"><h3>🌫️ История точки росы</h3><canvas id="dewChart"></canvas></div>
+  <div class="chart-card"><h3>🌊 История теплового потока</h3><canvas id="fluxChart"></canvas></div>
 </div>
 
 <!-- ЖУРНАЛ -->
@@ -334,7 +345,7 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
       <button class="btn btn-clear" onclick="clearHistory()">🗑️ Очистить</button>
     </div>
     <table class="history-table">
-      <thead><tr><th>Время</th><th>Вода °C</th><th>Воздух °C</th><th>Влажность %</th><th>TDS ppm</th><th>Свет</th><th>ИКВ</th></tr></thead>
+      <thead><tr><th>Время</th><th>Вода°C</th><th>Воздух°C</th><th>Влажность%</th><th>TDS</th><th>Роса°C</th><th>Поток°C</th><th>ИКВ</th></tr></thead>
       <tbody id="historyBody"></tbody>
     </table>
   </div>
@@ -346,15 +357,13 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 <script>
 const CHANNEL_ID = '3368346';
 const READ_KEY = '839C3D2TM2EPJ0KK';
-const STORAGE_KEY = 'lake_monitor_history';
+const STORAGE_KEY = 'lake_monitor_v2';
 const START_TIME = Date.now();
 let notificationsEnabled = false;
 let lastAlertTime = 0;
-let currentPeriod = 'day';
 let periodChart = null;
 let correlationChart = null;
 let forecastChart = null;
-let seasonChart = null;
 
 // Uptime
 setInterval(() => {
@@ -384,10 +393,36 @@ function sendAlert(msg) {
     new Notification('⚠️ Предупреждение', {body: msg});
 }
 
+// Производные расчёты в браузере
+function calcDewPoint(t, h) {
+  const a=17.27, b=237.7;
+  const alpha = ((a*t)/(b+t)) + Math.log(h/100);
+  return (b*alpha)/(a-alpha);
+}
+
+function calcEvaporation(wt, at, hum, lux) {
+  const sat = 0.6108 * Math.exp(17.27*wt/(wt+237.3));
+  const act = sat * hum/100;
+  const vpd = sat - act;
+  const rad = lux * 0.0079;
+  return Math.max(0, (0.408*rad + vpd*0.066)/(1+0.34*2));
+}
+
+function calcComfort(at, hum, wt) {
+  const ts = 100 - Math.abs(at-22)*5;
+  const hs = 100 - Math.abs(hum-55)*2;
+  const ws = 100 - Math.abs(wt-22)*5;
+  return Math.max(0, Math.min(100, (ts+hs+ws)/3));
+}
+
+function calcEutro(wt, tds, lux) {
+  return Math.min(100, Math.max(0,wt-15)*5 + Math.min(40,tds/10) + Math.min(20,lux/1000));
+}
+
 const chartOpts = {
-  plugins: {legend: {labels: {color:'#88aacc'}}},
-  scales: {x: {ticks: {color:'#88aacc', maxTicksLimit:6}}, y: {ticks: {color:'#88aacc'}}},
-  animation: {duration: 1000}
+  plugins: {legend:{labels:{color:'#88aacc'}}},
+  scales: {x:{ticks:{color:'#88aacc',maxTicksLimit:6}}, y:{ticks:{color:'#88aacc'}}},
+  animation: {duration:1000}
 };
 
 const tempChart = new Chart(document.getElementById('tempChart'), {
@@ -406,411 +441,249 @@ const wqiChart = new Chart(document.getElementById('wqiChart'), {
   type:'line', data:{labels:[], datasets:[{label:'ИКВ', data:[], borderColor:'#00ff88', backgroundColor:'#00ff8822', tension:0.4, fill:true}]},
   options:{...chartOpts, scales:{x:{ticks:{color:'#88aacc',maxTicksLimit:6}}, y:{min:0,max:100,ticks:{color:'#88aacc'}}}}
 });
+const dewChart = new Chart(document.getElementById('dewChart'), {
+  type:'line', data:{labels:[], datasets:[{label:'Точка росы °C', data:[], borderColor:'#9b59b6', backgroundColor:'#9b59b622', tension:0.4, fill:true}]}, options:chartOpts
+});
+const fluxChart = new Chart(document.getElementById('fluxChart'), {
+  type:'bar', data:{labels:[], datasets:[{label:'Тепловой поток °C', data:[], backgroundColor: ctx => ctx.raw>=0?'#ff444488':'#00d4ff88', borderColor: ctx => ctx.raw>=0?'#ff4444':'#00d4ff', borderWidth:1}]}, options:chartOpts
+});
 
-function loadHistory() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; } }
-function saveHistory(e) { let h=loadHistory(); h.unshift(e); if(h.length>500) h=h.slice(0,500); localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); }
+function loadHistory() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]; } catch { return []; } }
+function saveHistory(e) { let h=loadHistory(); h.unshift(e); if(h.length>500)h=h.slice(0,500); localStorage.setItem(STORAGE_KEY,JSON.stringify(h)); }
 function clearHistory() { if(confirm('Очистить?')) { localStorage.removeItem(STORAGE_KEY); renderHistory(); } }
 
 function exportCSV() {
-  const h = loadHistory();
-  if (!h.length) { alert('История пуста!'); return; }
-  let csv = 'Время,Вода °C,Воздух °C,Влажность %,TDS ppm,Свет,ИКВ\n';
-  h.forEach(e => { csv += `${e.time},${e.waterTemp},${e.airTemp},${e.humidity},${e.tds},${e.light},${e.wqi}\n`; });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'}));
-  a.download = `lake_${new Date().toLocaleDateString('ru-RU').replace(/\./g,'-')}.csv`;
+  const h=loadHistory();
+  if(!h.length){alert('История пуста!');return;}
+  let csv='Время,Вода°C,Воздух°C,Влажность%,TDS ppm,Роса°C,Поток°C,ИКВ\n';
+  h.forEach(e=>{csv+=`${e.time},${e.wt},${e.at},${e.hum},${e.tds},${e.dew},${e.flux},${e.wqi}\n`;});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`lake_${new Date().toLocaleDateString('ru-RU').replace(/\./g,'-')}.csv`;
   a.click();
 }
 
 function renderHistory() {
-  const h = loadHistory();
-  const tbody = document.getElementById('historyBody');
-  tbody.innerHTML = '';
-  h.slice(0,50).forEach(e => {
-    const c = e.wqi>=80?'#00ff88':e.wqi>=60?'#ffdd00':'#ff4444';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${e.time}</td><td>${e.waterTemp}</td><td>${e.airTemp}</td><td>${e.humidity}</td><td>${e.tds}</td><td>${e.light}</td><td style="color:${c}">${e.wqi}</td>`;
+  const h=loadHistory();
+  const tbody=document.getElementById('historyBody');
+  tbody.innerHTML='';
+  h.slice(0,50).forEach(e=>{
+    const c=e.wqi>=80?'#00ff88':e.wqi>=60?'#ffdd00':'#ff4444';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${e.time}</td><td>${e.wt}</td><td>${e.at}</td><td>${e.hum}</td><td>${e.tds}</td><td>${e.dew}</td><td>${e.flux}</td><td style="color:${c}">${e.wqi}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-// Индикатор риска для рыб
-function updateFishIndicator(wt, tds, wqi) {
-  const fishEl = document.getElementById('fishStatus');
-  const birdEl = document.getElementById('birdStatus');
-  const algaeEl = document.getElementById('algaeStatus');
-  const fishCard = fishEl.closest('.fish-card');
-  const birdCard = birdEl.closest('.fish-card');
-  const algaeCard = algaeEl.closest('.fish-card');
-
-  // Рыба
-  if (wt <= 25 && tds <= 500) {
-    fishEl.textContent = '✅ Безопасно';
-    fishCard.className = 'fish-card fish-safe';
-  } else if (wt <= 30 && tds <= 800) {
-    fishEl.textContent = '⚠️ Умеренный риск';
-    fishCard.className = 'fish-card fish-warn';
-  } else {
-    fishEl.textContent = '🚫 Высокий риск';
-    fishCard.className = 'fish-card fish-danger';
-  }
-
-  // Птицы
-  if (wt <= 30) {
-    birdEl.textContent = '✅ Безопасно';
-    birdCard.className = 'fish-card fish-safe';
-  } else {
-    birdEl.textContent = '⚠️ Умеренный риск';
-    birdCard.className = 'fish-card fish-warn';
-  }
-
-  // Цветение водорослей
-  if (wt > 25 && tds > 300) {
-    algaeEl.textContent = '🚫 Высокий риск';
-    algaeCard.className = 'fish-card fish-danger';
-  } else if (wt > 20 && tds > 200) {
-    algaeEl.textContent = '⚠️ Умеренный риск';
-    algaeCard.className = 'fish-card fish-warn';
-  } else {
-    algaeEl.textContent = '✅ Риск низкий';
-    algaeCard.className = 'fish-card fish-safe';
-  }
+function updateFish(wt, tds, wqi) {
+  const fishEl=document.getElementById('fishStatus');
+  const birdEl=document.getElementById('birdStatus');
+  const algaeEl=document.getElementById('algaeStatus');
+  const setCard=(el,status,cls)=>{el.textContent=status;el.closest('.fish-card').className='fish-card '+cls;};
+  setCard(fishEl, wt<=25&&tds<=500?'✅ Безопасно':wt<=30&&tds<=800?'⚠️ Умеренный риск':'🚫 Высокий риск', wt<=25&&tds<=500?'fish-safe':wt<=30&&tds<=800?'fish-warn':'fish-danger');
+  setCard(birdEl, wt<=30?'✅ Безопасно':'⚠️ Умеренный риск', wt<=30?'fish-safe':'fish-warn');
+  setCard(algaeEl, wt>25&&tds>300?'🚫 Высокий риск':wt>20&&tds>200?'⚠️ Умеренный риск':'✅ Риск низкий', wt>25&&tds>300?'fish-danger':wt>20&&tds>200?'fish-warn':'fish-safe');
 }
 
-// Питьё vs Купание
 function updateWaterUse(wt, tds, wqi) {
-  const drinkOk = wt <= 25 && tds <= 500;
-  const swimOk = wt <= 30 && wqi >= 60;
-
-  document.getElementById('drinkTemp').textContent = wt + '°C';
-  document.getElementById('drinkTemp').className = wt <= 25 ? 'use-ok' : 'use-warn';
-  document.getElementById('drinkTds').textContent = tds + ' ppm';
-  document.getElementById('drinkTds').className = tds <= 500 ? 'use-ok' : 'use-warn';
-
-  document.getElementById('swimTemp').textContent = wt + '°C';
-  document.getElementById('swimTemp').className = wt <= 30 ? 'use-ok' : 'use-warn';
-  document.getElementById('swimTds').textContent = tds + ' ppm';
-  document.getElementById('swimTds').className = tds <= 1000 ? 'use-ok' : 'use-warn';
-  document.getElementById('swimWqi').textContent = wqi;
-  document.getElementById('swimWqi').className = wqi >= 60 ? 'use-ok' : 'use-warn';
-
-  const drinkRes = document.getElementById('drinkResult');
-  drinkRes.textContent = drinkOk ? '✅ Пригодна для питья' : '❌ Не пригодна для питья';
-  drinkRes.className = 'use-result ' + (drinkOk ? 'result-ok' : 'result-warn');
-
-  const swimRes = document.getElementById('swimResult');
-  swimRes.textContent = swimOk ? '✅ Пригодна для купания' : '❌ Не рекомендуется купание';
-  swimRes.className = 'use-result ' + (swimOk ? 'result-ok' : 'result-warn');
+  const setEl=(id,val,ok)=>{const e=document.getElementById(id);e.textContent=val;e.className=ok?'use-ok':'use-warn';};
+  setEl('drinkTemp',wt+'°C',wt<=25);
+  setEl('drinkTds',tds+' ppm',tds<=500);
+  setEl('drinkDew','норм',true);
+  setEl('swimTemp',wt+'°C',wt<=30);
+  setEl('swimTds',tds+' ppm',tds<=1000);
+  setEl('swimWqi',wqi,wqi>=60);
+  const drinkOk=wt<=25&&tds<=500;
+  const swimOk=wt<=30&&wqi>=60;
+  const dr=document.getElementById('drinkResult');
+  dr.textContent=drinkOk?'✅ Пригодна для питья':'❌ Не пригодна для питья';
+  dr.className='use-result '+(drinkOk?'result-ok':'result-warn');
+  const sr=document.getElementById('swimResult');
+  sr.textContent=swimOk?'✅ Пригодна для купания':'❌ Не рекомендуется купание';
+  sr.className='use-result '+(swimOk?'result-ok':'result-warn');
 }
 
-// Аномалии
 function detectAnomalies(history) {
-  const anomalies = [];
-  for (let i = 1; i < Math.min(history.length, 50); i++) {
-    const curr = history[i-1];
-    const prev = history[i];
-    const wtDiff = Math.abs(parseFloat(curr.waterTemp) - parseFloat(prev.waterTemp));
-    const tdsDiff = Math.abs(parseFloat(curr.tds) - parseFloat(prev.tds));
-    const humDiff = Math.abs(parseFloat(curr.humidity) - parseFloat(prev.humidity));
-
-    if (wtDiff > 2) anomalies.push({ time: curr.time, text: `Резкое изменение температуры воды: ${wtDiff.toFixed(1)}°C`, color: '#ff4444' });
-    if (tdsDiff > 100) anomalies.push({ time: curr.time, text: `Резкое изменение TDS: ${tdsDiff.toFixed(0)} ppm`, color: '#ff8800' });
-    if (humDiff > 15) anomalies.push({ time: curr.time, text: `Резкое изменение влажности: ${humDiff.toFixed(1)}%`, color: '#ffdd00' });
+  const anomalies=[];
+  for(let i=1;i<Math.min(history.length,50);i++){
+    const c=history[i-1], p=history[i];
+    if(Math.abs(parseFloat(c.wt)-parseFloat(p.wt))>2) anomalies.push({time:c.time,text:`Резкое изменение температуры воды: ${(parseFloat(c.wt)-parseFloat(p.wt)).toFixed(1)}°C`,color:'#ff4444'});
+    if(Math.abs(parseFloat(c.tds)-parseFloat(p.tds))>100) anomalies.push({time:c.time,text:`Резкое изменение TDS: ${Math.abs(parseFloat(c.tds)-parseFloat(p.tds)).toFixed(0)} ppm`,color:'#ff8800'});
+    if(Math.abs(parseFloat(c.hum)-parseFloat(p.hum))>15) anomalies.push({time:c.time,text:`Резкое изменение влажности: ${Math.abs(parseFloat(c.hum)-parseFloat(p.hum)).toFixed(1)}%`,color:'#ffdd00'});
   }
-
-  const list = document.getElementById('anomalyList');
-  if (anomalies.length === 0) {
-    list.innerHTML = '<div class="anomaly-item"><div class="anomaly-dot" style="background:#00ff88"></div><span class="anomaly-text">Аномалий не обнаружено ✅</span></div>';
-  } else {
-    list.innerHTML = anomalies.slice(0,10).map(a => `
-      <div class="anomaly-item">
-        <div class="anomaly-dot" style="background:${a.color}"></div>
-        <span class="anomaly-time">${a.time.split(',')[1]?.trim() || ''}</span>
-        <span class="anomaly-text">${a.text}</span>
-      </div>`).join('');
-  }
+  const list=document.getElementById('anomalyList');
+  list.innerHTML=anomalies.length===0
+    ?'<div class="anomaly-item"><div class="anomaly-dot" style="background:#00ff88"></div><span>Аномалий не обнаружено ✅</span></div>'
+    :anomalies.slice(0,10).map(a=>`<div class="anomaly-item"><div class="anomaly-dot" style="background:${a.color}"></div><span class="anomaly-time">${a.time.split(',')[1]?.trim()||''}</span><span>${a.text}</span></div>`).join('');
 }
 
-// Рейтинг дней
 function updateDayRating(history) {
-  const byDay = {};
-  history.forEach(e => {
-    const day = e.time.split(',')[0];
-    if (!byDay[day]) byDay[day] = [];
-    byDay[day].push(parseFloat(e.wqi));
-  });
-
-  const dayAvgs = Object.entries(byDay).map(([day, wqis]) => ({
-    day, avg: (wqis.reduce((a,b)=>a+b,0)/wqis.length).toFixed(1)
-  })).sort((a,b) => b.avg - a.avg);
-
-  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
-
-  const best = document.getElementById('bestDays');
-  const worst = document.getElementById('worstDays');
-
-  if (dayAvgs.length === 0) {
-    best.innerHTML = '<div class="loading">Недостаточно данных</div>';
-    worst.innerHTML = '<div class="loading">Недостаточно данных</div>';
-    return;
-  }
-
-  best.innerHTML = dayAvgs.slice(0,5).map((d,i) => `
-    <div class="rating-item">
-      <span class="rating-rank">${medals[i]||'•'}</span>
-      <span class="rating-date">${d.day}</span>
-      <span class="rating-score" style="background:#00ff8822;color:#00ff88">${d.avg}</span>
-    </div>`).join('');
-
-  worst.innerHTML = [...dayAvgs].reverse().slice(0,5).map((d,i) => `
-    <div class="rating-item">
-      <span class="rating-rank">${medals[i]||'•'}</span>
-      <span class="rating-date">${d.day}</span>
-      <span class="rating-score" style="background:#ff444422;color:#ff4444">${d.avg}</span>
-    </div>`).join('');
+  const byDay={};
+  history.forEach(e=>{const d=e.time.split(',')[0];if(!byDay[d])byDay[d]=[];byDay[d].push(parseFloat(e.wqi));});
+  const avgs=Object.entries(byDay).map(([d,v])=>({d,avg:(v.reduce((a,b)=>a+b,0)/v.length).toFixed(1)})).sort((a,b)=>b.avg-a.avg);
+  const medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
+  const render=(el,items)=>{
+    el.innerHTML=items.length?items.slice(0,5).map((x,i)=>`<div class="rating-item"><span class="rating-rank">${medals[i]||'•'}</span><span class="rating-date">${x.d}</span><span class="rating-score" style="background:${parseFloat(x.avg)>=80?'#00ff8822':'#ff444422'};color:${parseFloat(x.avg)>=80?'#00ff88':'#ff4444'}">${x.avg}</span></div>`).join(''):'<div class="loading">Недостаточно данных</div>';
+  };
+  render(document.getElementById('bestDays'),avgs);
+  render(document.getElementById('worstDays'),[...avgs].reverse());
 }
 
-// Корреляция температура-TDS
 function updateCorrelation(feeds) {
-  const points = feeds.map(f => ({x: parseFloat(f.field1)||0, y: parseFloat(f.field2)||0})).filter(p => p.x && p.y);
-
-  if (correlationChart) correlationChart.destroy();
-  correlationChart = new Chart(document.getElementById('correlationChart'), {
-    type: 'scatter',
-    data: { datasets: [{
-      label: 'Температура vs TDS',
-      data: points,
-      backgroundColor: points.map(p => p.y > 500 ? '#ff444488' : p.y > 300 ? '#ffdd0088' : '#00d4ff88'),
-      pointRadius: 6
-    }]},
-    options: {
-      plugins: {legend: {labels: {color:'#88aacc'}}},
-      scales: {
-        x: {title: {display:true, text:'Температура воды (°C)', color:'#88aacc'}, ticks: {color:'#88aacc'}},
-        y: {title: {display:true, text:'TDS (ppm)', color:'#88aacc'}, ticks: {color:'#88aacc'}}
-      }
-    }
+  const pts=feeds.map(f=>({x:parseFloat(f.field1)||0,y:parseFloat(f.field2)||0})).filter(p=>p.x&&p.y);
+  if(correlationChart)correlationChart.destroy();
+  correlationChart=new Chart(document.getElementById('correlationChart'),{
+    type:'scatter',
+    data:{datasets:[{label:'Температура vs TDS',data:pts,backgroundColor:pts.map(p=>p.y>500?'#ff444488':p.y>300?'#ffdd0088':'#00d4ff88'),pointRadius:6}]},
+    options:{plugins:{legend:{labels:{color:'#88aacc'}}},scales:{x:{title:{display:true,text:'Температура воды (°C)',color:'#88aacc'},ticks:{color:'#88aacc'}},y:{title:{display:true,text:'TDS (ppm)',color:'#88aacc'},ticks:{color:'#88aacc'}}}}
   });
 }
 
-// Прогноз
 function updateForecast(history) {
-  const recent = history.slice(0, 10).reverse().map(h => parseFloat(h.waterTemp)).filter(v => !isNaN(v));
-  if (recent.length < 3) return;
-
-  const n = recent.length;
-  let sumX=0, sumY=0, sumXY=0, sumX2=0;
-  recent.forEach((y,x) => { sumX+=x; sumY+=y; sumXY+=x*y; sumX2+=x*x; });
-  const slope = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
-  const intercept = (sumY - slope*sumX) / n;
-
-  const labels = recent.map((_,i) => `-${(recent.length-i)*15}мин`);
-  const futureLabels = Array.from({length:8}, (_,i) => `+${(i+1)*3}ч`);
-  const allLabels = [...labels, ...futureLabels];
-
-  const historicalData = [...recent, ...Array(8).fill(null)];
-  const forecastData = [...Array(recent.length).fill(null), ...Array.from({length:8}, (_,i) => +(intercept + slope*(n+i)).toFixed(1))];
-
-  if (forecastChart) forecastChart.destroy();
-  forecastChart = new Chart(document.getElementById('forecastChart'), {
-    type: 'line',
-    data: { labels: allLabels, datasets: [
-      {label:'История', data:historicalData, borderColor:'#00d4ff', backgroundColor:'#00d4ff22', tension:0.4, fill:true, spanGaps:false},
-      {label:'Прогноз', data:forecastData, borderColor:'#ffdd00', backgroundColor:'#ffdd0011', tension:0.4, fill:false, borderDash:[8,4], spanGaps:false}
+  const recent=history.slice(0,10).reverse().map(h=>parseFloat(h.wt)).filter(v=>!isNaN(v));
+  if(recent.length<3)return;
+  const n=recent.length;
+  let sx=0,sy=0,sxy=0,sx2=0;
+  recent.forEach((y,x)=>{sx+=x;sy+=y;sxy+=x*y;sx2+=x*x;});
+  const slope=(n*sxy-sx*sy)/(n*sx2-sx*sx);
+  const intercept=(sy-slope*sx)/n;
+  const hLabels=recent.map((_,i)=>`-${(recent.length-i)*15}мин`);
+  const fLabels=Array.from({length:8},(_,i)=>`+${(i+1)*3}ч`);
+  const hData=[...recent,...Array(8).fill(null)];
+  const fData=[...Array(recent.length).fill(null),...Array.from({length:8},(_,i)=>+(intercept+slope*(n+i)).toFixed(1))];
+  if(forecastChart)forecastChart.destroy();
+  forecastChart=new Chart(document.getElementById('forecastChart'),{
+    type:'line',
+    data:{labels:[...hLabels,...fLabels],datasets:[
+      {label:'История',data:hData,borderColor:'#00d4ff',backgroundColor:'#00d4ff22',tension:0.4,fill:true,spanGaps:false},
+      {label:'Прогноз',data:fData,borderColor:'#ffdd00',backgroundColor:'#ffdd0011',tension:0.4,fill:false,borderDash:[8,4],spanGaps:false}
     ]},
-    options: {
-      plugins: {legend: {labels: {color:'#88aacc'}}},
-      scales: {x: {ticks: {color:'#88aacc'}}, y: {ticks: {color:'#88aacc'}}}
-    }
+    options:{plugins:{legend:{labels:{color:'#88aacc'}}},scales:{x:{ticks:{color:'#88aacc'}},y:{ticks:{color:'#88aacc'}}}}
   });
 }
 
-// Сезонное сравнение
-async function loadSeasonalComparison() {
-  try {
-    const now = new Date();
-    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-    const prevMonthStart = new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString();
-    const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString();
-
-    const [res1, res2] = await Promise.all([
-      fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=8000&start=${thisMonthStart}`),
-      fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=8000&start=${prevMonthStart}&end=${prevMonthEnd}`)
-    ]);
-    const [d1, d2] = await Promise.all([res1.json(), res2.json()]);
-
-    const avgByDay = (feeds) => {
-      const byDay = {};
-      feeds.forEach(f => {
-        const day = new Date(f.created_at).getDate();
-        if (!byDay[day]) byDay[day] = [];
-        if (f.field1) byDay[day].push(parseFloat(f.field1));
-      });
-      return Object.entries(byDay).map(([d, vals]) => ({day: parseInt(d), avg: vals.reduce((a,b)=>a+b,0)/vals.length})).sort((a,b)=>a.day-b.day);
-    };
-
-    const curr = avgByDay(d1.feeds || []);
-    const prev = avgByDay(d2.feeds || []);
-
-    const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-
-    if (seasonChart) seasonChart.destroy();
-    seasonChart = new Chart(document.getElementById('seasonChart'), {
-      type: 'line',
-      data: {
-        labels: Array.from({length:31}, (_,i) => i+1),
-        datasets: [
-          {label: monthNames[now.getMonth()]+' (текущий)', data: (() => { const d=Array(31).fill(null); curr.forEach(c=>d[c.day-1]=c.avg.toFixed(1)); return d; })(), borderColor:'#00d4ff', backgroundColor:'#00d4ff11', tension:0.4, spanGaps:true},
-          {label: monthNames[now.getMonth()-1>=0?now.getMonth()-1:11]+' (прошлый)', data: (() => { const d=Array(31).fill(null); prev.forEach(c=>d[c.day-1]=c.avg.toFixed(1)); return d; })(), borderColor:'#ff8800', backgroundColor:'#ff880011', tension:0.4, spanGaps:true, borderDash:[5,3]}
-        ]
-      },
-      options: {
-        plugins: {legend: {labels: {color:'#88aacc'}}},
-        scales: {x: {title:{display:true,text:'День месяца',color:'#88aacc'}, ticks:{color:'#88aacc'}}, y: {title:{display:true,text:'Температура воды °C',color:'#88aacc'}, ticks:{color:'#88aacc'}}}
-      }
-    });
-
-    document.getElementById('seasonDesc').textContent = curr.length > 0 && prev.length > 0
-      ? `Данные за ${monthNames[now.getMonth()]} и ${monthNames[now.getMonth()-1>=0?now.getMonth()-1:11]}`
-      : 'Недостаточно данных для сравнения — данные накопятся через несколько недель';
-  } catch(e) { console.error(e); }
+function getTrend(history,field){
+  const vals=history.slice(0,5).map(h=>parseFloat(h[field])).filter(v=>!isNaN(v));
+  if(vals.length<2)return{symbol:'→',cls:'stable'};
+  const diff=vals[0]-vals[vals.length-1];
+  return diff>0.3?{symbol:'↑',cls:'up'}:diff<-0.3?{symbol:'↓',cls:'down'}:{symbol:'→',cls:'stable'};
 }
 
-// Периоды
-async function switchPeriod(period, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+function setTrend(id,trend){const el=document.getElementById(id);el.textContent=trend.symbol;el.className='trend '+trend.cls;}
+
+function whoCheck(value,ok,statusId,tableValueId,tableStatusId){
+  const el=document.getElementById(statusId),tv=document.getElementById(tableValueId),ts=document.getElementById(tableStatusId);
+  el.textContent=ok?'✓ Норма':'⚠ Превышение';
+  el.className='who-status '+(ok?'who-ok':'who-warn');
+  if(tv)tv.textContent=value;
+  if(ts)ts.innerHTML=ok?'<span class="badge-ok">✓ Норма</span>':'<span class="badge-warn">⚠ Превышение</span>';
+}
+
+function updateValue(id,val){
+  const el=document.getElementById(id);
+  if(el.textContent!==String(val)){el.textContent=val;el.classList.remove('updated');void el.offsetWidth;el.classList.add('updated');}
+}
+
+async function switchPeriod(period,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  currentPeriod = period;
   await loadPeriodData(period);
 }
 
-async function loadPeriodData(period) {
-  document.getElementById('periodLoading').style.display = 'block';
-  document.getElementById('periodContent').style.display = 'none';
-  const results = period==='day'?960:period==='week'?6720:8000;
-  const days = period==='day'?1:period==='week'?7:30;
-  const start = new Date(Date.now()-days*24*3600*1000).toISOString();
-  try {
-    const res = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${results}&start=${start}`);
-    const data = await res.json();
-    const feeds = data.feeds || [];
-    if (!feeds.length) { document.getElementById('periodLoading').textContent='Нет данных'; return; }
-
-    const getVals = (f,n) => feeds.map(x=>parseFloat(x[n])).filter(v=>!isNaN(v));
-    const stats = [
-      {label:'💧 Температура воды', vals:getVals(feeds,'field1'), unit:'°C'},
-      {label:'🌡️ Воздух', vals:getVals(feeds,'field3'), unit:'°C'},
-      {label:'💨 Влажность', vals:getVals(feeds,'field4'), unit:'%'},
-      {label:'🔬 TDS', vals:getVals(feeds,'field2'), unit:'ppm'},
-      {label:'📈 ИКВ', vals:getVals(feeds,'field6'), unit:''},
+async function loadPeriodData(period){
+  document.getElementById('periodLoading').style.display='block';
+  document.getElementById('periodContent').style.display='none';
+  const days=period==='day'?1:period==='week'?7:30;
+  const start=new Date(Date.now()-days*24*3600*1000).toISOString();
+  try{
+    const res=await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=8000&start=${start}`);
+    const data=await res.json();
+    const feeds=data.feeds||[];
+    if(!feeds.length){document.getElementById('periodLoading').textContent='Нет данных';return;}
+    const gv=(n)=>feeds.map(f=>parseFloat(f[n])).filter(v=>!isNaN(v));
+    const stats=[
+      {label:'💧 Температура воды',vals:gv('field1'),unit:'°C'},
+      {label:'🌡️ Воздух',vals:gv('field3'),unit:'°C'},
+      {label:'💨 Влажность',vals:gv('field4'),unit:'%'},
+      {label:'🔬 TDS',vals:gv('field2'),unit:'ppm'},
+      {label:'🌫️ Точка росы',vals:gv('field7'),unit:'°C'},
+      {label:'🌊 Тепловой поток',vals:gv('field8'),unit:'°C'},
+      {label:'📈 ИКВ',vals:gv('field6'),unit:''},
     ];
-    const grid = document.getElementById('statsGrid');
-    grid.innerHTML = '';
-    stats.forEach(s => {
-      if (!s.vals.length) return;
-      const min=Math.min(...s.vals).toFixed(1), max=Math.max(...s.vals).toFixed(1), avg=(s.vals.reduce((a,b)=>a+b,0)/s.vals.length).toFixed(1);
-      const div = document.createElement('div');
-      div.className = 'stat-card';
-      div.innerHTML = `<div class="stat-label">${s.label}</div><div class="stat-row"><div class="stat-item"><div class="stat-val min-val">${min}${s.unit}</div><div class="stat-name">Мин</div></div><div class="stat-item"><div class="stat-val avg-val">${avg}${s.unit}</div><div class="stat-name">Среднее</div></div><div class="stat-item"><div class="stat-val max-val">${max}${s.unit}</div><div class="stat-name">Макс</div></div></div>`;
+    const grid=document.getElementById('statsGrid');
+    grid.innerHTML='';
+    stats.forEach(s=>{
+      if(!s.vals.length)return;
+      const min=Math.min(...s.vals).toFixed(1),max=Math.max(...s.vals).toFixed(1),avg=(s.vals.reduce((a,b)=>a+b,0)/s.vals.length).toFixed(1);
+      const div=document.createElement('div');
+      div.className='stat-card';
+      div.innerHTML=`<div class="stat-label">${s.label}</div><div class="stat-row"><div class="stat-item"><div class="stat-val min-val">${min}${s.unit}</div><div class="stat-name">Мин</div></div><div class="stat-item"><div class="stat-val avg-val">${avg}${s.unit}</div><div class="stat-name">Среднее</div></div><div class="stat-item"><div class="stat-val max-val">${max}${s.unit}</div><div class="stat-name">Макс</div></div></div>`;
       grid.appendChild(div);
     });
-
-    let labels, wtD, atD, wqiD;
-    if (period==='day') {
-      labels = feeds.map(f=>new Date(f.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}));
-      wtD = feeds.map(f=>parseFloat(f.field1)||null);
-      atD = feeds.map(f=>parseFloat(f.field3)||null);
-      wqiD = feeds.map(f=>parseFloat(f.field6)||null);
-    } else {
-      const byDay = {};
-      feeds.forEach(f => {
-        const d = new Date(f.created_at).toLocaleDateString('ru-RU');
-        if (!byDay[d]) byDay[d]={wt:[],at:[],wqi:[]};
-        if(f.field1) byDay[d].wt.push(parseFloat(f.field1));
-        if(f.field3) byDay[d].at.push(parseFloat(f.field3));
-        if(f.field6) byDay[d].wqi.push(parseFloat(f.field6));
-      });
-      labels = Object.keys(byDay);
-      const avg = arr => arr.length?(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1):null;
-      wtD = labels.map(d=>avg(byDay[d].wt));
-      atD = labels.map(d=>avg(byDay[d].at));
-      wqiD = labels.map(d=>avg(byDay[d].wqi));
+    let labels,datasets;
+    if(period==='day'){
+      labels=feeds.map(f=>new Date(f.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}));
+      datasets=[
+        {label:'Вода °C',data:feeds.map(f=>parseFloat(f.field1)||null),borderColor:'#00d4ff',tension:0.4,fill:false},
+        {label:'Воздух °C',data:feeds.map(f=>parseFloat(f.field3)||null),borderColor:'#ff8800',tension:0.4,fill:false},
+        {label:'ИКВ',data:feeds.map(f=>parseFloat(f.field6)||null),borderColor:'#00ff88',tension:0.4,fill:false,yAxisID:'y2'}
+      ];
+    }else{
+      const byDay={};
+      feeds.forEach(f=>{const d=new Date(f.created_at).toLocaleDateString('ru-RU');if(!byDay[d])byDay[d]={wt:[],at:[],wqi:[]};if(f.field1)byDay[d].wt.push(parseFloat(f.field1));if(f.field3)byDay[d].at.push(parseFloat(f.field3));if(f.field6)byDay[d].wqi.push(parseFloat(f.field6));});
+      labels=Object.keys(byDay);
+      const avg=arr=>arr.length?(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1):null;
+      datasets=[
+        {label:'Вода °C',data:labels.map(d=>avg(byDay[d].wt)),borderColor:'#00d4ff',tension:0.4,fill:false},
+        {label:'Воздух °C',data:labels.map(d=>avg(byDay[d].at)),borderColor:'#ff8800',tension:0.4,fill:false},
+        {label:'ИКВ',data:labels.map(d=>avg(byDay[d].wqi)),borderColor:'#00ff88',tension:0.4,fill:false,yAxisID:'y2'}
+      ];
     }
-
-    if (periodChart) periodChart.destroy();
-    periodChart = new Chart(document.getElementById('periodChart'), {
-      type:'line',
-      data:{labels, datasets:[
-        {label:'Вода °C', data:wtD, borderColor:'#00d4ff', tension:0.4, fill:false},
-        {label:'Воздух °C', data:atD, borderColor:'#ff8800', tension:0.4, fill:false},
-        {label:'ИКВ', data:wqiD, borderColor:'#00ff88', tension:0.4, fill:false, yAxisID:'y2'}
-      ]},
-      options:{
-        plugins:{legend:{labels:{color:'#88aacc'}}},
-        scales:{x:{ticks:{color:'#88aacc',maxTicksLimit:10}}, y:{ticks:{color:'#88aacc'}}, y2:{ticks:{color:'#00ff88'}, position:'right', min:0, max:100, grid:{drawOnChartArea:false}}}
-      }
+    if(periodChart)periodChart.destroy();
+    periodChart=new Chart(document.getElementById('periodChart'),{
+      type:'line',data:{labels,datasets},
+      options:{plugins:{legend:{labels:{color:'#88aacc'}}},scales:{x:{ticks:{color:'#88aacc',maxTicksLimit:10}},y:{ticks:{color:'#88aacc'}},y2:{ticks:{color:'#00ff88'},position:'right',min:0,max:100,grid:{drawOnChartArea:false}}}}
     });
     document.getElementById('periodLoading').style.display='none';
     document.getElementById('periodContent').style.display='block';
-  } catch(e) { document.getElementById('periodLoading').textContent='Ошибка'; }
+  }catch(e){document.getElementById('periodLoading').textContent='Ошибка';}
 }
 
-function getTrend(history, field) {
-  const vals = history.slice(0,5).map(h=>parseFloat(h[field])).filter(v=>!isNaN(v));
-  if (vals.length<2) return {symbol:'→',cls:'stable'};
-  const diff = vals[0]-vals[vals.length-1];
-  if (diff>0.3) return {symbol:'↑',cls:'up'};
-  if (diff<-0.3) return {symbol:'↓',cls:'down'};
-  return {symbol:'→',cls:'stable'};
-}
+async function fetchData(){
+  try{
+    const res=await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=20`);
+    const data=await res.json();
+    const feeds=data.feeds;
+    if(!feeds||!feeds.length)return;
+    const last=feeds[feeds.length-1];
+    const wt=parseFloat(last.field1).toFixed(1);
+    const tds=parseFloat(last.field2).toFixed(0);
+    const at=parseFloat(last.field3).toFixed(1);
+    const hum=parseFloat(last.field4).toFixed(1);
+    const light=parseFloat(last.field5).toFixed(0);
+    const wqi=parseFloat(last.field6)||0;
+    const dew=parseFloat(last.field7)||calcDewPoint(parseFloat(at),parseFloat(hum));
+    const flux=parseFloat(last.field8)||(parseFloat(wt)-parseFloat(at));
 
-function setTrend(id, trend) {
-  const el = document.getElementById(id);
-  el.textContent = trend.symbol;
-  el.className = 'trend ' + trend.cls;
-}
-
-function whoCheck(value, ok, statusId, tableValueId, tableStatusId) {
-  const el=document.getElementById(statusId), tv=document.getElementById(tableValueId), ts=document.getElementById(tableStatusId);
-  el.textContent = ok?'✓ Норма':'⚠ Превышение';
-  el.className = 'who-status '+(ok?'who-ok':'who-warn');
-  if(tv) tv.textContent=value;
-  if(ts) ts.innerHTML=ok?'<span class="badge-ok">✓ Норма</span>':'<span class="badge-warn">⚠ Превышение</span>';
-}
-
-function updateValue(id, val) {
-  const el = document.getElementById(id);
-  if (el.textContent !== String(val)) {
-    el.textContent = val;
-    el.classList.remove('updated');
-    void el.offsetWidth;
-    el.classList.add('updated');
-  }
-}
-
-async function fetchData() {
-  try {
-    const res = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=20`);
-    const data = await res.json();
-    const feeds = data.feeds;
-    if (!feeds || !feeds.length) return;
-
-    const last = feeds[feeds.length-1];
-    const wt = parseFloat(last.field1).toFixed(1);
-    const tds = parseFloat(last.field2).toFixed(0);
-    const at = parseFloat(last.field3).toFixed(1);
-    const hum = parseFloat(last.field4).toFixed(1);
-    const light = parseFloat(last.field5).toFixed(0);
-    const wqi = parseFloat(last.field6)||0;
+    // Производные в браузере
+    const evap=calcEvaporation(parseFloat(wt),parseFloat(at),parseFloat(hum),parseFloat(light));
+    const comfort=calcComfort(parseFloat(at),parseFloat(hum),parseFloat(wt));
+    const eutro=calcEutro(parseFloat(wt),parseFloat(tds),parseFloat(light));
 
     updateValue('waterTemp',wt); updateValue('airTemp',at); updateValue('humidity',hum);
     updateValue('tds',tds); updateValue('light',light); updateValue('wqiScore',wqi);
+    updateValue('dewPoint',dew.toFixed(1));
+    updateValue('thermalFlux',flux.toFixed(1));
+    updateValue('evaporation',evap.toFixed(2));
+    updateValue('comfortIndex',comfort.toFixed(0));
+    updateValue('eutroIndex',eutro.toFixed(0));
     document.getElementById('wqiFill').style.width=wqi+'%';
 
-    if(parseFloat(wt)>25) sendAlert(`Температура воды: ${wt}°C`);
-    if(parseFloat(tds)>500) sendAlert(`TDS: ${tds} ppm`);
+    if(parseFloat(wt)>25)sendAlert(`Температура воды: ${wt}°C превышает норму`);
+    if(parseFloat(tds)>500)sendAlert(`TDS: ${tds} ppm превышает норму ВОЗ`);
+    if(eutro>70)sendAlert(`Высокий риск эвтрофикации: ${eutro.toFixed(0)}/100`);
 
-    let wqiColor='#00ff88', wqiLabel='Отлично 🟢';
+    let wqiColor='#00ff88',wqiLabel='Отлично 🟢';
     if(wqi<80){wqiColor='#ffdd00';wqiLabel='Хорошо 🟡';}
     if(wqi<60){wqiColor='#ff8800';wqiLabel='Удовлетворительно 🟠';}
     if(wqi<40){wqiColor='#ff4444';wqiLabel='Плохо 🔴';}
@@ -822,41 +695,45 @@ async function fetchData() {
     whoCheck(wt+'°C',parseFloat(wt)<=25,'whoWater','whoTableWater','whoTableWaterStatus');
     whoCheck(tds+' ppm',parseFloat(tds)<=500,'whoTds','whoTableTds','whoTableTdsStatus');
     whoCheck(hum+'%',parseFloat(hum)>=40&&parseFloat(hum)<=70,'whoHum','whoTableHum','whoTableHumStatus');
+    whoCheck(dew.toFixed(1)+'°C',parseFloat(dew)<parseFloat(at),'whoWater','whoTableDew','whoTableDewStatus');
 
-    updateFishIndicator(parseFloat(wt), parseFloat(tds), wqi);
-    updateWaterUse(parseFloat(wt), parseFloat(tds), wqi);
+    updateFish(parseFloat(wt),parseFloat(tds),wqi);
+    updateWaterUse(parseFloat(wt),parseFloat(tds),wqi);
     updateCorrelation(feeds);
 
-    const now = new Date().toLocaleString('ru-RU');
-    saveHistory({time:now, waterTemp:wt, airTemp:at, humidity:hum, tds, light, wqi});
+    const now=new Date().toLocaleString('ru-RU');
+    saveHistory({time:now,wt,at,hum,tds,light,dew:dew.toFixed(1),flux:flux.toFixed(1),wqi});
     renderHistory();
 
-    const history = loadHistory();
-    setTrend('trendWater',getTrend(history,'waterTemp'));
-    setTrend('trendAir',getTrend(history,'airTemp'));
-    setTrend('trendHum',getTrend(history,'humidity'));
+    const history=loadHistory();
+    setTrend('trendWater',getTrend(history,'wt'));
+    setTrend('trendAir',getTrend(history,'at'));
+    setTrend('trendHum',getTrend(history,'hum'));
     setTrend('trendTds',getTrend(history,'tds'));
     setTrend('trendLight',getTrend(history,'light'));
-
     detectAnomalies(history);
     updateDayRating(history);
     updateForecast(history);
 
-    const labels = feeds.map(f=>new Date(f.created_at).toLocaleTimeString('ru-RU'));
-    tempChart.data.labels=labels; tempChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field1)||0); tempChart.data.datasets[1].data=feeds.map(f=>parseFloat(f.field3)||0); tempChart.update();
-    humChart.data.labels=labels; humChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field4)||0); humChart.update();
-    tdsChart.data.labels=labels; tdsChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field2)||0); tdsChart.update();
-    wqiChart.data.labels=labels; wqiChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field6)||0); wqiChart.update();
+    const labels=feeds.map(f=>new Date(f.created_at).toLocaleTimeString('ru-RU'));
+    tempChart.data.labels=labels;
+    tempChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field1)||0);
+    tempChart.data.datasets[1].data=feeds.map(f=>parseFloat(f.field3)||0);
+    tempChart.update();
+    humChart.data.labels=labels;humChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field4)||0);humChart.update();
+    tdsChart.data.labels=labels;tdsChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field2)||0);tdsChart.update();
+    wqiChart.data.labels=labels;wqiChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field6)||0);wqiChart.update();
+    dewChart.data.labels=labels;dewChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field7)||0);dewChart.update();
+    fluxChart.data.labels=labels;fluxChart.data.datasets[0].data=feeds.map(f=>parseFloat(f.field8)||0);fluxChart.update();
 
     document.getElementById('lastUpdate').textContent=now;
-  } catch(e) { console.error(e); }
+  }catch(e){console.error(e);}
 }
 
 renderHistory();
 fetchData();
 loadPeriodData('day');
-loadSeasonalComparison();
-setInterval(fetchData, 15000);
+setInterval(fetchData,15000);
 </script>
 </body>
 </html>
