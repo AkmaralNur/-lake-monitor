@@ -116,50 +116,54 @@ const CHANNEL_ID = '3368346';
 const READ_KEY = '839C3D2TM2EPJ0KK';
 const MAX_POINTS = 20;
 
+const chartOptions = {
+  plugins: { legend: { labels: { color: '#88aacc' } } },
+  scales: {
+    x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } },
+    y: { ticks: { color: '#88aacc' } }
+  }
+};
+
 const tempChart = new Chart(document.getElementById('tempChart'), {
   type: 'line',
   data: { labels: [], datasets: [
     { label: 'Water °C', data: [], borderColor: '#00d4ff', backgroundColor: '#00d4ff22', tension: 0.4, fill: true },
     { label: 'Air °C', data: [], borderColor: '#ff8800', backgroundColor: '#ff880022', tension: 0.4, fill: true }
   ]},
-  options: { plugins: { legend: { labels: { color: '#88aacc' } } }, scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } } }
+  options: chartOptions
 });
 
 const humChart = new Chart(document.getElementById('humChart'), {
   type: 'line',
-  data: { labels: [], datasets: [{ label: 'Humidity %', data: [], borderColor: '#00ff88', backgroundColor: '#00ff8822', tension: 0.4, fill: true }] },
-  options: { plugins: { legend: { labels: { color: '#88aacc' } } }, scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } } }
+  data: { labels: [], datasets: [
+    { label: 'Humidity %', data: [], borderColor: '#00ff88', backgroundColor: '#00ff8822', tension: 0.4, fill: true }
+  ]},
+  options: chartOptions
 });
 
 const tdsChart = new Chart(document.getElementById('tdsChart'), {
   type: 'line',
-  data: { labels: [], datasets: [{ label: 'TDS ppm', data: [], borderColor: '#ff4444', backgroundColor: '#ff444422', tension: 0.4, fill: true }] },
-  options: { plugins: { legend: { labels: { color: '#88aacc' } } }, scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } } }
+  data: { labels: [], datasets: [
+    { label: 'TDS ppm', data: [], borderColor: '#ff4444', backgroundColor: '#ff444422', tension: 0.4, fill: true }
+  ]},
+  options: chartOptions
 });
 
 const lightChart = new Chart(document.getElementById('lightChart'), {
   type: 'line',
-  data: { labels: [], datasets: [{ label: 'Light lux', data: [], borderColor: '#ffdd00', backgroundColor: '#ffdd0022', tension: 0.4, fill: true }] },
-  options: { plugins: { legend: { labels: { color: '#88aacc' } } }, scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } } }
+  data: { labels: [], datasets: [
+    { label: 'Light lux', data: [], borderColor: '#ffdd00', backgroundColor: '#ffdd0022', tension: 0.4, fill: true }
+  ]},
+  options: chartOptions
 });
 
 async function fetchData() {
   try {
-    const res = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_POINTS}`, {
-  mode: 'cors',
-  headers: { 'Accept': 'application/json' }
-});
+    const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_POINTS}`;
+    const res = await fetch(url);
     const data = await res.json();
     const feeds = data.feeds;
     if (!feeds || feeds.length === 0) return;
-
-    const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString());
-    const waterTemps = feeds.map(f => parseFloat(f.field1) || 0);
-    const tdsValues = feeds.map(f => parseFloat(f.field2) || 0);
-    const airTemps = feeds.map(f => parseFloat(f.field3) || 0);
-    const humValues = feeds.map(f => parseFloat(f.field4) || 0);
-    const lightValues = feeds.map(f => parseFloat(f.field5) || 0);
-    const wqiValues = feeds.map(f => parseFloat(f.field6) || 0);
 
     const last = feeds[feeds.length - 1];
     document.getElementById('waterTemp').textContent = parseFloat(last.field1).toFixed(1);
@@ -169,4 +173,52 @@ async function fetchData() {
     document.getElementById('light').textContent = parseFloat(last.field5).toFixed(0);
 
     const wqi = parseFloat(last.field6) || 0;
-    document.getElementById('wqiScore').tex
+    document.getElementById('wqiScore').textContent = wqi;
+    document.getElementById('wqiFill').style.width = wqi + '%';
+
+    let wqiColor = '#00ff88';
+    let wqiLabel = 'Excellent 🟢';
+    if (wqi < 80) { wqiColor = '#ffdd00'; wqiLabel = 'Good 🟡'; }
+    if (wqi < 60) { wqiColor = '#ff8800'; wqiLabel = 'Moderate 🟠'; }
+    if (wqi < 40) { wqiColor = '#ff4444'; wqiLabel = 'Poor 🔴'; }
+
+    document.getElementById('wqiScore').style.color = wqiColor;
+    document.getElementById('wqiLabel').style.color = wqiColor;
+    document.getElementById('wqiLabel').textContent = wqiLabel;
+    document.getElementById('wqiFill').style.background = wqiColor;
+
+    const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString());
+    const waterTemps = feeds.map(f => parseFloat(f.field1) || 0);
+    const tdsValues = feeds.map(f => parseFloat(f.field2) || 0);
+    const airTemps = feeds.map(f => parseFloat(f.field3) || 0);
+    const humValues = feeds.map(f => parseFloat(f.field4) || 0);
+    const lightValues = feeds.map(f => parseFloat(f.field5) || 0);
+
+    tempChart.data.labels = labels;
+    tempChart.data.datasets[0].data = waterTemps;
+    tempChart.data.datasets[1].data = airTemps;
+    tempChart.update();
+
+    humChart.data.labels = labels;
+    humChart.data.datasets[0].data = humValues;
+    humChart.update();
+
+    tdsChart.data.labels = labels;
+    tdsChart.data.datasets[0].data = tdsValues;
+    tdsChart.update();
+
+    lightChart.data.labels = labels;
+    lightChart.data.datasets[0].data = lightValues;
+    lightChart.update();
+
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+  } catch(e) {
+    console.error('Error:', e);
+  }
+}
+
+fetchData();
+setInterval(fetchData, 15000);
+</script>
+</body>
+</html>
