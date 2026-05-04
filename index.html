@@ -8,61 +8,69 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#0a1628; color:white; font-family:Arial; overflow-x:hidden; }
-
 header { background:#0d1f3c; padding:20px; text-align:center; border-bottom:2px solid #00d4ff; position:relative; overflow:hidden; }
 header::before { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background: radial-gradient(ellipse at center, #00d4ff11 0%, transparent 70%); animation: headerGlow 4s ease-in-out infinite; }
 @keyframes headerGlow { 0%,100%{opacity:0.5} 50%{opacity:1} }
 header h1 { color:#00d4ff; font-size:32px; position:relative; }
 header p { color:#88aacc; margin-top:5px; position:relative; }
-
 .status { display:inline-block; width:10px; height:10px; border-radius:50%; background:#00ff88; margin-right:8px; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
-
+.uptime { background:#1a2a4a; border:1px solid #00d4ff33; border-radius:10px; padding:8px 20px; display:inline-block; margin-top:10px; font-size:13px; color:#00d4ff; position:relative; }
 .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; padding:20px; max-width:1200px; margin:auto; }
-
 .card { background:#1a2a4a; border-radius:15px; padding:20px; text-align:center; border:1px solid #00d4ff33; transition: transform 0.3s, box-shadow 0.3s; animation: fadeIn 0.5s ease-out; position:relative; overflow:hidden; }
 .card::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg, transparent, #00d4ff11, transparent); animation: shimmer 3s infinite; }
 @keyframes shimmer { 0%{left:-100%} 100%{left:100%} }
 @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
 .card:hover { transform: translateY(-8px); box-shadow: 0 10px 30px #00d4ff33; }
-.card .icon { font-size:32px; margin-bottom:10px; }
+.card .icon { font-size:32px; margin-bottom:5px; }
+.card .value-row { display:flex; align-items:center; justify-content:center; gap:8px; }
 .card .value { font-size:40px; font-weight:bold; color:#00d4ff; transition: all 0.5s; }
 .card .value.updated { animation: valueUpdate 0.5s ease; }
 @keyframes valueUpdate { 0%{transform:scale(1.2);color:#00ff88} 100%{transform:scale(1);color:#00d4ff} }
+.trend { font-size:24px; font-weight:bold; }
+.trend.up { color:#ff4444; }
+.trend.down { color:#00ff88; }
+.trend.stable { color:#ffdd00; }
 .card .unit { font-size:14px; color:#88aacc; }
-.card .label { font-size:13px; color:#88aacc; margin-top:8px; }
-
+.card .label { font-size:13px; color:#88aacc; margin-top:5px; }
+.who-status { font-size:11px; padding:3px 8px; border-radius:10px; margin-top:6px; display:inline-block; }
+.who-ok { background:#00ff8822; color:#00ff88; border:1px solid #00ff8844; }
+.who-warn { background:#ff444422; color:#ff4444; border:1px solid #ff444444; }
+.who-norm { font-size:10px; color:#88aacc; margin-top:3px; }
 .wqi-section { margin:0 20px 20px; }
-.wqi-card { background:#1a2a4a; border-radius:15px; padding:30px; text-align:center; border:1px solid #00d4ff33; max-width:1200px; margin:auto; position:relative; overflow:hidden; }
+.wqi-card { background:#1a2a4a; border-radius:15px; padding:30px; text-align:center; border:1px solid #00d4ff33; max-width:1200px; margin:auto; }
 .wqi-card h2 { color:#00d4ff; font-size:22px; margin-bottom:15px; }
 .wqi-score { font-size:80px; font-weight:bold; transition: all 1s; }
 .wqi-label { font-size:22px; margin-top:5px; }
 .wqi-bar { background:#0a1628; border-radius:10px; height:20px; margin:15px auto; max-width:400px; overflow:hidden; }
 .wqi-fill { height:100%; border-radius:10px; transition: width 1.5s ease; }
-
+.who-table-section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
+.who-table-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
+.who-table-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
+.who-table { width:100%; border-collapse:collapse; font-size:13px; }
+.who-table th { color:#00d4ff; padding:10px; border-bottom:1px solid #00d4ff33; text-align:center; }
+.who-table td { padding:10px; border-bottom:1px solid #ffffff11; text-align:center; }
+.badge-ok { background:#00ff8822; color:#00ff88; padding:4px 10px; border-radius:10px; border:1px solid #00ff8844; }
+.badge-warn { background:#ff444422; color:#ff4444; padding:4px 10px; border-radius:10px; border:1px solid #ff444444; }
 .charts { max-width:1200px; margin:0 auto 20px; padding:0 20px; display:grid; grid-template-columns:1fr 1fr; gap:15px; }
-.chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; transition: box-shadow 0.3s; }
-.chart-card:hover { box-shadow: 0 5px 20px #00d4ff22; }
+.chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
 .chart-card h3 { color:#00d4ff; margin-bottom:15px; font-size:15px; }
-
 .history-section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
 .history-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
 .history-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
-.history-table { width:100%; border-collapse:collapse; font-size:13px; }
+.btn-row { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
+.btn { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; transition: all 0.3s; border:none; }
+.btn-csv { background:#00d4ff22; border:1px solid #00d4ff; color:#00d4ff; }
+.btn-csv:hover { background:#00d4ff; color:#0a1628; }
+.btn-clear { background:#ff444422; border:1px solid #ff4444; color:#ff4444; }
+.btn-clear:hover { background:#ff4444; color:white; }
+.history-table { width:100%; border-collapse:collapse; font-size:12px; }
 .history-table th { color:#00d4ff; padding:10px; border-bottom:1px solid #00d4ff33; text-align:center; }
 .history-table td { padding:8px 10px; border-bottom:1px solid #ffffff11; text-align:center; color:#88aacc; }
 .history-table tr:hover td { background:#ffffff08; color:white; }
-.history-table tr:first-child td { color:white; font-weight:bold; }
-
-.btn-clear { background:#ff444433; border:1px solid #ff4444; color:#ff4444; padding:8px 15px; border-radius:8px; cursor:pointer; font-size:12px; float:right; transition: all 0.3s; }
-.btn-clear:hover { background:#ff4444; color:white; }
-
 .last-update { text-align:center; color:#88aacc; font-size:12px; padding:10px; }
 footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-top:1px solid #00d4ff22; }
-
-.wave { position:fixed; bottom:0; left:0; width:100%; opacity:0.05; pointer-events:none; }
-
-@media(max-width:600px) { .charts { grid-template-columns:1fr; } header h1 { font-size:22px; } .card .value { font-size:30px; } }
+@media(max-width:600px) { .charts { grid-template-columns:1fr; } header h1 { font-size:22px; } .card .value { font-size:28px; } }
 </style>
 </head>
 <body>
@@ -70,36 +78,58 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 <header>
   <h1>🌊 Система мониторинга озера</h1>
   <p><span class="status"></span>Мониторинг качества воды в реальном времени • Кыргызстан 🇰🇬</p>
+  <div class="uptime">⏱️ Время работы: <span id="uptime">00:00:00</span></div>
 </header>
 
 <div class="grid">
   <div class="card">
     <div class="icon">💧</div>
-    <div class="value" id="waterTemp">--</div>
+    <div class="value-row">
+      <div class="value" id="waterTemp">--</div>
+      <div class="trend" id="trendWater">→</div>
+    </div>
     <div class="unit">°C</div>
     <div class="label">Температура воды</div>
+    <div class="who-norm">Норма ВОЗ: до 25°C</div>
+    <div class="who-status" id="whoWater">--</div>
   </div>
   <div class="card">
     <div class="icon">🌡️</div>
-    <div class="value" id="airTemp">--</div>
+    <div class="value-row">
+      <div class="value" id="airTemp">--</div>
+      <div class="trend" id="trendAir">→</div>
+    </div>
     <div class="unit">°C</div>
     <div class="label">Температура воздуха</div>
   </div>
   <div class="card">
     <div class="icon">💨</div>
-    <div class="value" id="humidity">--</div>
+    <div class="value-row">
+      <div class="value" id="humidity">--</div>
+      <div class="trend" id="trendHum">→</div>
+    </div>
     <div class="unit">%</div>
     <div class="label">Влажность воздуха</div>
+    <div class="who-norm">Норма: 40-70%</div>
+    <div class="who-status" id="whoHum">--</div>
   </div>
   <div class="card">
     <div class="icon">🔬</div>
-    <div class="value" id="tds">--</div>
+    <div class="value-row">
+      <div class="value" id="tds">--</div>
+      <div class="trend" id="trendTds">→</div>
+    </div>
     <div class="unit">ppm</div>
     <div class="label">Качество воды TDS</div>
+    <div class="who-norm">Норма ВОЗ: до 500 ppm</div>
+    <div class="who-status" id="whoTds">--</div>
   </div>
   <div class="card">
     <div class="icon">☀️</div>
-    <div class="value" id="light">--</div>
+    <div class="value-row">
+      <div class="value" id="light">--</div>
+      <div class="trend" id="trendLight">→</div>
+    </div>
     <div class="unit">люкс</div>
     <div class="label">Освещённость</div>
   </div>
@@ -113,6 +143,42 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
     <div class="wqi-bar">
       <div class="wqi-fill" id="wqiFill" style="width:0%"></div>
     </div>
+  </div>
+</div>
+
+<div class="who-table-section">
+  <div class="who-table-card">
+    <h3>📊 Сравнение с нормами ВОЗ</h3>
+    <table class="who-table">
+      <thead>
+        <tr>
+          <th>Показатель</th>
+          <th>Норма ВОЗ</th>
+          <th>Текущее значение</th>
+          <th>Статус</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Температура воды</td>
+          <td>до 25°C</td>
+          <td id="whoTableWater">--</td>
+          <td id="whoTableWaterStatus">--</td>
+        </tr>
+        <tr>
+          <td>TDS (минерализация)</td>
+          <td>до 500 ppm</td>
+          <td id="whoTableTds">--</td>
+          <td id="whoTableTdsStatus">--</td>
+        </tr>
+        <tr>
+          <td>Влажность воздуха</td>
+          <td>40-70%</td>
+          <td id="whoTableHum">--</td>
+          <td id="whoTableHumStatus">--</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -137,7 +203,11 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 
 <div class="history-section">
   <div class="history-card">
-    <h3>📋 Журнал измерений <button class="btn-clear" onclick="clearHistory()">Очистить историю</button></h3>
+    <h3>📋 Журнал измерений</h3>
+    <div class="btn-row">
+      <button class="btn btn-csv" onclick="exportCSV()">📥 Скачать CSV (Excel)</button>
+      <button class="btn btn-clear" onclick="clearHistory()">🗑️ Очистить историю</button>
+    </div>
     <table class="history-table">
       <thead>
         <tr>
@@ -166,13 +236,20 @@ const CHANNEL_ID = '3368346';
 const READ_KEY = '839C3D2TM2EPJ0KK';
 const MAX_POINTS = 20;
 const STORAGE_KEY = 'lake_monitor_history';
+const START_TIME = Date.now();
+
+// Uptime счётчик
+setInterval(() => {
+  const elapsed = Math.floor((Date.now() - START_TIME) / 1000);
+  const h = Math.floor(elapsed / 3600).toString().padStart(2,'0');
+  const m = Math.floor((elapsed % 3600) / 60).toString().padStart(2,'0');
+  const s = (elapsed % 60).toString().padStart(2,'0');
+  document.getElementById('uptime').textContent = `${h}:${m}:${s}`;
+}, 1000);
 
 const chartOptions = {
   plugins: { legend: { labels: { color: '#88aacc' } } },
-  scales: {
-    x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } },
-    y: { ticks: { color: '#88aacc' } }
-  },
+  scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } },
   animation: { duration: 1000 }
 };
 
@@ -187,38 +264,32 @@ const tempChart = new Chart(document.getElementById('tempChart'), {
 
 const humChart = new Chart(document.getElementById('humChart'), {
   type: 'line',
-  data: { labels: [], datasets: [
-    { label: 'Влажность %', data: [], borderColor: '#00ff88', backgroundColor: '#00ff8822', tension: 0.4, fill: true }
-  ]},
+  data: { labels: [], datasets: [{ label: 'Влажность %', data: [], borderColor: '#00ff88', backgroundColor: '#00ff8822', tension: 0.4, fill: true }]},
   options: chartOptions
 });
 
 const tdsChart = new Chart(document.getElementById('tdsChart'), {
   type: 'line',
-  data: { labels: [], datasets: [
-    { label: 'TDS ppm', data: [], borderColor: '#ff4444', backgroundColor: '#ff444422', tension: 0.4, fill: true }
-  ]},
+  data: { labels: [], datasets: [{ label: 'TDS ppm', data: [], borderColor: '#ff4444', backgroundColor: '#ff444422', tension: 0.4, fill: true }]},
   options: chartOptions
 });
 
 const lightChart = new Chart(document.getElementById('lightChart'), {
   type: 'line',
-  data: { labels: [], datasets: [
-    { label: 'Освещённость люкс', data: [], borderColor: '#ffdd00', backgroundColor: '#ffdd0022', tension: 0.4, fill: true }
-  ]},
+  data: { labels: [], datasets: [{ label: 'Освещённость люкс', data: [], borderColor: '#ffdd00', backgroundColor: '#ffdd0022', tension: 0.4, fill: true }]},
   options: chartOptions
 });
 
+// История
 function loadHistory() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch { return []; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
 }
 
 function saveHistory(entry) {
   let history = loadHistory();
   history.unshift(entry);
-  if (history.length > 100) history = history.slice(0, 100);
+  if (history.length > 200) history = history.slice(0, 200);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
 }
 
@@ -229,12 +300,28 @@ function clearHistory() {
   }
 }
 
+function exportCSV() {
+  const history = loadHistory();
+  if (history.length === 0) { alert('История пуста!'); return; }
+  let csv = 'Время,Температура воды °C,Температура воздуха °C,Влажность %,TDS ppm,Освещённость люкс,ИКВ\n';
+  history.forEach(e => {
+    csv += `${e.time},${e.waterTemp},${e.airTemp},${e.humidity},${e.tds},${e.light},${e.wqi}\n`;
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `lake_monitor_${new Date().toLocaleDateString('ru-RU').replace(/\./g,'-')}.csv`;
+  a.click();
+}
+
 function renderHistory() {
   const history = loadHistory();
   const tbody = document.getElementById('historyBody');
   tbody.innerHTML = '';
-  history.slice(0, 50).forEach((entry, i) => {
+  history.slice(0, 50).forEach(entry => {
     const tr = document.createElement('tr');
+    const wqiColor = entry.wqi >= 80 ? '#00ff88' : entry.wqi >= 60 ? '#ffdd00' : '#ff4444';
     tr.innerHTML = `
       <td>${entry.time}</td>
       <td>${entry.waterTemp}</td>
@@ -242,15 +329,50 @@ function renderHistory() {
       <td>${entry.humidity}</td>
       <td>${entry.tds}</td>
       <td>${entry.light}</td>
-      <td style="color:${entry.wqi >= 80 ? '#00ff88' : entry.wqi >= 60 ? '#ffdd00' : '#ff4444'}">${entry.wqi}</td>
+      <td style="color:${wqiColor}">${entry.wqi}</td>
     `;
     tbody.appendChild(tr);
   });
 }
 
+// Тренд
+function getTrend(history, field) {
+  if (history.length < 3) return { symbol: '→', cls: 'stable' };
+  const vals = history.slice(0, 5).map(h => parseFloat(h[field])).filter(v => !isNaN(v));
+  if (vals.length < 2) return { symbol: '→', cls: 'stable' };
+  const diff = vals[0] - vals[vals.length - 1];
+  if (diff > 0.3) return { symbol: '↑', cls: 'up' };
+  if (diff < -0.3) return { symbol: '↓', cls: 'down' };
+  return { symbol: '→', cls: 'stable' };
+}
+
+function setTrend(id, trend) {
+  const el = document.getElementById(id);
+  el.textContent = trend.symbol;
+  el.className = 'trend ' + trend.cls;
+}
+
+// ВОЗ проверка
+function whoCheck(value, ok, label, statusId, tableValueId, tableStatusId) {
+  const el = document.getElementById(statusId);
+  const tvEl = document.getElementById(tableValueId);
+  const tsEl = document.getElementById(tableStatusId);
+  if (ok) {
+    el.textContent = '✓ Норма';
+    el.className = 'who-status who-ok';
+    if (tvEl) tvEl.textContent = value;
+    if (tsEl) tsEl.innerHTML = '<span class="badge-ok">✓ Норма</span>';
+  } else {
+    el.textContent = '⚠ Превышение';
+    el.className = 'who-status who-warn';
+    if (tvEl) tvEl.textContent = value;
+    if (tsEl) tsEl.innerHTML = '<span class="badge-warn">⚠ Превышение</span>';
+  }
+}
+
 function updateValue(id, newVal) {
   const el = document.getElementById(id);
-  if (el.textContent !== newVal) {
+  if (el.textContent !== String(newVal)) {
     el.textContent = newVal;
     el.classList.remove('updated');
     void el.offsetWidth;
@@ -287,16 +409,30 @@ async function fetchData() {
     if (wqi < 80) { wqiColor = '#ffdd00'; wqiLabel = 'Хорошо 🟡'; }
     if (wqi < 60) { wqiColor = '#ff8800'; wqiLabel = 'Удовлетворительно 🟠'; }
     if (wqi < 40) { wqiColor = '#ff4444'; wqiLabel = 'Плохо 🔴'; }
-
     document.getElementById('wqiScore').style.color = wqiColor;
     document.getElementById('wqiLabel').style.color = wqiColor;
     document.getElementById('wqiLabel').textContent = wqiLabel;
     document.getElementById('wqiFill').style.background = wqiColor;
 
+    // ВОЗ проверки
+    whoCheck(wt + '°C', parseFloat(wt) <= 25, 'вода', 'whoWater', 'whoTableWater', 'whoTableWaterStatus');
+    whoCheck(tds + ' ppm', parseFloat(tds) <= 500, 'tds', 'whoTds', 'whoTableTds', 'whoTableTdsStatus');
+    whoCheck(hum + '%', parseFloat(hum) >= 40 && parseFloat(hum) <= 70, 'влажность', 'whoHum', 'whoTableHum', 'whoTableHumStatus');
+
+    // Сохранить и рендерить историю
     const now = new Date().toLocaleString('ru-RU');
     saveHistory({ time: now, waterTemp: wt, airTemp: at, humidity: hum, tds, light, wqi });
     renderHistory();
 
+    // Тренды
+    const history = loadHistory();
+    setTrend('trendWater', getTrend(history, 'waterTemp'));
+    setTrend('trendAir', getTrend(history, 'airTemp'));
+    setTrend('trendHum', getTrend(history, 'humidity'));
+    setTrend('trendTds', getTrend(history, 'tds'));
+    setTrend('trendLight', getTrend(history, 'light'));
+
+    // Графики
     const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString('ru-RU'));
     tempChart.data.labels = labels;
     tempChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field1) || 0);
