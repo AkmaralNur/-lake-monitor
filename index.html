@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lake Monitoring System</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0a1628; color:white; font-family:Arial; }
+header { background:#0d1f3c; padding:20px; text-align:center; border-bottom:2px solid #00d4ff; }
+header h1 { color:#00d4ff; font-size:32px; }
+header p { color:#88aacc; margin-top:5px; }
+.status { display:inline-block; width:10px; height:10px; border-radius:50%; background:#00ff88; margin-right:8px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; padding:20px; max-width:1200px; margin:auto; }
+.card { background:#1a2a4a; border-radius:15px; padding:20px; text-align:center; border:1px solid #00d4ff33; transition: transform 0.2s; }
+.card:hover { transform: translateY(-5px); }
+.card .icon { font-size:32px; margin-bottom:10px; }
+.card .value { font-size:40px; font-weight:bold; color:#00d4ff; }
+.card .unit { font-size:14px; color:#88aacc; }
+.card .label { font-size:13px; color:#88aacc; margin-top:8px; }
+.wqi-section { margin:0 20px 20px; }
+.wqi-card { background:#1a2a4a; border-radius:15px; padding:30px; text-align:center; border:1px solid #00d4ff33; max-width:1200px; margin:auto; }
+.wqi-card h2 { color:#00d4ff; font-size:22px; margin-bottom:15px; }
+.wqi-score { font-size:80px; font-weight:bold; }
+.wqi-label { font-size:22px; margin-top:5px; }
+.wqi-bar { background:#0a1628; border-radius:10px; height:20px; margin:15px auto; max-width:400px; overflow:hidden; }
+.wqi-fill { height:100%; border-radius:10px; transition: width 1s; }
+.charts { max-width:1200px; margin:0 auto 20px; padding:0 20px; display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+.chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
+.chart-card h3 { color:#00d4ff; margin-bottom:15px; font-size:15px; }
+.last-update { text-align:center; color:#88aacc; font-size:12px; padding:10px; }
+footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-top:1px solid #00d4ff22; }
+@media(max-width:600px) { .charts { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌊 Lake Monitoring System</h1>
+  <p><span class="status"></span>Real-time water quality monitoring • Kyrgyzstan</p>
+</header>
+
+<div class="grid">
+  <div class="card">
+    <div class="icon">💧</div>
+    <div class="value" id="waterTemp">--</div>
+    <div class="unit">°C</div>
+    <div class="label">Water Temperature</div>
+  </div>
+  <div class="card">
+    <div class="icon">🌡️</div>
+    <div class="value" id="airTemp">--</div>
+    <div class="unit">°C</div>
+    <div class="label">Air Temperature</div>
+  </div>
+  <div class="card">
+    <div class="icon">💨</div>
+    <div class="value" id="humidity">--</div>
+    <div class="unit">%</div>
+    <div class="label">Humidity</div>
+  </div>
+  <div class="card">
+    <div class="icon">🔬</div>
+    <div class="value" id="tds">--</div>
+    <div class="unit">ppm</div>
+    <div class="label">Water Quality TDS</div>
+  </div>
+  <div class="card">
+    <div class="icon">☀️</div>
+    <div class="value" id="light">--</div>
+    <div class="unit">lux</div>
+    <div class="label">Light Level</div>
+  </div>
+</div>
+
+<div class="wqi-section">
+  <div class="wqi-card">
+    <h2>Water Quality Index (WQI)</h2>
+    <div class="wqi-score" id="wqiScore">--</div>
+    <div class="wqi-label" id="wqiLabel">Loading...</div>
+    <div class="wqi-bar">
+      <div class="wqi-fill" id="wqiFill" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="charts">
+  <div class="chart-card">
+    <h3>🌡️ Temperature History</h3>
+    <canvas id="tempChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>💨 Humidity History</h3>
+    <canvas id="humChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>🔬 TDS History</h3>
+    <canvas id="tdsChart"></canvas>
+  </div>
+  <div class="chart-card">
+    <h3>☀️ Light History</h3>
+    <canvas id="lightChart"></canvas>
+  </div>
+</div>
+
+<div class="last-update">Last updated: <span id="lastUpdate">--</span></div>
+
+<footer>
+  Lake Monitoring System • ESP32 • ThingSpeak • Made in Kyrgyzstan 🇰🇬
+</footer>
+
+<script>
+const CHANNEL_ID = '3368346';
+const READ_KEY = '839C3D2TM2EPJ0KK';
+const MAX_POINTS = 20;
+
+const tempChart = new Chart(document.getElementById('tempChart'), {
+  type: 'line',
+  data: { labels: [], datasets: [
+    { label: 'Water °C', data: [], borderColor: '#00d4ff', backgroundColor: '#00d4ff22', tension: 0.4, fill: true },
+    { label: 'Air °C', data: [], borderColor: '#ff8800', backgroundColor: '#ff880022', tension: 0.4, fill: true }
+  ]},
+  options: { plugins: { legend: { labels: { color: '#88aacc' } } }, scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } } }
+});
+
+const humChart = new Chart(document.getElementById('humChart'), {
+  type: 'line',
+  data: { labels: [], datasets: [{ label: 'Humidity %', data: [], borderColor: '#00ff88', backgroundColor: '#00ff8822', tension: 0.4, fill: true }] },
+  options: { plugins: { legend: { labels: { color: '#88aacc' } } }, scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } } }
+});
+
+const tdsChart = new Chart(document.getElementById('tdsChart'), {
+  type: 'line',
+  data: { labels: [], datasets: [{ label: 'TDS ppm', data: [], borderColor: '#ff4444', backgroundColor: '#ff444422', tension: 0.4, fill: true }] },
+  options: { plugins: { legend: { labels: { color: '#88aacc' } } }, scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } } }
+});
+
+const lightChart = new Chart(document.getElementById('lightChart'), {
+  type: 'line',
+  data: { labels: [], datasets: [{ label: 'Light lux', data: [], borderColor: '#ffdd00', backgroundColor: '#ffdd0022', tension: 0.4, fill: true }] },
+  options: { plugins: { legend: { labels: { color: '#88aacc' } } }, scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } } }
+});
+
+async function fetchData() {
+  try {
+    const res = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_POINTS}`);
+    const data = await res.json();
+    const feeds = data.feeds;
+    if (!feeds || feeds.length === 0) return;
+
+    const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString());
+    const waterTemps = feeds.map(f => parseFloat(f.field1) || 0);
+    const tdsValues = feeds.map(f => parseFloat(f.field2) || 0);
+    const airTemps = feeds.map(f => parseFloat(f.field3) || 0);
+    const humValues = feeds.map(f => parseFloat(f.field4) || 0);
+    const lightValues = feeds.map(f => parseFloat(f.field5) || 0);
+    const wqiValues = feeds.map(f => parseFloat(f.field6) || 0);
+
+    const last = feeds[feeds.length - 1];
+    document.getElementById('waterTemp').textContent = parseFloat(last.field1).toFixed(1);
+    document.getElementById('airTemp').textContent = parseFloat(last.field3).toFixed(1);
+    document.getElementById('humidity').textContent = parseFloat(last.field4).toFixed(1);
+    document.getElementById('tds').textContent = parseFloat(last.field2).toFixed(0);
+    document.getElementById('light').textContent = parseFloat(last.field5).toFixed(0);
+
+    const wqi = parseFloat(last.field6) || 0;
+    document.getElementById('wqiScore').tex
