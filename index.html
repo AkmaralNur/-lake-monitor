@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lake Monitoring System</title>
+<title>Мониторинг озера</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -38,8 +38,8 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 <body>
 
 <header>
-  <h1>🌊 Lake Monitoring System</h1>
-  <p><span class="status"></span>Real-time water quality monitoring • Kyrgyzstan</p>
+  <h1>🌊 Система мониторинга озера</h1>
+  <p><span class="status"></span>Мониторинг качества воды в реальном времени • Кыргызстан 🇰🇬</p>
 </header>
 
 <div class="grid">
@@ -47,39 +47,39 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
     <div class="icon">💧</div>
     <div class="value" id="waterTemp">--</div>
     <div class="unit">°C</div>
-    <div class="label">Water Temperature</div>
+    <div class="label">Температура воды</div>
   </div>
   <div class="card">
     <div class="icon">🌡️</div>
     <div class="value" id="airTemp">--</div>
     <div class="unit">°C</div>
-    <div class="label">Air Temperature</div>
+    <div class="label">Температура воздуха</div>
   </div>
   <div class="card">
     <div class="icon">💨</div>
     <div class="value" id="humidity">--</div>
     <div class="unit">%</div>
-    <div class="label">Humidity</div>
+    <div class="label">Влажность воздуха</div>
   </div>
   <div class="card">
     <div class="icon">🔬</div>
     <div class="value" id="tds">--</div>
     <div class="unit">ppm</div>
-    <div class="label">Water Quality TDS</div>
+    <div class="label">Качество воды TDS</div>
   </div>
   <div class="card">
     <div class="icon">☀️</div>
     <div class="value" id="light">--</div>
-    <div class="unit">lux</div>
-    <div class="label">Light Level</div>
+    <div class="unit">люкс</div>
+    <div class="label">Освещённость</div>
   </div>
 </div>
 
 <div class="wqi-section">
   <div class="wqi-card">
-    <h2>Water Quality Index (WQI)</h2>
+    <h2>Индекс качества воды (ИКВ)</h2>
     <div class="wqi-score" id="wqiScore">--</div>
-    <div class="wqi-label" id="wqiLabel">Loading...</div>
+    <div class="wqi-label" id="wqiLabel">Загрузка...</div>
     <div class="wqi-bar">
       <div class="wqi-fill" id="wqiFill" style="width:0%"></div>
     </div>
@@ -88,27 +88,27 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 
 <div class="charts">
   <div class="chart-card">
-    <h3>🌡️ Temperature History</h3>
+    <h3>🌡️ История температуры</h3>
     <canvas id="tempChart"></canvas>
   </div>
   <div class="chart-card">
-    <h3>💨 Humidity History</h3>
+    <h3>💨 История влажности</h3>
     <canvas id="humChart"></canvas>
   </div>
   <div class="chart-card">
-    <h3>🔬 TDS History</h3>
+    <h3>🔬 История TDS</h3>
     <canvas id="tdsChart"></canvas>
   </div>
   <div class="chart-card">
-    <h3>☀️ Light History</h3>
+    <h3>☀️ История освещённости</h3>
     <canvas id="lightChart"></canvas>
   </div>
 </div>
 
-<div class="last-update">Last updated: <span id="lastUpdate">--</span></div>
+<div class="last-update">Последнее обновление: <span id="lastUpdate">--</span></div>
 
 <footer>
-  Lake Monitoring System • ESP32 • ThingSpeak • Made in Kyrgyzstan 🇰🇬
+  Система мониторинга озера • ESP32 • ThingSpeak • Сделано в Кыргызстане 🇰🇬
 </footer>
 
 <script>
@@ -127,8 +127,8 @@ const chartOptions = {
 const tempChart = new Chart(document.getElementById('tempChart'), {
   type: 'line',
   data: { labels: [], datasets: [
-    { label: 'Water °C', data: [], borderColor: '#00d4ff', backgroundColor: '#00d4ff22', tension: 0.4, fill: true },
-    { label: 'Air °C', data: [], borderColor: '#ff8800', backgroundColor: '#ff880022', tension: 0.4, fill: true }
+    { label: 'Вода °C', data: [], borderColor: '#00d4ff', backgroundColor: '#00d4ff22', tension: 0.4, fill: true },
+    { label: 'Воздух °C', data: [], borderColor: '#ff8800', backgroundColor: '#ff880022', tension: 0.4, fill: true }
   ]},
   options: chartOptions
 });
@@ -136,7 +136,7 @@ const tempChart = new Chart(document.getElementById('tempChart'), {
 const humChart = new Chart(document.getElementById('humChart'), {
   type: 'line',
   data: { labels: [], datasets: [
-    { label: 'Humidity %', data: [], borderColor: '#00ff88', backgroundColor: '#00ff8822', tension: 0.4, fill: true }
+    { label: 'Влажность %', data: [], borderColor: '#00ff88', backgroundColor: '#00ff8822', tension: 0.4, fill: true }
   ]},
   options: chartOptions
 });
@@ -152,7 +152,7 @@ const tdsChart = new Chart(document.getElementById('tdsChart'), {
 const lightChart = new Chart(document.getElementById('lightChart'), {
   type: 'line',
   data: { labels: [], datasets: [
-    { label: 'Light lux', data: [], borderColor: '#ffdd00', backgroundColor: '#ffdd0022', tension: 0.4, fill: true }
+    { label: 'Освещённость люкс', data: [], borderColor: '#ffdd00', backgroundColor: '#ffdd0022', tension: 0.4, fill: true }
   ]},
   options: chartOptions
 });
@@ -177,17 +177,17 @@ async function fetchData() {
     document.getElementById('wqiFill').style.width = wqi + '%';
 
     let wqiColor = '#00ff88';
-    let wqiLabel = 'Excellent 🟢';
-    if (wqi < 80) { wqiColor = '#ffdd00'; wqiLabel = 'Good 🟡'; }
-    if (wqi < 60) { wqiColor = '#ff8800'; wqiLabel = 'Moderate 🟠'; }
-    if (wqi < 40) { wqiColor = '#ff4444'; wqiLabel = 'Poor 🔴'; }
+    let wqiLabel = 'Отлично 🟢';
+    if (wqi < 80) { wqiColor = '#ffdd00'; wqiLabel = 'Хорошо 🟡'; }
+    if (wqi < 60) { wqiColor = '#ff8800'; wqiLabel = 'Удовлетворительно 🟠'; }
+    if (wqi < 40) { wqiColor = '#ff4444'; wqiLabel = 'Плохо 🔴'; }
 
     document.getElementById('wqiScore').style.color = wqiColor;
     document.getElementById('wqiLabel').style.color = wqiColor;
     document.getElementById('wqiLabel').textContent = wqiLabel;
     document.getElementById('wqiFill').style.background = wqiColor;
 
-    const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString());
+    const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString('ru-RU'));
     const waterTemps = feeds.map(f => parseFloat(f.field1) || 0);
     const tdsValues = feeds.map(f => parseFloat(f.field2) || 0);
     const airTemps = feeds.map(f => parseFloat(f.field3) || 0);
@@ -211,9 +211,9 @@ async function fetchData() {
     lightChart.data.datasets[0].data = lightValues;
     lightChart.update();
 
-    document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleString('ru-RU');
   } catch(e) {
-    console.error('Error:', e);
+    console.error('Ошибка:', e);
   }
 }
 
