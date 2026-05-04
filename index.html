@@ -13,9 +13,16 @@ header::before { content:''; position:absolute; top:-50%; left:-50%; width:200%;
 @keyframes headerGlow { 0%,100%{opacity:0.5} 50%{opacity:1} }
 header h1 { color:#00d4ff; font-size:32px; position:relative; }
 header p { color:#88aacc; margin-top:5px; position:relative; }
+.header-bottom { display:flex; justify-content:center; gap:15px; flex-wrap:wrap; margin-top:10px; position:relative; }
 .status { display:inline-block; width:10px; height:10px; border-radius:50%; background:#00ff88; margin-right:8px; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
-.uptime { background:#1a2a4a; border:1px solid #00d4ff33; border-radius:10px; padding:8px 20px; display:inline-block; margin-top:10px; font-size:13px; color:#00d4ff; position:relative; }
+.uptime { background:#1a2a4a; border:1px solid #00d4ff33; border-radius:10px; padding:8px 20px; font-size:13px; color:#00d4ff; }
+.notif-btn { background:#1a2a4a; border:1px solid #ffdd0033; border-radius:10px; padding:8px 20px; font-size:13px; color:#ffdd00; cursor:pointer; transition:all 0.3s; }
+.notif-btn:hover { background:#ffdd0022; }
+.notif-btn.active { border-color:#00ff88; color:#00ff88; background:#00ff8811; }
+.alert-banner { display:none; background:#ff444422; border:1px solid #ff4444; border-radius:10px; padding:12px 20px; margin:10px 20px; text-align:center; color:#ff4444; font-weight:bold; animation: blink 1s infinite; }
+.alert-banner.show { display:block; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.7} }
 .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; padding:20px; max-width:1200px; margin:auto; }
 .card { background:#1a2a4a; border-radius:15px; padding:20px; text-align:center; border:1px solid #00d4ff33; transition: transform 0.3s, box-shadow 0.3s; animation: fadeIn 0.5s ease-out; position:relative; overflow:hidden; }
 .card::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg, transparent, #00d4ff11, transparent); animation: shimmer 3s infinite; }
@@ -55,6 +62,9 @@ header p { color:#88aacc; margin-top:5px; position:relative; }
 .charts { max-width:1200px; margin:0 auto 20px; padding:0 20px; display:grid; grid-template-columns:1fr 1fr; gap:15px; }
 .chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
 .chart-card h3 { color:#00d4ff; margin-bottom:15px; font-size:15px; }
+.wqi-chart-section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
+.wqi-chart-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
+.wqi-chart-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
 .history-section { max-width:1200px; margin:0 auto 20px; padding:0 20px; }
 .history-card { background:#1a2a4a; border-radius:15px; padding:20px; border:1px solid #00d4ff33; }
 .history-card h3 { color:#00d4ff; margin-bottom:15px; font-size:16px; }
@@ -78,8 +88,13 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
 <header>
   <h1>🌊 Система мониторинга озера</h1>
   <p><span class="status"></span>Мониторинг качества воды в реальном времени • Кыргызстан 🇰🇬</p>
-  <div class="uptime">⏱️ Время работы: <span id="uptime">00:00:00</span></div>
+  <div class="header-bottom">
+    <div class="uptime">⏱️ Время работы: <span id="uptime">00:00:00</span></div>
+    <div class="notif-btn" id="notifBtn" onclick="toggleNotifications()">🔔 Включить уведомления</div>
+  </div>
 </header>
+
+<div class="alert-banner" id="alertBanner"></div>
 
 <div class="grid">
   <div class="card">
@@ -143,6 +158,13 @@ footer { text-align:center; padding:20px; color:#88aacc; font-size:12px; border-
     <div class="wqi-bar">
       <div class="wqi-fill" id="wqiFill" style="width:0%"></div>
     </div>
+  </div>
+</div>
+
+<div class="wqi-chart-section">
+  <div class="wqi-chart-card">
+    <h3>📈 История индекса качества воды (ИКВ)</h3>
+    <canvas id="wqiChart" height="80"></canvas>
   </div>
 </div>
 
@@ -237,8 +259,10 @@ const READ_KEY = '839C3D2TM2EPJ0KK';
 const MAX_POINTS = 20;
 const STORAGE_KEY = 'lake_monitor_history';
 const START_TIME = Date.now();
+let notificationsEnabled = false;
+let lastAlertTime = 0;
 
-// Uptime счётчик
+// Uptime
 setInterval(() => {
   const elapsed = Math.floor((Date.now() - START_TIME) / 1000);
   const h = Math.floor(elapsed / 3600).toString().padStart(2,'0');
@@ -247,6 +271,40 @@ setInterval(() => {
   document.getElementById('uptime').textContent = `${h}:${m}:${s}`;
 }, 1000);
 
+// Уведомления
+async function toggleNotifications() {
+  if (!('Notification' in window)) { alert('Браузер не поддерживает уведомления'); return; }
+  if (Notification.permission === 'denied') { alert('Уведомления заблокированы в браузере'); return; }
+  if (Notification.permission !== 'granted') {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') return;
+  }
+  notificationsEnabled = !notificationsEnabled;
+  const btn = document.getElementById('notifBtn');
+  if (notificationsEnabled) {
+    btn.textContent = '🔔 Уведомления включены';
+    btn.classList.add('active');
+    new Notification('Мониторинг озера', { body: 'Уведомления включены! Вы будете получать оповещения о превышении норм.', icon: '🌊' });
+  } else {
+    btn.textContent = '🔔 Включить уведомления';
+    btn.classList.remove('active');
+  }
+}
+
+function sendAlert(message) {
+  const now = Date.now();
+  if (now - lastAlertTime < 60000) return;
+  lastAlertTime = now;
+  const banner = document.getElementById('alertBanner');
+  banner.textContent = '⚠️ ' + message;
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 10000);
+  if (notificationsEnabled && Notification.permission === 'granted') {
+    new Notification('⚠️ Предупреждение - Мониторинг озера', { body: message });
+  }
+}
+
+// Графики
 const chartOptions = {
   plugins: { legend: { labels: { color: '#88aacc' } } },
   scales: { x: { ticks: { color: '#88aacc', maxTicksLimit: 6 } }, y: { ticks: { color: '#88aacc' } } },
@@ -280,6 +338,39 @@ const lightChart = new Chart(document.getElementById('lightChart'), {
   options: chartOptions
 });
 
+const wqiChart = new Chart(document.getElementById('wqiChart'), {
+  type: 'line',
+  data: { labels: [], datasets: [{
+    label: 'ИКВ',
+    data: [],
+    borderColor: '#00ff88',
+    backgroundColor: '#00ff8822',
+    tension: 0.4,
+    fill: true,
+    pointBackgroundColor: function(ctx) {
+      const v = ctx.dataset.data[ctx.dataIndex];
+      if (v >= 80) return '#00ff88';
+      if (v >= 60) return '#ffdd00';
+      if (v >= 40) return '#ff8800';
+      return '#ff4444';
+    },
+    pointRadius: 5
+  }]},
+  options: {
+    plugins: { legend: { labels: { color: '#88aacc' } },
+      annotation: { annotations: [{
+        type: 'line', yMin: 80, yMax: 80,
+        borderColor: '#00ff8844', borderWidth: 1, borderDash: [5,5]
+      }]}
+    },
+    scales: {
+      x: { ticks: { color: '#88aacc', maxTicksLimit: 8 } },
+      y: { min: 0, max: 100, ticks: { color: '#88aacc' } }
+    },
+    animation: { duration: 1000 }
+  }
+});
+
 // История
 function loadHistory() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
@@ -304,9 +395,7 @@ function exportCSV() {
   const history = loadHistory();
   if (history.length === 0) { alert('История пуста!'); return; }
   let csv = 'Время,Температура воды °C,Температура воздуха °C,Влажность %,TDS ppm,Освещённость люкс,ИКВ\n';
-  history.forEach(e => {
-    csv += `${e.time},${e.waterTemp},${e.airTemp},${e.humidity},${e.tds},${e.light},${e.wqi}\n`;
-  });
+  history.forEach(e => { csv += `${e.time},${e.waterTemp},${e.airTemp},${e.humidity},${e.tds},${e.light},${e.wqi}\n`; });
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -322,20 +411,11 @@ function renderHistory() {
   history.slice(0, 50).forEach(entry => {
     const tr = document.createElement('tr');
     const wqiColor = entry.wqi >= 80 ? '#00ff88' : entry.wqi >= 60 ? '#ffdd00' : '#ff4444';
-    tr.innerHTML = `
-      <td>${entry.time}</td>
-      <td>${entry.waterTemp}</td>
-      <td>${entry.airTemp}</td>
-      <td>${entry.humidity}</td>
-      <td>${entry.tds}</td>
-      <td>${entry.light}</td>
-      <td style="color:${wqiColor}">${entry.wqi}</td>
-    `;
+    tr.innerHTML = `<td>${entry.time}</td><td>${entry.waterTemp}</td><td>${entry.airTemp}</td><td>${entry.humidity}</td><td>${entry.tds}</td><td>${entry.light}</td><td style="color:${wqiColor}">${entry.wqi}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-// Тренд
 function getTrend(history, field) {
   if (history.length < 3) return { symbol: '→', cls: 'stable' };
   const vals = history.slice(0, 5).map(h => parseFloat(h[field])).filter(v => !isNaN(v));
@@ -352,8 +432,7 @@ function setTrend(id, trend) {
   el.className = 'trend ' + trend.cls;
 }
 
-// ВОЗ проверка
-function whoCheck(value, ok, label, statusId, tableValueId, tableStatusId) {
+function whoCheck(value, ok, statusId, tableValueId, tableStatusId) {
   const el = document.getElementById(statusId);
   const tvEl = document.getElementById(tableValueId);
   const tsEl = document.getElementById(tableStatusId);
@@ -404,6 +483,11 @@ async function fetchData() {
     updateValue('wqiScore', wqi);
     document.getElementById('wqiFill').style.width = wqi + '%';
 
+    // Проверка алертов
+    if (parseFloat(wt) > 25) sendAlert(`Температура воды превышает норму ВОЗ: ${wt}°C (норма до 25°C)`);
+    if (parseFloat(tds) > 500) sendAlert(`TDS превышает норму ВОЗ: ${tds} ppm (норма до 500 ppm)`);
+    if (wqi < 60) sendAlert(`Индекс качества воды низкий: ${wqi} (удовлетворительно)`);
+
     let wqiColor = '#00ff88';
     let wqiLabel = 'Отлично 🟢';
     if (wqi < 80) { wqiColor = '#ffdd00'; wqiLabel = 'Хорошо 🟡'; }
@@ -414,17 +498,14 @@ async function fetchData() {
     document.getElementById('wqiLabel').textContent = wqiLabel;
     document.getElementById('wqiFill').style.background = wqiColor;
 
-    // ВОЗ проверки
-    whoCheck(wt + '°C', parseFloat(wt) <= 25, 'вода', 'whoWater', 'whoTableWater', 'whoTableWaterStatus');
-    whoCheck(tds + ' ppm', parseFloat(tds) <= 500, 'tds', 'whoTds', 'whoTableTds', 'whoTableTdsStatus');
-    whoCheck(hum + '%', parseFloat(hum) >= 40 && parseFloat(hum) <= 70, 'влажность', 'whoHum', 'whoTableHum', 'whoTableHumStatus');
+    whoCheck(wt + '°C', parseFloat(wt) <= 25, 'whoWater', 'whoTableWater', 'whoTableWaterStatus');
+    whoCheck(tds + ' ppm', parseFloat(tds) <= 500, 'whoTds', 'whoTableTds', 'whoTableTdsStatus');
+    whoCheck(hum + '%', parseFloat(hum) >= 40 && parseFloat(hum) <= 70, 'whoHum', 'whoTableHum', 'whoTableHumStatus');
 
-    // Сохранить и рендерить историю
     const now = new Date().toLocaleString('ru-RU');
     saveHistory({ time: now, waterTemp: wt, airTemp: at, humidity: hum, tds, light, wqi });
     renderHistory();
 
-    // Тренды
     const history = loadHistory();
     setTrend('trendWater', getTrend(history, 'waterTemp'));
     setTrend('trendAir', getTrend(history, 'airTemp'));
@@ -432,7 +513,6 @@ async function fetchData() {
     setTrend('trendTds', getTrend(history, 'tds'));
     setTrend('trendLight', getTrend(history, 'light'));
 
-    // Графики
     const labels = feeds.map(f => new Date(f.created_at).toLocaleTimeString('ru-RU'));
     tempChart.data.labels = labels;
     tempChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field1) || 0);
@@ -450,6 +530,12 @@ async function fetchData() {
     lightChart.data.labels = labels;
     lightChart.data.datasets[0].data = feeds.map(f => parseFloat(f.field5) || 0);
     lightChart.update();
+
+    // ИКВ график из истории
+    const wqiHistory = history.slice(0, 20).reverse();
+    wqiChart.data.labels = wqiHistory.map(h => h.time.split(',')[1]?.trim() || h.time);
+    wqiChart.data.datasets[0].data = wqiHistory.map(h => h.wqi);
+    wqiChart.update();
 
     document.getElementById('lastUpdate').textContent = now;
   } catch(e) {
