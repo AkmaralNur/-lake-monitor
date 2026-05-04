@@ -145,7 +145,10 @@ const lightChart = new Chart(document.getElementById('lightChart'), {
 
 async function fetchData() {
   try {
-    const res = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_POINTS}`);
+    const res = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_KEY}&results=${MAX_POINTS}`, {
+  mode: 'cors',
+  headers: { 'Accept': 'application/json' }
+});
     const data = await res.json();
     const feeds = data.feeds;
     if (!feeds || feeds.length === 0) return;
