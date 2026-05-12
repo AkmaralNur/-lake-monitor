@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Мониторинг озера · Кыргызстан</title>
+<title>Иссык-Куль · Мониторинг воды</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -270,7 +270,7 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
 <nav class="nav">
   <div class="nav-logo">
     <div class="nav-logo-icon">🌊</div>
-    <div class="nav-logo-text">Озеро · KG</div>
+    <div class="nav-logo-text">Иссык-Куль · KG</div>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showPage('home',this)"><i class="fas fa-home"></i> Главная</button>
@@ -294,8 +294,8 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
 
   <div class="hero">
     <div>
-      <div class="hero-title">🌊 Мониторинг озера · Кыргызстан</div>
-      <div class="hero-sub">ESP32 · DS18B20 · DHT22 · TDS V1.0 · Датчик мутности · ThingSpeak 🇰🇬</div>
+      <div class="hero-title">🏔️ Мониторинг озера Иссык-Куль</div>
+      <div class="hero-sub">Солоноватое высокогорное озеро · 1608 м н.у.м. · Кыргызстан 🇰🇬<br>ESP32 · DS18B20 · DHT22 · TDS V1.0 · Датчик мутности · ThingSpeak</div>
     </div>
     <div style="text-align:right">
       <div class="live-badge"><div class="status-dot"></div> В эфире · 15с</div>
@@ -310,7 +310,7 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
       <div class="scard-top"><div class="scard-icon ic-blue"><i class="fas fa-water"></i></div><span class="trend" id="trendWater">→</span></div>
       <div class="scard-label">Температура воды</div>
       <div class="scard-val"><span id="h-waterTemp">--</span><span class="scard-unit">°C</span></div>
-      <div class="scard-bottom"><span class="who-badge" id="h-whoWater">—</span><span class="scard-norm">ВОЗ &lt;25°C</span></div>
+      <div class="scard-bottom"><span class="who-badge" id="h-whoWater">—</span><span class="scard-norm">Купание 18–24°C</span></div>
     </div>
     <div class="scard amber-top">
       <div class="scard-top"><div class="scard-icon ic-amber"><i class="fas fa-thermometer-half"></i></div><span class="trend" id="trendAir">→</span></div>
@@ -328,7 +328,7 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
       <div class="scard-top"><div class="scard-icon ic-purple"><i class="fas fa-microscope"></i></div><span class="trend" id="trendTds">→</span></div>
       <div class="scard-label">TDS</div>
       <div class="scard-val"><span id="h-tds">--</span><span class="scard-unit">ppm</span></div>
-      <div class="scard-bottom"><span class="who-badge" id="h-whoTds">—</span><span class="scard-norm">ВОЗ &lt;500</span></div>
+      <div class="scard-bottom"><span class="who-badge" id="h-whoTds">—</span><span class="scard-norm">Норма 5–7к ppm</span></div>
     </div>
     <div class="scard green-top">
       <div class="scard-top"><div class="scard-icon ic-green"><i class="fas fa-sun"></i></div><span class="trend" id="trendLight">→</span></div>
@@ -347,7 +347,7 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
       <div class="scard-top"><div class="scard-icon ic-cyan"><i class="fas fa-flask"></i></div></div>
       <div class="scard-label">Солёность (расч.)</div>
       <div class="scard-val"><span id="h-salinity">--</span><span class="scard-unit">г/л</span></div>
-      <div class="scard-bottom"><span class="who-badge" id="h-whoSal">—</span><span class="scard-norm">по TDS × 1.56</span></div>
+      <div class="scard-bottom"><span class="who-badge" id="h-whoSal">—</span><span class="scard-norm">Норма 5–6.5 г/л</span></div>
     </div>
     <div class="scard red-top">
       <div class="scard-top"><div class="scard-icon ic-red"><i class="fas fa-shield-alt"></i></div></div>
@@ -391,18 +391,18 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
     <div class="dcard"><div class="dcard-icon">🌡️</div><div class="dcard-val" id="h-heatIdx">--</div><div class="dcard-unit">°C</div><div class="dcard-label">Индекс жары</div></div>
   </div>
 
-  <!-- НОРМЫ ВОЗ -->
-  <div class="sec"><i class="fas fa-heartbeat" style="color:var(--red)"></i> Нормы ВОЗ</div>
+  <!-- НОРМЫ ИССЫК-КУЛЬ -->
+  <div class="sec"><i class="fas fa-mountain" style="color:var(--teal)"></i> Нормы для Иссык-Куля</div>
   <div class="card">
     <table class="tbl">
-      <thead><tr><th>Показатель</th><th>Норма ВОЗ</th><th>Текущее</th><th>Статус</th></tr></thead>
+      <thead><tr><th>Показатель</th><th>Норма Иссык-Куль</th><th>Текущее</th><th>Статус</th></tr></thead>
       <tbody>
-        <tr><td>Температура воды</td><td class="mono">до 25°C</td><td class="mono" id="whoTblWater">--</td><td id="whoTblWaterSt">--</td></tr>
-        <tr><td>TDS</td><td class="mono">до 500 ppm</td><td class="mono" id="whoTblTds">--</td><td id="whoTblTdsSt">--</td></tr>
+        <tr><td>Температура воды (купание)</td><td class="mono">18–24°C (лето)</td><td class="mono" id="whoTblWater">--</td><td id="whoTblWaterSt">--</td></tr>
+        <tr><td>TDS (норма озера)</td><td class="mono">5000–7000 ppm</td><td class="mono" id="whoTblTds">--</td><td id="whoTblTdsSt">--</td></tr>
         <tr><td>Влажность воздуха</td><td class="mono">40–70%</td><td class="mono" id="whoTblHum">--</td><td id="whoTblHumSt">--</td></tr>
-        <tr><td>Мутность (питьё)</td><td class="mono">до 5 NTU</td><td class="mono" id="whoTblTurb">--</td><td id="whoTblTurbSt">--</td></tr>
+        <tr><td>Мутность (норма озера)</td><td class="mono">до 5 NTU</td><td class="mono" id="whoTblTurb">--</td><td id="whoTblTurbSt">--</td></tr>
         <tr><td>Мутность (купание)</td><td class="mono">до 200 NTU</td><td class="mono" id="whoTblTurb2">--</td><td id="whoTblTurb2St">--</td></tr>
-        <tr><td>Солёность (пресная)</td><td class="mono">до 0.5 г/л</td><td class="mono" id="whoTblSal">--</td><td id="whoTblSalSt">--</td></tr>
+        <tr><td>Солёность (норма озера)</td><td class="mono">5.0–6.5 г/л</td><td class="mono" id="whoTblSal">--</td><td id="whoTblSalSt">--</td></tr>
         <tr><td>Точка росы</td><td>ниже темп. воздуха</td><td class="mono" id="whoTblDew">--</td><td id="whoTblDewSt">--</td></tr>
       </tbody>
     </table>
@@ -414,32 +414,152 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
      ЭКОЛОГИЯ
 ══════════════════════════════════ -->
 <div class="page" id="page-ecology">
-  <div class="page-title">Экология</div>
-  <div class="page-sub">Риски для водных обитателей, пригодность воды, аномалии</div>
+  <div class="page-title">Экология Иссык-Куля</div>
+  <div class="page-sub">Реальные обитатели озера · индикаторы риска по текущим данным датчиков</div>
 
-  <div class="sec"><i class="fas fa-fish" style="color:var(--teal)"></i> Водные обитатели</div>
-  <div class="card">
-    <div class="g4">
-      <div class="fish-card fish-safe" id="fishCard"><span class="fish-emoji">🐟</span><div class="fish-name">Рыба</div><div class="fish-desc">15–25°C · TDS &lt;500</div><div class="fish-status" id="fishStatus">Загрузка...</div></div>
-      <div class="fish-card fish-safe" id="birdCard"><span class="fish-emoji">🦆</span><div class="fish-name">Птицы</div><div class="fish-desc">Вода до 30°C</div><div class="fish-status" id="birdStatus">Загрузка...</div></div>
-      <div class="fish-card fish-safe" id="algaeCard"><span class="fish-emoji">🦠</span><div class="fish-name">Цветение</div><div class="fish-desc">Темп + TDS + свет</div><div class="fish-status" id="algaeStatus">Загрузка...</div></div>
-      <div class="fish-card fish-safe" id="turbFishCard"><span class="fish-emoji">👁</span><div class="fish-name">Прозрачность</div><div class="fish-desc">ВОЗ купание &lt;200 NTU</div><div class="fish-status" id="turbFishStatus">Загрузка...</div></div>
+  <!-- РЫБЫ -->
+  <div class="sec"><i class="fas fa-fish" style="color:var(--teal)"></i> Рыбы озера (26 видов, 12 эндемиков)</div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px" id="fishGrid">
+
+      <div class="fish-card fish-safe" id="fc-trout">
+        <span class="fish-emoji">🐟</span>
+        <div class="fish-name">Форель (севанская)</div>
+        <div class="fish-desc">Завезена с оз. Севан<br>Оптимум: 10–18°C<br>Чувствительна к теплу</div>
+        <div class="fish-status" id="fs-trout">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="fc-chebak">
+        <span class="fish-emoji">🐠</span>
+        <div class="fish-name">Чебачок ⚠️ Эндемик</div>
+        <div class="fish-desc">90% биомассы озера<br>Оптимум: 15–22°C<br>Под угрозой исчезновения</div>
+        <div class="fish-status" id="fs-chebak">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="fc-osman">
+        <span class="fish-emoji">🐡</span>
+        <div class="fish-name">Осман голый 🔴 Эндемик</div>
+        <div class="fish-desc">Красная книга КР<br>Оптимум: 12–20°C<br>Вымирающий вид</div>
+        <div class="fish-status" id="fs-osman">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="fc-marinka">
+        <span class="fish-emoji">🐟</span>
+        <div class="fish-name">Маринка 🔴 Эндемик</div>
+        <div class="fish-desc">Красная книга КР<br>Оптимум: 12–20°C<br>Икра и брюшина ядовиты</div>
+        <div class="fish-status" id="fs-marinka">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="fc-sudak">
+        <span class="fish-emoji">🐟</span>
+        <div class="fish-name">Судак</div>
+        <div class="fish-desc">Завезён с оз. Селигер<br>Оптимум: 18–24°C<br>Промысловая рыба</div>
+        <div class="fish-status" id="fs-sudak">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="fc-omul">
+        <span class="fish-emoji">🐟</span>
+        <div class="fish-name">Омуль сибирский</div>
+        <div class="fish-desc">Завезён из Сибири<br>Оптимум: 8–16°C<br>Холодолюбивая рыба</div>
+        <div class="fish-status" id="fs-omul">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="fc-carp">
+        <span class="fish-emoji">🐟</span>
+        <div class="fish-name">Сазан / Карп</div>
+        <div class="fish-desc">Завезённый вид<br>Оптимум: 20–28°C<br>Тепловодная рыба</div>
+        <div class="fish-status" id="fs-carp">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="fc-turb-fish">
+        <span class="fish-emoji">👁</span>
+        <div class="fish-name">Прозрачность воды</div>
+        <div class="fish-desc">Иссык-Куль: до 30 м<br>Норма мутности: &lt;5 NTU<br>Видимость сейчас:</div>
+        <div class="fish-status" id="fs-turb-fish">—</div>
+      </div>
+
     </div>
   </div>
 
-  <div class="sec"><i class="fas fa-tint" style="color:var(--accent)"></i> Пригодность воды (ВОЗ)</div>
+  <!-- ПТИЦЫ -->
+  <div class="sec"><i class="fas fa-dove" style="color:var(--accent)"></i> Птицы · зимует 20–65 тысяч особей</div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+
+      <div class="fish-card fish-safe" id="bc-swan">
+        <span class="fish-emoji">🦢</span>
+        <div class="fish-name">Лебедь-шипун</div>
+        <div class="fish-desc">~850 особей зимует<br>Зап. заливы озера<br>Охраняемый вид</div>
+        <div class="fish-status" id="bs-swan">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="bc-duck">
+        <span class="fish-emoji">🦆</span>
+        <div class="fish-name">Красноносый нырок</div>
+        <div class="fish-desc">До 50 тыс. зимует<br>Ныряет до 2 м<br>Питается рдестами</div>
+        <div class="fish-status" id="bs-duck">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="bc-coot">
+        <span class="fish-emoji">🐦</span>
+        <div class="fish-name">Лысуха</div>
+        <div class="fish-desc">Массовый зимовщик<br>Питается водорослями<br>Индикатор чистоты</div>
+        <div class="fish-status" id="bs-coot">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="bc-heron">
+        <span class="fish-emoji">🦩</span>
+        <div class="fish-name">Серая цапля</div>
+        <div class="fish-desc">Гнездится на берегах<br>Питается рыбой<br>Чувствительна к мутности</div>
+        <div class="fish-status" id="bs-heron">—</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- РАСТЕНИЯ -->
+  <div class="sec"><i class="fas fa-seedling" style="color:var(--green)"></i> Подводные растения</div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+
+      <div class="fish-card fish-safe" id="pc-chara">
+        <span class="fish-emoji">🌿</span>
+        <div class="fish-name">Харовые водоросли</div>
+        <div class="fish-desc">Сплошной покров до 35–40 м<br>Очищают воду<br>Индикатор чистоты</div>
+        <div class="fish-status" id="ps-chara">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="pc-rdest">
+        <span class="fish-emoji">🌱</span>
+        <div class="fish-name">Рдест (Potamogeton)</div>
+        <div class="fish-desc">В заливах, мелководье<br>Корм для птиц<br>Чувствителен к мутности</div>
+        <div class="fish-status" id="ps-rdest">—</div>
+      </div>
+
+      <div class="fish-card fish-safe" id="pc-algae">
+        <span class="fish-emoji">🦠</span>
+        <div class="fish-name">Риск цветения</div>
+        <div class="fish-desc">Темп + TDS + освещение<br>Эвтрофикация<br>Иссык-Куль — низкий риск</div>
+        <div class="fish-status" id="ps-algae">—</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ПРИГОДНОСТЬ ВОДЫ -->
+  <div class="sec"><i class="fas fa-tint" style="color:var(--accent)"></i> Пригодность воды</div>
   <div class="card">
     <div class="wu-grid">
       <div class="wu-box">
-        <div class="wu-title">🚰 Для питья</div>
+        <div class="wu-title">🚰 Для питья (справка)</div>
         <div class="wu-row"><span class="wu-key">Температура</span><span id="drinkTemp" class="wu-ok">--</span></div>
         <div class="wu-row"><span class="wu-key">TDS</span><span id="drinkTds" class="wu-ok">--</span></div>
         <div class="wu-row"><span class="wu-key">Мутность</span><span id="drinkTurb" class="wu-ok">--</span></div>
         <div class="wu-row"><span class="wu-key">Солёность</span><span id="drinkSal" class="wu-ok">--</span></div>
-        <div class="wu-result wr-ok" id="drinkResult">—</div>
+        <div class="wu-result wr-warn" id="drinkResult">—</div>
       </div>
       <div class="wu-box">
-        <div class="wu-title">🏊 Для купания</div>
+        <div class="wu-title">🏊 Для купания (Иссык-Куль)</div>
         <div class="wu-row"><span class="wu-key">Температура</span><span id="swimTemp" class="wu-ok">--</span></div>
         <div class="wu-row"><span class="wu-key">TDS</span><span id="swimTds" class="wu-ok">--</span></div>
         <div class="wu-row"><span class="wu-key">Мутность</span><span id="swimTurb" class="wu-ok">--</span></div>
@@ -538,7 +658,7 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
   </div>
 </div>
 
-<div class="footer">ESP32 · DS18B20 · DHT22 · TDS V1.0 · Датчик мутности · ThingSpeak · Кыргызстан 🇰🇬</div>
+<div class="footer">Озеро Иссык-Куль · ESP32 · DS18B20 · DHT22 · TDS V1.0 · Датчик мутности · ThingSpeak · Кыргызстан 🇰🇬</div>
 
 <script>
 const CHANNEL_ID='3368346',READ_KEY='839C3D2TM2EPJ0KK',STORAGE_KEY='lake_monitor_v5';
@@ -589,12 +709,14 @@ function showPage(name,tabEl){
   if(name==='journal'){renderHistory();updateSummary();}
 }
 
-// ─── РАСЧЁТ СОЛЁНОСТИ ───
-function calcSalinity(tds){return(tds*0.001*1.56);}
+// ─── РАСЧЁТ СОЛЁНОСТИ (Иссык-Куль — солоноватое озеро) ───
+// Иссык-Куль: ~6 г/л, коэффициент для солоноватой воды
+function calcSalinity(tds){return(tds*0.001*1.0);}  // для Иссык-Куля TDS≈6000 → ~6 г/л
 function salinityType(sal){
   if(sal<0.5)return'Пресная';
-  if(sal<1.5)return'Слабосолёная';
-  if(sal<5)return'Солоноватая';
+  if(sal<5.0)return'Слабосолёная';
+  if(sal<=7.0)return'✓ Норма озера';  // 5–7 г/л — норма Иссык-Куля
+  if(sal<10)return'Повышенная';
   return'Солёная';
 }
 function secchiDepth(ntu){
@@ -776,24 +898,115 @@ async function loadPeriodData(period){
   }catch(e){document.getElementById('periodLoading').textContent='Ошибка загрузки';}
 }
 
-// ─── ЭКОЛОГИЯ ───
+// ─── ОБИТАТЕЛИ ИССЫК-КУЛЯ ───
+function setSpecies(statusId, cardId, status, cls) {
+  var s=document.getElementById(statusId);
+  var c=document.getElementById(cardId);
+  if(s){s.textContent=status;s.className='fish-status fs-'+cls;}
+  if(c)c.className='fish-card fish-'+cls;
+}
+
 function updateFish(wt,tds,ntu){
-  var set=function(id,cid,status,cls){document.getElementById(id).textContent=status;document.getElementById(id).className='fish-status fs-'+cls;document.getElementById(cid).className='fish-card fish-'+cls;};
-  set('fishStatus','fishCard',wt<=25&&tds<=500?'✓ Безопасно':wt<=30&&tds<=800?'⚠ Умеренный':'✕ Высокий риск',wt<=25&&tds<=500?'safe':wt<=30&&tds<=800?'warn':'danger');
-  set('birdStatus','birdCard',wt<=30?'✓ Безопасно':'⚠ Умеренный',wt<=30?'safe':'warn');
-  set('algaeStatus','algaeCard',wt>25&&tds>300?'✕ Высокий':wt>20&&tds>200?'⚠ Умеренный':'✓ Низкий',wt>25&&tds>300?'danger':wt>20&&tds>200?'warn':'safe');
-  set('turbFishStatus','turbFishCard',ntu<50?'✓ Прозрачная':ntu<200?'⚠ Мутновато':'✕ Очень мутная',ntu<50?'safe':ntu<200?'warn':'danger');
+  var eutro=calcEutro(wt,tds,0);
+
+  // ── РЫБЫ ──
+  // Форель: холодолюбивая, оптимум 10–18°C
+  if(wt<=18)setSpecies('fs-trout','fc-trout','✓ Идеальные условия','safe');
+  else if(wt<=22)setSpecies('fs-trout','fc-trout','⚠ Немного тепло','warn');
+  else setSpecies('fs-trout','fc-trout','✕ Слишком тепло','danger');
+
+  // Чебачок-эндемик: оптимум 15–22°C, основная рыба озера
+  if(wt>=15&&wt<=22&&ntu<=10)setSpecies('fs-chebak','fc-chebak','✓ Оптимальные условия','safe');
+  else if(wt<=25&&ntu<=30)setSpecies('fs-chebak','fc-chebak','⚠ Условия терпимые','warn');
+  else setSpecies('fs-chebak','fc-chebak','✕ Риск для эндемика!','danger');
+
+  // Осман голый (Красная книга): очень чувствителен
+  if(wt>=12&&wt<=20&&ntu<=5)setSpecies('fs-osman','fc-osman','✓ Условия подходят','safe');
+  else if(wt<=23&&ntu<=15)setSpecies('fs-osman','fc-osman','⚠ Осторожно','warn');
+  else setSpecies('fs-osman','fc-osman','✕ Критический риск!','danger');
+
+  // Маринка (Красная книга): аналог османа
+  if(wt>=12&&wt<=20&&ntu<=5)setSpecies('fs-marinka','fc-marinka','✓ Условия подходят','safe');
+  else if(wt<=23&&ntu<=15)setSpecies('fs-marinka','fc-marinka','⚠ Осторожно','warn');
+  else setSpecies('fs-marinka','fc-marinka','✕ Критический риск!','danger');
+
+  // Судак: теплолюбивый, оптимум 18–24°C
+  if(wt>=18&&wt<=24)setSpecies('fs-sudak','fc-sudak','✓ Оптимально','safe');
+  else if(wt>=14&&wt<=28)setSpecies('fs-sudak','fc-sudak','⚠ Приемлемо','warn');
+  else setSpecies('fs-sudak','fc-sudak','✕ Неблагоприятно','danger');
+
+  // Омуль сибирский: холодолюбивый, оптимум 8–16°C
+  if(wt<=16)setSpecies('fs-omul','fc-omul','✓ Хорошие условия','safe');
+  else if(wt<=20)setSpecies('fs-omul','fc-omul','⚠ Немного тепло','warn');
+  else setSpecies('fs-omul','fc-omul','✕ Слишком тепло','danger');
+
+  // Сазан/Карп: теплолюбивый
+  if(wt>=20&&wt<=28)setSpecies('fs-carp','fc-carp','✓ Оптимально','safe');
+  else if(wt>=16)setSpecies('fs-carp','fc-carp','⚠ Прохладно','warn');
+  else setSpecies('fs-carp','fc-carp','✕ Слишком холодно','danger');
+
+  // Прозрачность (Иссык-Куль норма до 30 м)
+  var sec=parseFloat((1.13/Math.sqrt(Math.max(ntu,0.1))).toFixed(1));
+  if(ntu<=5)setSpecies('fs-turb-fish','fc-turb-fish','✓ '+sec+' м · отлично','safe');
+  else if(ntu<=50)setSpecies('fs-turb-fish','fc-turb-fish','⚠ '+sec+' м · мутновато','warn');
+  else setSpecies('fs-turb-fish','fc-turb-fish','✕ '+sec+' м · мутная','danger');
+
+  // ── ПТИЦЫ ──
+  // Лебедь: зимует, чувствителен к загрязнению
+  if(ntu<=10&&wt<=15)setSpecies('bs-swan','bc-swan','✓ Благоприятно','safe');
+  else if(ntu<=50)setSpecies('bs-swan','bc-swan','⚠ Умеренный риск','warn');
+  else setSpecies('bs-swan','bc-swan','✕ Плохие условия','danger');
+
+  // Нырок красноносый: ныряет за едой
+  if(ntu<=20)setSpecies('bs-duck','bc-duck','✓ Видимость хорошая','safe');
+  else if(ntu<=100)setSpecies('bs-duck','bc-duck','⚠ Видимость слабая','warn');
+  else setSpecies('bs-duck','bc-duck','✕ Охота затруднена','danger');
+
+  // Лысуха: питается водорослями
+  if(ntu<=15&&eutro<=40)setSpecies('bs-coot','bc-coot','✓ Корм доступен','safe');
+  else if(ntu<=50)setSpecies('bs-coot','bc-coot','⚠ Условия меняются','warn');
+  else setSpecies('bs-coot','bc-coot','✕ Неблагоприятно','danger');
+
+  // Цапля: питается рыбой, нужна прозрачность
+  if(ntu<=10)setSpecies('bs-heron','bc-heron','✓ Видит рыбу хорошо','safe');
+  else if(ntu<=40)setSpecies('bs-heron','bc-heron','⚠ Охота затруднена','warn');
+  else setSpecies('bs-heron','bc-heron','✕ Не видит добычу','danger');
+
+  // ── РАСТЕНИЯ ──
+  // Харовые водоросли: растут до 40 м, нужна прозрачность
+  if(ntu<=5&&eutro<=30)setSpecies('ps-chara','pc-chara','✓ Условия хорошие','safe');
+  else if(ntu<=20&&eutro<=60)setSpecies('ps-chara','pc-chara','⚠ Условия ухудшаются','warn');
+  else setSpecies('ps-chara','pc-chara','✕ Риск деградации','danger');
+
+  // Рдест: в заливах, нужна чистота
+  if(ntu<=10&&eutro<=40)setSpecies('ps-rdest','pc-rdest','✓ Растёт нормально','safe');
+  else if(ntu<=30)setSpecies('ps-rdest','pc-rdest','⚠ Умеренный риск','warn');
+  else setSpecies('ps-rdest','pc-rdest','✕ Угроза зарастания','danger');
+
+  // Цветение водорослей
+  if(eutro<=30)setSpecies('ps-algae','pc-algae','✓ Риск низкий','safe');
+  else if(eutro<=60)setSpecies('ps-algae','pc-algae','⚠ Умеренный риск','warn');
+  else setSpecies('ps-algae','pc-algae','✕ Высокий риск!','danger');
 }
 function updateWaterUse(wt,tds,wqi,ntu,sal){
   var se=function(id,val,ok){var e=document.getElementById(id);if(e){e.textContent=val;e.className=ok?'wu-ok':'wu-warn';}};
-  se('drinkTemp',wt.toFixed(1)+'°C',wt<=25);se('drinkTds',tds.toFixed(0)+' ppm',tds<=500);
-  se('drinkTurb',ntu.toFixed(0)+' NTU',ntu<=5);se('drinkSal',sal.toFixed(3)+' г/л',sal<=0.5);
-  se('swimTemp',wt.toFixed(1)+'°C',wt<=30);se('swimTds',tds.toFixed(0)+' ppm',tds<=1000);
-  se('swimTurb',ntu.toFixed(0)+' NTU',ntu<=200);se('swimWqi',wqi,wqi>=60);
-  var drOk=wt<=25&&tds<=500&&ntu<=5&&sal<=0.5;
-  var swOk=wt<=30&&ntu<=200&&wqi>=60;
-  var dr=document.getElementById('drinkResult');if(dr){dr.textContent=drOk?'✓ Пригодна для питья':'✕ Не пригодна';dr.className='wu-result '+(drOk?'wr-ok':'wr-warn');}
-  var sr=document.getElementById('swimResult');if(sr){sr.textContent=swOk?'✓ Пригодна для купания':'✕ Не рекомендуется';sr.className='wu-result '+(swOk?'wr-ok':'wr-warn');}
+  // Иссык-Куль — солоноватое, НЕ питьевое (соль ~6 г/л, TDS ~6000)
+  se('drinkTemp',wt.toFixed(1)+'°C',wt<=25);
+  se('drinkTds',tds.toFixed(0)+' ppm',false);
+  se('drinkTurb',ntu.toFixed(0)+' NTU',ntu<=5);
+  se('drinkSal',sal.toFixed(2)+' г/л',false);
+  // Для купания — норма Иссык-Куля 16–26°C
+  se('swimTemp',wt.toFixed(1)+'°C',wt>=16&&wt<=26);
+  se('swimTds',tds.toFixed(0)+' ppm',true);
+  se('swimTurb',ntu.toFixed(0)+' NTU',ntu<=200);
+  se('swimWqi',wqi,wqi>=60);
+  // Питьё — всегда нет (солоноватое озеро)
+  var dr=document.getElementById('drinkResult');
+  if(dr){dr.textContent='✕ Не питьевая (солоноватое озеро)';dr.className='wu-result wr-warn';}
+  // Купание — зависит от температуры и мутности
+  var swOk=wt>=16&&wt<=28&&ntu<=200&&wqi>=50;
+  var sr=document.getElementById('swimResult');
+  if(sr){sr.textContent=swOk?'✓ Отлично для купания':'⚠ Условия не оптимальны';sr.className='wu-result '+(swOk?'wr-ok':'wr-warn');}
 }
 function detectAnomalies(history){
   var a=[];
@@ -879,12 +1092,14 @@ async function fetchData(){
     uv('h-salinity',sal.toFixed(3));
     uv('h-wqiScore',wqi);
 
-    // WHO badges
-    whoSet(wt<=25,'h-whoWater');whoSet(hum>=40&&hum<=70,'h-whoHum');whoSet(tds<=500,'h-whoTds');
+    // WHO badges — нормы Иссык-Куля
+    whoSet(wt>=18&&wt<=24,'h-whoWater');  // норма купания 18–24°C
+    whoSet(hum>=40&&hum<=70,'h-whoHum');
+    whoSet(tds>=4000&&tds<=8000,'h-whoTds');  // норма озера 4000–8000 ppm
     var turbBadge=document.getElementById('h-whoTurb');
     if(turbBadge){turbBadge.textContent=ntu<5?'✓ Норма':ntu<200?'⚠ Мутная':'✕ Оч. мутная';turbBadge.className='who-badge '+(ntu<5?'who-ok':'who-warn');}
     var salBadge=document.getElementById('h-whoSal');
-    if(salBadge){salBadge.textContent=sal<0.5?'✓ Пресная':sal<1.5?'Слабосолёная':'Солоноватая';salBadge.className='who-badge '+(sal<0.5?'who-ok':'who-neutral');}
+    if(salBadge){salBadge.textContent=sal>=5.0&&sal<=7.0?'✓ Норма озера':sal<5.0?'↓ Ниже нормы':'↑ Выше нормы';salBadge.className='who-badge '+(sal>=5.0&&sal<=7.0?'who-ok':'who-warn');}
     var wqiBadge=document.getElementById('h-wqiBadge');
     if(wqiBadge){var wqiOk=wqi>=60;wqiBadge.textContent=wqi>=80?'Отлично':wqi>=60?'Хорошо':wqi>=40?'Удовл.':'Плохо';wqiBadge.className='who-badge '+(wqiOk?'who-ok':'who-warn');}
 
@@ -919,18 +1134,23 @@ async function fetchData(){
     uv('h-salType',salinityType(sal));
     uv('h-heatIdx',heatIdx.toFixed(1));
 
-    // ── НОРМЫ ВОЗ ──
-    whoTbl(wt.toFixed(1)+'°C',wt<=25,'whoTblWater','whoTblWaterSt');
-    whoTbl(tds.toFixed(0)+' ppm',tds<=500,'whoTblTds','whoTblTdsSt');
+    // ── НОРМЫ ИССЫК-КУЛЬ ──
+    // Температура: норма купания 18–24°C летом
+    whoTbl(wt.toFixed(1)+'°C',wt>=18&&wt<=24,'whoTblWater','whoTblWaterSt');
+    // TDS: норма Иссык-Куля 5000–7000 ppm (солоноватое озеро)
+    whoTbl(tds.toFixed(0)+' ppm',tds>=4000&&tds<=8000,'whoTblTds','whoTblTdsSt');
     whoTbl(hum.toFixed(1)+'%',hum>=40&&hum<=70,'whoTblHum','whoTblHumSt');
     whoTbl(ntu.toFixed(0)+' NTU',ntu<=5,'whoTblTurb','whoTblTurbSt');
     whoTbl(ntu.toFixed(0)+' NTU',ntu<=200,'whoTblTurb2','whoTblTurb2St');
-    whoTbl(sal.toFixed(3)+' г/л',sal<=0.5,'whoTblSal','whoTblSalSt');
+    // Солёность: норма Иссык-Куля 5.0–6.5 г/л
+    whoTbl(sal.toFixed(2)+' г/л',sal>=5.0&&sal<=7.0,'whoTblSal','whoTblSalSt');
     whoTbl(dew.toFixed(1)+'°C',dew<at,'whoTblDew','whoTblDewSt');
 
-    // ── АЛЕРТЫ ──
-    if(wt>25)sendAlert('Температура воды '+wt.toFixed(1)+'°C превышает норму ВОЗ');
-    if(tds>500)sendAlert('TDS '+tds.toFixed(0)+' ppm превышает норму ВОЗ');
+    // ── АЛЕРТЫ (под Иссык-Куль) ──
+    if(wt>26)sendAlert('Температура воды '+wt.toFixed(1)+'°C — аномально высокая для Иссык-Куля!');
+    if(wt<10)sendAlert('Температура воды '+wt.toFixed(1)+'°C — опасно холодная вода!');
+    if(tds<3000)sendAlert('TDS '+tds.toFixed(0)+' ppm — аномально низкий для Иссык-Куля!');
+    if(tds>9000)sendAlert('TDS '+tds.toFixed(0)+' ppm — аномально высокий!');
     if(ntu>200)sendAlert('Мутность '+ntu.toFixed(0)+' NTU — вода очень мутная!');
     if(eutro>70)sendAlert('Высокий риск эвтрофикации: '+eutro.toFixed(0)+'/100');
 
