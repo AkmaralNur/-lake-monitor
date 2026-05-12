@@ -14,7 +14,7 @@
   --surface:rgba(255,255,255,0.04);--surface2:rgba(255,255,255,0.07);
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
   --accent:#3d9ef5;--teal:#00c9a7;--purple:#a78bfa;
-  --amber:#fbbf24;--red:#f87171;--green:#34d399;
+  --amber:#fbbf24;--red:#f87171;--green:#34d399;--orange:#fb923c;
   --text1:rgba(255,255,255,0.95);--text2:rgba(255,255,255,0.55);--text3:rgba(255,255,255,0.3);
   --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;
   --r:16px;--r-sm:10px;
@@ -53,12 +53,13 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:12px}
 .card-title{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);margin-bottom:18px;display:flex;align-items:center;gap:7px}
 .card-title i{font-size:13px;color:var(--accent)}
+.g6{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
 .g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:1100px){.g5{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.g5,.g4,.g3,.g2{grid-template-columns:1fr}}
+@media(max-width:1200px){.g6{grid-template-columns:repeat(3,1fr)}.g5{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.g6,.g5,.g4,.g3,.g2{grid-template-columns:1fr}}
 .scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;transition:transform .18s,border-color .18s}
 .scard:hover{transform:translateY(-2px);border-color:var(--border2)}
 .scard-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:14px}
@@ -67,9 +68,10 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
 .ic-purple{background:rgba(167,139,250,0.12);color:var(--purple)}
 .ic-amber{background:rgba(251,191,36,0.12);color:var(--amber)}
 .ic-green{background:rgba(52,211,153,0.12);color:var(--green)}
+.ic-orange{background:rgba(251,146,60,0.12);color:var(--orange)}
 .scard-label{font-size:11px;color:var(--text2);margin-bottom:6px}
-.scard-val{font-family:var(--mono);font-size:30px;font-weight:500;color:var(--text1);line-height:1;display:flex;align-items:baseline;gap:5px}
-.scard-unit{font-size:13px;color:var(--text2);font-family:var(--sans);font-weight:400}
+.scard-val{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--text1);line-height:1;display:flex;align-items:baseline;gap:5px}
+.scard-unit{font-size:12px;color:var(--text2);font-family:var(--sans);font-weight:400}
 .scard-meta{margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .trend{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;font-family:var(--mono)}
 .trend-up{background:rgba(248,113,113,0.1);color:var(--red)}
@@ -79,6 +81,13 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
 .who-ok{background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.2)}
 .who-warn{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2)}
 .scard-norm{font-size:10px;color:var(--text3);margin-top:5px}
+
+/* мутность бар */
+.turb-bar-wrap{margin-top:10px}
+.turb-bar-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.turb-bar-fill{height:100%;border-radius:2px;transition:width .8s ease,background .5s}
+.turb-label{font-size:10px;color:var(--text2);margin-top:4px}
+
 .wqi-hero{display:grid;grid-template-columns:160px 1fr;gap:28px;align-items:center}
 @media(max-width:700px){.wqi-hero{grid-template-columns:1fr}}
 .wqi-num{font-family:var(--mono);font-size:68px;font-weight:600;line-height:1;transition:color .5s;text-align:center}
@@ -183,6 +192,16 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
 .footer{text-align:center;padding:20px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);letter-spacing:.5px}
 @keyframes valBump{from{opacity:.4;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
 .val-updated{animation:valBump .3s ease}
+
+/* Карточка мутности — специальная */
+.turb-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden}
+.turb-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0;transition:background .5s}
+.turb-ntu{font-family:var(--mono);font-size:32px;font-weight:600;color:var(--text1);margin:8px 0 4px}
+.turb-cat{font-size:12px;font-weight:600;margin-bottom:12px}
+.turb-secchi{font-size:11px;color:var(--text2);margin-top:6px}
+.ntu-scale{display:flex;gap:3px;margin-top:10px}
+.ntu-seg{flex:1;height:6px;border-radius:2px}
+.ntu-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--mono);margin-top:3px}
 </style>
 </head>
 <body>
@@ -207,26 +226,30 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
 
 <div class="alert-bar" id="alertBanner"></div>
 
-<!-- ГЛАВНАЯ -->
+<!-- ═══════════════ ГЛАВНАЯ ═══════════════ -->
 <div class="page active" id="page-home">
   <div class="hero">
     <div>
       <div class="hero-title">🌊 Мониторинг озера</div>
-      <div class="hero-sub">Система мониторинга качества воды в реальном времени<br>ESP32 · DS18B20 · DHT22 · TDS V1.0 · ThingSpeak · Кыргызстан 🇰🇬</div>
+      <div class="hero-sub">Система мониторинга качества воды в реальном времени<br>ESP32 · DS18B20 · DHT22 · TDS V1.0 · Датчик мутности · ThingSpeak · Кыргызстан 🇰🇬</div>
     </div>
     <div style="text-align:right">
       <div class="live-badge"><div class="status-dot"></div> В эфире · 15с</div>
       <div class="last-upd">Обновлено: <span id="lastUpdate">—</span></div>
     </div>
   </div>
+
   <div class="sec"><i class="fas fa-broadcast-tower" style="color:var(--accent)"></i> Текущие показания</div>
-  <div class="g5" style="margin-bottom:12px">
+  <div class="g6" style="margin-bottom:12px">
     <div class="scard"><div class="scard-icon ic-blue"><i class="fas fa-water"></i></div><div class="scard-label">Температура воды</div><div class="scard-val"><span id="h-waterTemp">--</span><span class="scard-unit">°C</span></div><div class="scard-meta"><span class="who-badge" id="h-whoWater">—</span></div></div>
     <div class="scard"><div class="scard-icon ic-amber"><i class="fas fa-thermometer-half"></i></div><div class="scard-label">Температура воздуха</div><div class="scard-val"><span id="h-airTemp">--</span><span class="scard-unit">°C</span></div></div>
     <div class="scard"><div class="scard-icon ic-teal"><i class="fas fa-wind"></i></div><div class="scard-label">Влажность</div><div class="scard-val"><span id="h-humidity">--</span><span class="scard-unit">%</span></div><div class="scard-meta"><span class="who-badge" id="h-whoHum">—</span></div></div>
     <div class="scard"><div class="scard-icon ic-purple"><i class="fas fa-microscope"></i></div><div class="scard-label">TDS</div><div class="scard-val"><span id="h-tds">--</span><span class="scard-unit">ppm</span></div><div class="scard-meta"><span class="who-badge" id="h-whoTds">—</span></div></div>
     <div class="scard"><div class="scard-icon ic-green"><i class="fas fa-sun"></i></div><div class="scard-label">Освещённость</div><div class="scard-val"><span id="h-light">--</span><span class="scard-unit">лк</span></div></div>
+    <!-- МУТНОСТЬ на главной -->
+    <div class="scard"><div class="scard-icon ic-orange"><i class="fas fa-eye-slash"></i></div><div class="scard-label">Мутность воды</div><div class="scard-val"><span id="h-turb">--</span><span class="scard-unit">NTU</span></div><div class="scard-meta"><span class="who-badge" id="h-whoTurb">—</span></div></div>
   </div>
+
   <div class="sec"><i class="fas fa-shield-alt" style="color:var(--teal)"></i> Индекс качества воды (ИКВ)</div>
   <div class="card">
     <div class="wqi-hero">
@@ -244,47 +267,77 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
       </div>
     </div>
   </div>
+
   <div class="sec"><i class="fas fa-th-large" style="color:var(--purple)"></i> Разделы</div>
   <div class="nav-cards">
-    <div class="nav-card" onclick="showPage('sensors',document.querySelectorAll('.nav-tab')[1])">
-      <div class="nc-icon ic-blue"><i class="fas fa-satellite-dish"></i></div>
-      <div class="nc-title">Датчики</div>
-      <div class="nc-desc">Детальные показания, тренды, производные величины, нормы ВОЗ</div>
-      <div class="nc-arrow"><i class="fas fa-arrow-right"></i> Открыть</div>
-    </div>
-    <div class="nav-card" onclick="showPage('ecology',document.querySelectorAll('.nav-tab')[2])">
-      <div class="nc-icon ic-green"><i class="fas fa-leaf"></i></div>
-      <div class="nc-title">Экология</div>
-      <div class="nc-desc">Риски для водных обитателей, пригодность воды, аномалии</div>
-      <div class="nc-arrow"><i class="fas fa-arrow-right"></i> Открыть</div>
-    </div>
-    <div class="nav-card" onclick="showPage('charts',document.querySelectorAll('.nav-tab')[3])">
-      <div class="nc-icon ic-purple"><i class="fas fa-chart-area"></i></div>
-      <div class="nc-title">Графики</div>
-      <div class="nc-desc">История по периодам, корреляция, прогноз температуры</div>
-      <div class="nc-arrow"><i class="fas fa-arrow-right"></i> Открыть</div>
-    </div>
-    <div class="nav-card" onclick="showPage('journal',document.querySelectorAll('.nav-tab')[4])">
-      <div class="nc-icon ic-amber"><i class="fas fa-database"></i></div>
-      <div class="nc-title">Журнал</div>
-      <div class="nc-desc">Все измерения, экспорт CSV, статистика, нормы ВОЗ</div>
-      <div class="nc-arrow"><i class="fas fa-arrow-right"></i> Открыть</div>
-    </div>
+    <div class="nav-card" onclick="showPage('sensors',document.querySelectorAll('.nav-tab')[1])"><div class="nc-icon ic-blue"><i class="fas fa-satellite-dish"></i></div><div class="nc-title">Датчики</div><div class="nc-desc">Все датчики, мутность, тренды, производные, нормы ВОЗ</div><div class="nc-arrow"><i class="fas fa-arrow-right"></i> Открыть</div></div>
+    <div class="nav-card" onclick="showPage('ecology',document.querySelectorAll('.nav-tab')[2])"><div class="nc-icon ic-green"><i class="fas fa-leaf"></i></div><div class="nc-title">Экология</div><div class="nc-desc">Риски, прозрачность воды, пригодность, аномалии</div><div class="nc-arrow"><i class="fas fa-arrow-right"></i> Открыть</div></div>
+    <div class="nav-card" onclick="showPage('charts',document.querySelectorAll('.nav-tab')[3])"><div class="nc-icon ic-purple"><i class="fas fa-chart-area"></i></div><div class="nc-title">Графики</div><div class="nc-desc">История мутности, корреляция, прогноз, периоды</div><div class="nc-arrow"><i class="fas fa-arrow-right"></i> Открыть</div></div>
+    <div class="nav-card" onclick="showPage('journal',document.querySelectorAll('.nav-tab')[4])"><div class="nc-icon ic-amber"><i class="fas fa-database"></i></div><div class="nc-title">Журнал</div><div class="nc-desc">Все измерения с NTU, экспорт CSV, статистика</div><div class="nc-arrow"><i class="fas fa-arrow-right"></i> Открыть</div></div>
   </div>
 </div>
 
-<!-- ДАТЧИКИ -->
+<!-- ═══════════════ ДАТЧИКИ ═══════════════ -->
 <div class="page" id="page-sensors">
   <div class="page-title">Датчики</div>
-  <div class="page-sub">Показания всех датчиков ESP32 в реальном времени · обновление каждые 15 секунд</div>
+  <div class="page-sub">Показания всех датчиков ESP32 · обновление каждые 15 секунд</div>
+
   <div class="sec"><i class="fas fa-thermometer" style="color:var(--accent)"></i> Основные датчики</div>
   <div class="g5" style="margin-bottom:12px">
-    <div class="scard"><div class="scard-icon ic-blue"><i class="fas fa-water"></i></div><div class="scard-label">Температура воды</div><div class="scard-val"><span id="s-waterTemp">--</span><span class="scard-unit">°C</span></div><div class="scard-meta"><span class="trend" id="s-trendWater">→</span><span class="who-badge" id="s-whoWater">—</span></div><div class="scard-norm">DS18B20 · GPIO4 · 1-Wire · ВОЗ: до 25°C</div></div>
+    <div class="scard"><div class="scard-icon ic-blue"><i class="fas fa-water"></i></div><div class="scard-label">Температура воды</div><div class="scard-val"><span id="s-waterTemp">--</span><span class="scard-unit">°C</span></div><div class="scard-meta"><span class="trend" id="s-trendWater">→</span><span class="who-badge" id="s-whoWater">—</span></div><div class="scard-norm">DS18B20 · GPIO4 · ВОЗ: до 25°C</div></div>
     <div class="scard"><div class="scard-icon ic-amber"><i class="fas fa-thermometer-half"></i></div><div class="scard-label">Температура воздуха</div><div class="scard-val"><span id="s-airTemp">--</span><span class="scard-unit">°C</span></div><div class="scard-meta"><span class="trend" id="s-trendAir">→</span></div><div class="scard-norm">DHT22 · GPIO27</div></div>
     <div class="scard"><div class="scard-icon ic-teal"><i class="fas fa-wind"></i></div><div class="scard-label">Влажность воздуха</div><div class="scard-val"><span id="s-humidity">--</span><span class="scard-unit">%</span></div><div class="scard-meta"><span class="trend" id="s-trendHum">→</span><span class="who-badge" id="s-whoHum">—</span></div><div class="scard-norm">DHT22 · GPIO27 · Норма: 40–70%</div></div>
-    <div class="scard"><div class="scard-icon ic-purple"><i class="fas fa-microscope"></i></div><div class="scard-label">TDS качество воды</div><div class="scard-val"><span id="s-tds">--</span><span class="scard-unit">ppm</span></div><div class="scard-meta"><span class="trend" id="s-trendTds">→</span><span class="who-badge" id="s-whoTds">—</span></div><div class="scard-norm">TDS V1.0 · GPIO26 · ВОЗ: до 500 ppm</div></div>
-    <div class="scard"><div class="scard-icon ic-green"><i class="fas fa-sun"></i></div><div class="scard-label">Освещённость</div><div class="scard-val"><span id="s-light">--</span><span class="scard-unit">лк</span></div><div class="scard-meta"><span class="trend" id="s-trendLight">→</span></div><div class="scard-norm">Фоторезистор · GPIO34 · Аналог</div></div>
+    <div class="scard"><div class="scard-icon ic-purple"><i class="fas fa-microscope"></i></div><div class="scard-label">TDS качество воды</div><div class="scard-val"><span id="s-tds">--</span><span class="scard-unit">ppm</span></div><div class="scard-meta"><span class="trend" id="s-trendTds">→</span><span class="who-badge" id="s-whoTds">—</span></div><div class="scard-norm">TDS V1.0 · GPIO33 · ВОЗ: до 500 ppm</div></div>
+    <div class="scard"><div class="scard-icon ic-green"><i class="fas fa-sun"></i></div><div class="scard-label">Освещённость</div><div class="scard-val"><span id="s-light">--</span><span class="scard-unit">лк</span></div><div class="scard-meta"><span class="trend" id="s-trendLight">→</span></div><div class="scard-norm">Фоторезистор · GPIO34</div></div>
   </div>
+
+  <!-- КАРТОЧКА МУТНОСТИ -->
+  <div class="sec"><i class="fas fa-eye-slash" style="color:var(--orange)"></i> Мутность воды</div>
+  <div class="g2" style="margin-bottom:12px">
+    <div class="turb-card" id="turbCard">
+      <div id="turbCardBar" style="position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0;background:var(--green);transition:background .5s"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:4px"><i class="fas fa-eye-slash" style="color:var(--orange);margin-right:5px"></i>Датчик мутности · GPIO35 · ИК-метод</div>
+          <div class="turb-ntu"><span id="s-turb">--</span> <span style="font-size:16px;color:var(--text2);font-weight:400">NTU</span></div>
+          <div class="turb-cat" id="turbCat">—</div>
+          <div class="turb-secchi">👁 Прозрачность (диск Секки): <span id="turbSecchi" style="color:var(--accent);font-family:var(--mono)">--</span> м</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:6px">ВОЗ норма</div>
+          <div style="font-size:11px;color:var(--green);font-family:var(--mono)">Питьё: &lt;5 NTU</div>
+          <div style="font-size:11px;color:var(--accent);font-family:var(--mono)">Купание: &lt;200</div>
+          <div style="margin-top:8px"><span class="who-badge" id="s-whoTurb">—</span></div>
+        </div>
+      </div>
+      <!-- NTU шкала -->
+      <div class="ntu-scale">
+        <div class="ntu-seg" style="background:#34d399;flex:1"></div>
+        <div class="ntu-seg" style="background:#34d399;flex:4"></div>
+        <div class="ntu-seg" style="background:#fbbf24;flex:45"></div>
+        <div class="ntu-seg" style="background:#f87171;flex:150"></div>
+        <div class="ntu-seg" style="background:#dc2626;flex:800"></div>
+      </div>
+      <div class="ntu-labels"><span>0</span><span>5</span><span>50</span><span>200</span><span>1000</span></div>
+      <!-- Индикатор позиции -->
+      <div style="margin-top:8px;font-size:11px;color:var(--text2)">Текущее: <span id="turbPercBar" style="font-family:var(--mono);color:var(--orange)">--</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title"><i class="fas fa-info-circle"></i> Что означает мутность</div>
+      <table class="tbl" style="font-size:12px">
+        <thead><tr><th>NTU</th><th>Категория</th><th>Применение</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">&lt; 1</td><td style="color:var(--green)">Кристально чистая</td><td>Питьё без фильтрации</td></tr>
+          <tr><td class="mono">1–5</td><td style="color:var(--green)">Чистая</td><td>Питьё (норма ВОЗ)</td></tr>
+          <tr><td class="mono">5–50</td><td style="color:var(--amber)">Слабо мутная</td><td>Только после очистки</td></tr>
+          <tr><td class="mono">50–200</td><td style="color:var(--orange)">Мутная</td><td>Купание с осторожностью</td></tr>
+          <tr><td class="mono">&gt; 200</td><td style="color:var(--red)">Очень мутная</td><td>Не рекомендуется</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="sec"><i class="fas fa-calculator" style="color:var(--purple)"></i> Производные величины</div>
   <div class="g5" style="margin-bottom:12px">
     <div class="dcard"><div class="dcard-icon">🌫️</div><div class="dcard-val" id="s-dewPoint">--</div><div class="dcard-unit">°C</div><div class="dcard-label">Точка росы</div></div>
@@ -293,6 +346,7 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
     <div class="dcard"><div class="dcard-icon">😊</div><div class="dcard-val" id="s-comfortIndex">--</div><div class="dcard-unit">/ 100</div><div class="dcard-label">Комфорт у воды</div></div>
     <div class="dcard"><div class="dcard-icon">🌿</div><div class="dcard-val" id="s-eutroIndex">--</div><div class="dcard-unit">/ 100</div><div class="dcard-label">Риск эвтрофикации</div></div>
   </div>
+
   <div class="sec"><i class="fas fa-heartbeat" style="color:var(--red)"></i> Нормы ВОЗ</div>
   <div class="card">
     <table class="tbl">
@@ -301,24 +355,29 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
         <tr><td>Температура воды</td><td class="mono">DS18B20</td><td class="mono">до 25°C</td><td class="mono" id="s-whoTblWater">--</td><td id="s-whoTblWaterSt">--</td></tr>
         <tr><td>TDS</td><td class="mono">TDS V1.0</td><td class="mono">до 500 ppm</td><td class="mono" id="s-whoTblTds">--</td><td id="s-whoTblTdsSt">--</td></tr>
         <tr><td>Влажность</td><td class="mono">DHT22</td><td class="mono">40–70%</td><td class="mono" id="s-whoTblHum">--</td><td id="s-whoTblHumSt">--</td></tr>
+        <tr><td>Мутность (питьё)</td><td class="mono">Turb · GPIO35</td><td class="mono">до 5 NTU</td><td class="mono" id="s-whoTblTurb">--</td><td id="s-whoTblTurbSt">--</td></tr>
         <tr><td>Точка росы</td><td class="mono">Расчётная</td><td>ниже темп. воздуха</td><td class="mono" id="s-whoTblDew">--</td><td id="s-whoTblDewSt">--</td></tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- ЭКОЛОГИЯ -->
+<!-- ═══════════════ ЭКОЛОГИЯ ═══════════════ -->
 <div class="page" id="page-ecology">
   <div class="page-title">Экология</div>
-  <div class="page-sub">Риски для водных обитателей, пригодность воды для питья и купания, аномалии</div>
+  <div class="page-sub">Риски для водных обитателей, прозрачность воды, пригодность для питья и купания</div>
+
   <div class="sec"><i class="fas fa-fish" style="color:var(--teal)"></i> Водные обитатели</div>
   <div class="card">
-    <div class="g3">
+    <div class="g4">
       <div class="fish-card fish-safe" id="fishCard"><span class="fish-emoji">🐟</span><div class="fish-name">Рыба</div><div class="fish-desc">Оптимум 15–25°C<br>TDS до 500 ppm</div><div class="fish-status" id="fishStatus">Загрузка...</div></div>
       <div class="fish-card fish-safe" id="birdCard"><span class="fish-emoji">🦆</span><div class="fish-name">Водоплавающие птицы</div><div class="fish-desc">Температура воды<br>до 30°C</div><div class="fish-status" id="birdStatus">Загрузка...</div></div>
       <div class="fish-card fish-safe" id="algaeCard"><span class="fish-emoji">🦠</span><div class="fish-name">Риск цветения</div><div class="fish-desc">Температура + TDS<br>+ освещённость</div><div class="fish-status" id="algaeStatus">Загрузка...</div></div>
+      <!-- НОВАЯ карточка мутности для рыб -->
+      <div class="fish-card fish-safe" id="turbFishCard"><span class="fish-emoji">👁</span><div class="fish-name">Прозрачность</div><div class="fish-desc">Мутность воды<br>ВОЗ купание &lt;200 NTU</div><div class="fish-status" id="turbFishStatus">Загрузка...</div></div>
     </div>
   </div>
+
   <div class="sec"><i class="fas fa-tint" style="color:var(--accent)"></i> Пригодность воды (ВОЗ)</div>
   <div class="card">
     <div class="wu-grid">
@@ -326,18 +385,19 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
         <div class="wu-title">🚰 Для питья</div>
         <div class="wu-row"><span class="wu-key">Температура</span><span id="drinkTemp" class="wu-ok">--</span></div>
         <div class="wu-row"><span class="wu-key">TDS</span><span id="drinkTds" class="wu-ok">--</span></div>
-        <div class="wu-row"><span class="wu-key">Точка росы</span><span id="drinkDew" class="wu-ok">--</span></div>
+        <div class="wu-row"><span class="wu-key">Мутность</span><span id="drinkTurb" class="wu-ok">--</span></div>
         <div class="wu-result wr-ok" id="drinkResult">—</div>
       </div>
       <div class="wu-box">
         <div class="wu-title">🏊 Для купания</div>
         <div class="wu-row"><span class="wu-key">Температура</span><span id="swimTemp" class="wu-ok">--</span></div>
         <div class="wu-row"><span class="wu-key">TDS</span><span id="swimTds" class="wu-ok">--</span></div>
-        <div class="wu-row"><span class="wu-key">ИКВ</span><span id="swimWqi" class="wu-ok">--</span></div>
+        <div class="wu-row"><span class="wu-key">Мутность</span><span id="swimTurb" class="wu-ok">--</span></div>
         <div class="wu-result wr-ok" id="swimResult">—</div>
       </div>
     </div>
   </div>
+
   <div class="g2">
     <div class="card">
       <div class="card-title"><i class="fas fa-bolt"></i> Аномалии</div>
@@ -353,10 +413,11 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
   </div>
 </div>
 
-<!-- ГРАФИКИ -->
+<!-- ═══════════════ ГРАФИКИ ═══════════════ -->
 <div class="page" id="page-charts">
   <div class="page-title">Графики</div>
   <div class="page-sub">История измерений, анализ по периодам, корреляция и прогноз</div>
+
   <div class="sec"><i class="fas fa-calendar-alt" style="color:var(--accent)"></i> Анализ по периодам</div>
   <div class="card">
     <div class="ptabs">
@@ -370,20 +431,24 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
       <div style="position:relative;height:220px"><canvas id="periodChart"></canvas></div>
     </div>
   </div>
+
   <div class="sec"><i class="fas fa-chart-line" style="color:var(--teal)"></i> История (последние 20)</div>
   <div class="g2">
     <div class="card"><div class="card-title"><i class="fas fa-thermometer"></i> Температура</div><div style="position:relative;height:170px"><canvas id="tempChart"></canvas></div></div>
     <div class="card"><div class="card-title"><i class="fas fa-tint"></i> Влажность</div><div style="position:relative;height:170px"><canvas id="humChart"></canvas></div></div>
     <div class="card"><div class="card-title"><i class="fas fa-flask"></i> TDS</div><div style="position:relative;height:170px"><canvas id="tdsChart"></canvas></div></div>
     <div class="card"><div class="card-title"><i class="fas fa-chart-line"></i> ИКВ</div><div style="position:relative;height:170px"><canvas id="wqiChart"></canvas></div></div>
+    <!-- НОВЫЙ ГРАФИК МУТНОСТИ -->
+    <div class="card"><div class="card-title"><i class="fas fa-eye-slash" style="color:var(--orange)"></i> Мутность воды (NTU)</div><div style="position:relative;height:170px"><canvas id="turbChart"></canvas></div></div>
     <div class="card"><div class="card-title"><i class="fas fa-cloud"></i> Точка росы</div><div style="position:relative;height:170px"><canvas id="dewChart"></canvas></div></div>
-    <div class="card"><div class="card-title"><i class="fas fa-exchange-alt"></i> Тепловой поток</div><div style="position:relative;height:170px"><canvas id="fluxChart"></canvas></div></div>
   </div>
+
   <div class="sec"><i class="fas fa-project-diagram" style="color:var(--purple)"></i> Корреляция</div>
   <div class="card">
-    <div class="card-title"><i class="fas fa-project-diagram"></i> Температура воды vs TDS</div>
+    <div class="card-title"><i class="fas fa-project-diagram"></i> Температура воды vs Мутность (NTU)</div>
     <div style="position:relative;height:230px"><canvas id="correlationChart"></canvas></div>
   </div>
+
   <div class="sec"><i class="fas fa-magic" style="color:var(--amber)"></i> Прогноз</div>
   <div class="card">
     <div class="card-title"><i class="fas fa-chart-line"></i> Прогноз температуры воды на 24 часа</div>
@@ -392,7 +457,7 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
   </div>
 </div>
 
-<!-- ЖУРНАЛ -->
+<!-- ═══════════════ ЖУРНАЛ ═══════════════ -->
 <div class="page" id="page-journal">
   <div class="page-title">Журнал</div>
   <div class="page-sub">История всех записей из LocalStorage · до 500 последних измерений</div>
@@ -400,8 +465,9 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
     <div class="metric-card"><div class="metric-label">Всего записей</div><div class="metric-val" id="j-totalRec">--</div></div>
     <div class="metric-card"><div class="metric-label">Средний ИКВ</div><div class="metric-val" id="j-avgWqi" style="color:var(--green)">--</div></div>
     <div class="metric-card"><div class="metric-label">Ср. температура воды</div><div class="metric-val" id="j-avgWater" style="color:var(--accent)">--</div></div>
-    <div class="metric-card"><div class="metric-label">Записей сегодня</div><div class="metric-val" id="j-todayRec" style="color:var(--amber)">--</div></div>
+    <div class="metric-card"><div class="metric-label">Ср. мутность</div><div class="metric-val" id="j-avgTurb" style="color:var(--orange)">-- NTU</div></div>
   </div>
+
   <div class="sec"><i class="fas fa-heartbeat" style="color:var(--red)"></i> Нормы ВОЗ · текущие значения</div>
   <div class="card">
     <table class="tbl">
@@ -410,10 +476,12 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
         <tr><td>Температура воды</td><td class="mono">до 25°C</td><td class="mono" id="j-whoWater">--</td><td id="j-whoWaterSt">--</td></tr>
         <tr><td>TDS</td><td class="mono">до 500 ppm</td><td class="mono" id="j-whoTds">--</td><td id="j-whoTdsSt">--</td></tr>
         <tr><td>Влажность воздуха</td><td class="mono">40–70%</td><td class="mono" id="j-whoHum">--</td><td id="j-whoHumSt">--</td></tr>
-        <tr><td>Точка росы</td><td>ниже темп. воздуха</td><td class="mono" id="j-whoDew">--</td><td id="j-whoDewSt">--</td></tr>
+        <tr><td>Мутность (питьё)</td><td class="mono">до 5 NTU</td><td class="mono" id="j-whoTurb">--</td><td id="j-whoTurbSt">--</td></tr>
+        <tr><td>Мутность (купание)</td><td class="mono">до 200 NTU</td><td class="mono" id="j-whoTurb2">--</td><td id="j-whoTurb2St">--</td></tr>
       </tbody>
     </table>
   </div>
+
   <div class="sec"><i class="fas fa-table" style="color:var(--accent)"></i> Таблица записей</div>
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
@@ -425,7 +493,7 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
     </div>
     <div style="overflow-x:auto">
       <table class="hist-tbl">
-        <thead><tr><th>Время</th><th>Вода°C</th><th>Воздух°C</th><th>Влажность%</th><th>TDS</th><th>Роса°C</th><th>Поток°C</th><th>ИКВ</th></tr></thead>
+        <thead><tr><th>Время</th><th>Вода°C</th><th>Воздух°C</th><th>Влажн%</th><th>TDS</th><th>Мутность NTU</th><th>Роса°C</th><th>ИКВ</th></tr></thead>
         <tbody id="historyBody"></tbody>
       </table>
     </div>
@@ -433,89 +501,106 @@ body{background:var(--bg);color:var(--text1);font-family:var(--sans);font-size:1
   </div>
 </div>
 
-<div class="footer">ESP32 · DS18B20 · DHT22 · TDS V1.0 · ThingSpeak · Кыргызстан 🇰🇬</div>
+<div class="footer">ESP32 · DS18B20 · DHT22 · TDS V1.0 · Датчик мутности · ThingSpeak · Кыргызстан 🇰🇬</div>
 
 <script>
-const CHANNEL_ID='3368346', READ_KEY='839C3D2TM2EPJ0KK', STORAGE_KEY='lake_monitor_v3';
+const CHANNEL_ID='3368346', READ_KEY='839C3D2TM2EPJ0KK', STORAGE_KEY='lake_monitor_v4';
 const START=Date.now();
 let notifOn=false, lastAlert=0;
-
-// ─── Все графики объявляем как null, создаём лениво ───
-let miniChart=null, corrChart=null, forecastChart=null, periodChart=null;
-let tempChart=null, humChart=null, tdsChart=null, wqiChart=null, dewChart=null, fluxChart=null;
+let miniChart=null,corrChart=null,forecastChart=null,periodChart=null;
+let tempChart=null,humChart=null,tdsChart=null,wqiChart=null,dewChart=null,turbChart=null;
 let chartsInited=false;
 
-// ─── PAGE NAVIGATION ───
-function showPage(name, tabEl) {
-  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.remove('active'); });
+// ─── навигация ───
+function showPage(name,tabEl){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
   document.getElementById('page-'+name).classList.add('active');
-  if(tabEl) tabEl.classList.add('active');
-  if(name==='charts' && !chartsInited) { chartsInited=true; initCharts(); loadPeriodData('day'); }
-  if(name==='journal') { renderHistory(); updateSummary(); }
+  if(tabEl)tabEl.classList.add('active');
+  if(name==='charts'&&!chartsInited){chartsInited=true;initCharts();loadPeriodData('day');}
+  if(name==='journal'){renderHistory();updateSummary();}
 }
 
-// ─── CHARTS: ленивая инициализация ───
-function initCharts() {
-  var CO = function(extra) {
-    extra = extra || {};
-    var base = {
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:'rgba(255,255,255,0.4)',font:{family:"'JetBrains Mono',monospace",size:11},boxWidth:10,boxHeight:10}}},
-      scales:{
-        x:{ticks:{color:'rgba(255,255,255,0.3)',maxTicksLimit:6,font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
-        y:{ticks:{color:'rgba(255,255,255,0.3)',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}}
-      }
-    };
-    if(extra.scales) {
-      base.scales = Object.assign({}, base.scales, extra.scales);
-      delete extra.scales;
-    }
-    return Object.assign(base, extra);
-  };
+// ─── мутность: утилиты ───
+function turbCategory(ntu){
+  if(ntu<1)return{txt:'Кристально чистая',color:'#34d399'};
+  if(ntu<5)return{txt:'Чистая (ВОЗ питьё ✓)',color:'#34d399'};
+  if(ntu<50)return{txt:'Слабо мутная',color:'#fbbf24'};
+  if(ntu<200)return{txt:'Мутная',color:'#fb923c'};
+  return{txt:'Очень мутная',color:'#f87171'};
+}
+function secchiDepth(ntu){
+  // формула Secchi disk: SD ≈ 1.13 / NTU^0.5 (приблизительно)
+  if(ntu<=0)return '—';
+  return (1.13/Math.sqrt(ntu)).toFixed(1);
+}
 
-  tempChart = new Chart(document.getElementById('tempChart'), {type:'line',data:{labels:[],datasets:[
+// ─── обновление карточки мутности ───
+function updateTurbCard(ntu){
+  var cat=turbCategory(ntu);
+  // Главная
+  uv('h-turb',ntu.toFixed(0));
+  var hb=document.getElementById('h-whoTurb');
+  if(hb){hb.textContent=ntu<5?'✓ Норма питьё':ntu<200?'⚠ Только купание':'✕ Загрязнена';hb.className='who-badge '+(ntu<5?'who-ok':'who-warn');}
+  // Датчики
+  uv('s-turb',ntu.toFixed(0));
+  var catEl=document.getElementById('turbCat');
+  if(catEl){catEl.textContent=cat.txt;catEl.style.color=cat.color;}
+  var bar=document.getElementById('turbCardBar');
+  if(bar)bar.style.background=cat.color;
+  var sec=document.getElementById('turbSecchi');
+  if(sec)sec.textContent=secchiDepth(ntu);
+  var pct=document.getElementById('turbPercBar');
+  if(pct)pct.textContent=ntu.toFixed(0)+' NTU';
+  // WHO badge датчики
+  var wb=document.getElementById('s-whoTurb');
+  if(wb){wb.textContent=ntu<5?'✓ Питьё норма':ntu<200?'⚠ Купание ок':'✕ Превышение';wb.className='who-badge '+(ntu<5?'who-ok':'who-warn');}
+  whoTbl(ntu.toFixed(0)+' NTU',ntu<=5,'s-whoTblTurb','s-whoTblTurbSt');
+  // Экология рыбы
+  var fc=document.getElementById('turbFishCard');
+  var fs=document.getElementById('turbFishStatus');
+  if(fc&&fs){
+    if(ntu<50){fc.className='fish-card fish-safe';fs.className='fish-status fs-safe';fs.textContent='✓ Прозрачная';}
+    else if(ntu<200){fc.className='fish-card fish-warn';fs.className='fish-status fs-warn';fs.textContent='⚠ Мутновато';}
+    else{fc.className='fish-card fish-danger';fs.className='fish-status fs-danger';fs.textContent='✕ Очень мутная';}
+  }
+  // Журнал
+  whoTbl(ntu.toFixed(0)+' NTU',ntu<=5,'j-whoTurb','j-whoTurbSt');
+  whoTbl(ntu.toFixed(0)+' NTU',ntu<=200,'j-whoTurb2','j-whoTurb2St');
+}
+
+// ─── ленивая инициализация графиков ───
+function initCharts(){
+  var CO=function(extra){
+    extra=extra||{};
+    var base={responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'rgba(255,255,255,0.4)',font:{family:"'JetBrains Mono',monospace",size:11},boxWidth:10,boxHeight:10}}},
+      scales:{x:{ticks:{color:'rgba(255,255,255,0.3)',maxTicksLimit:6,font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'rgba(255,255,255,0.3)',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}}}};
+    if(extra.scales){base.scales=Object.assign({},base.scales,extra.scales);delete extra.scales;}
+    return Object.assign(base,extra);
+  };
+  tempChart=new Chart(document.getElementById('tempChart'),{type:'line',data:{labels:[],datasets:[
     {label:'Вода °C',data:[],borderColor:'#3d9ef5',backgroundColor:'rgba(61,158,245,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0},
     {label:'Воздух °C',data:[],borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,0.06)',tension:.4,fill:true,borderWidth:2,pointRadius:0}
   ]},options:CO()});
-
-  humChart = new Chart(document.getElementById('humChart'), {type:'line',data:{labels:[],datasets:[
-    {label:'Влажность %',data:[],borderColor:'#00c9a7',backgroundColor:'rgba(0,201,167,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}
-  ]},options:CO()});
-
-  tdsChart = new Chart(document.getElementById('tdsChart'), {type:'line',data:{labels:[],datasets:[
-    {label:'TDS ppm',data:[],borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}
-  ]},options:CO()});
-
-  wqiChart = new Chart(document.getElementById('wqiChart'), {type:'line',data:{labels:[],datasets:[
-    {label:'ИКВ',data:[],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}
-  ]},options:CO({scales:{x:{ticks:{color:'rgba(255,255,255,0.3)',maxTicksLimit:6,font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},y:{min:0,max:100,ticks:{color:'rgba(255,255,255,0.3)',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}}}})});
-
-  dewChart = new Chart(document.getElementById('dewChart'), {type:'line',data:{labels:[],datasets:[
-    {label:'Точка росы °C',data:[],borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}
-  ]},options:CO()});
-
-  fluxChart = new Chart(document.getElementById('fluxChart'), {type:'bar',data:{labels:[],datasets:[{
-    label:'Тепловой поток °C',data:[],
-    backgroundColor:function(ctx){return ctx.raw>=0?'rgba(248,113,113,0.45)':'rgba(61,158,245,0.45)';},
-    borderColor:function(ctx){return ctx.raw>=0?'#f87171':'#3d9ef5';},
-    borderWidth:1
-  }]},options:CO()});
+  humChart=new Chart(document.getElementById('humChart'),{type:'line',data:{labels:[],datasets:[{label:'Влажность %',data:[],borderColor:'#00c9a7',backgroundColor:'rgba(0,201,167,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO()});
+  tdsChart=new Chart(document.getElementById('tdsChart'),{type:'line',data:{labels:[],datasets:[{label:'TDS ppm',data:[],borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO()});
+  wqiChart=new Chart(document.getElementById('wqiChart'),{type:'line',data:{labels:[],datasets:[{label:'ИКВ',data:[],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO({scales:{x:{ticks:{color:'rgba(255,255,255,0.3)',maxTicksLimit:6,font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},y:{min:0,max:100,ticks:{color:'rgba(255,255,255,0.3)',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}}}})});
+  // НОВЫЙ график мутности
+  turbChart=new Chart(document.getElementById('turbChart'),{type:'line',data:{labels:[],datasets:[{label:'Мутность NTU',data:[],borderColor:'#fb923c',backgroundColor:'rgba(251,146,60,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO()});
+  dewChart=new Chart(document.getElementById('dewChart'),{type:'line',data:{labels:[],datasets:[{label:'Точка росы °C',data:[],borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO()});
 }
 
-// ─── UPTIME ───
+// ─── uptime ───
 setInterval(function(){
   var e=Math.floor((Date.now()-START)/1e3);
-  document.getElementById('uptime').textContent=
-    String(Math.floor(e/3600)).padStart(2,'0')+':'+
-    String(Math.floor((e%3600)/60)).padStart(2,'0')+':'+
-    String(e%60).padStart(2,'0');
+  document.getElementById('uptime').textContent=String(Math.floor(e/3600)).padStart(2,'0')+':'+String(Math.floor((e%3600)/60)).padStart(2,'0')+':'+String(e%60).padStart(2,'0');
 },1000);
 
-// ─── NOTIFICATIONS ───
+// ─── уведомления ───
 async function toggleNotifications(){
-  if(!('Notification' in window)) return;
-  if(Notification.permission!=='granted') await Notification.requestPermission();
+  if(!('Notification'in window))return;
+  if(Notification.permission!=='granted')await Notification.requestPermission();
   notifOn=!notifOn;
   var b=document.getElementById('notifBtn');
   b.innerHTML=notifOn?'<i class="fas fa-bell"></i>':'<i class="fas fa-bell-slash"></i>';
@@ -525,75 +610,60 @@ function sendAlert(msg){
   var now=Date.now();if(now-lastAlert<60e3)return;lastAlert=now;
   var b=document.getElementById('alertBanner');b.textContent='⚠ '+msg;b.classList.add('show');
   setTimeout(function(){b.classList.remove('show');},10e3);
-  if(notifOn&&Notification.permission==='granted') new Notification('⚠ Предупреждение',{body:msg});
+  if(notifOn&&Notification.permission==='granted')new Notification('⚠ Предупреждение',{body:msg});
 }
 
-// ─── CALCULATIONS ───
+// ─── расчёты ───
 function calcDewPoint(t,h){var a=17.27,b=237.7,al=((a*t)/(b+t))+Math.log(h/100);return(b*al)/(a-al);}
 function calcEvaporation(wt,at,hum,lux){var sat=0.6108*Math.exp(17.27*wt/(wt+237.3)),act=sat*hum/100,vpd=sat-act,rad=lux*0.0079;return Math.max(0,(0.408*rad+vpd*0.066)/(1+0.34*2));}
 function calcComfort(at,hum,wt){return Math.max(0,Math.min(100,((100-Math.abs(at-22)*5)+(100-Math.abs(hum-55)*2)+(100-Math.abs(wt-22)*5))/3));}
 function calcEutro(wt,tds,lux){return Math.min(100,Math.max(0,wt-15)*5+Math.min(40,tds/10)+Math.min(20,lux/1000));}
 
-// ─── STORAGE ───
+// ─── localStorage ───
 function loadHistory(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch(e){return[];}}
 function saveHistory(e){var h=loadHistory();h.unshift(e);if(h.length>500)h=h.slice(0,500);localStorage.setItem(STORAGE_KEY,JSON.stringify(h));}
 function clearHistory(){if(confirm('Очистить всю историю?')){localStorage.removeItem(STORAGE_KEY);renderHistory();updateSummary();}}
 
-// ─── HELPERS ───
-function uv(id,val){
-  var el=document.getElementById(id);
-  if(el&&el.textContent!==String(val)){el.textContent=val;el.classList.remove('val-updated');void el.offsetWidth;el.classList.add('val-updated');}
-}
-function whoSet(ok,badgeId){
-  var el=document.getElementById(badgeId);if(!el)return;
-  el.textContent=ok?'✓ Норма':'⚠ Превышение';
-  el.className='who-badge '+(ok?'who-ok':'who-warn');
-}
-function whoTbl(val,ok,tvId,tsId){
-  if(tvId)document.getElementById(tvId).textContent=val;
-  if(tsId)document.getElementById(tsId).innerHTML=ok?'<span class="badge-ok">✓ Норма</span>':'<span class="badge-warn">⚠ Превышение</span>';
-}
-function getTrend(h,f){
-  var v=h.slice(0,5).map(function(x){return parseFloat(x[f]);}).filter(function(n){return !isNaN(n);});
-  if(v.length<2)return{s:'→',c:'trend-stable'};
-  var d=v[0]-v[v.length-1];
-  return d>.3?{s:'↑',c:'trend-up'}:d<-.3?{s:'↓',c:'trend-down'}:{s:'→',c:'trend-stable'};
-}
+// ─── helpers ───
+function uv(id,val){var el=document.getElementById(id);if(el&&el.textContent!==String(val)){el.textContent=val;el.classList.remove('val-updated');void el.offsetWidth;el.classList.add('val-updated');}}
+function whoSet(ok,badgeId){var el=document.getElementById(badgeId);if(!el)return;el.textContent=ok?'✓ Норма':'⚠ Превышение';el.className='who-badge '+(ok?'who-ok':'who-warn');}
+function whoTbl(val,ok,tvId,tsId){if(tvId)document.getElementById(tvId).textContent=val;if(tsId)document.getElementById(tsId).innerHTML=ok?'<span class="badge-ok">✓ Норма</span>':'<span class="badge-warn">⚠ Превышение</span>';}
+function getTrend(h,f){var v=h.slice(0,5).map(function(x){return parseFloat(x[f]);}).filter(function(n){return !isNaN(n);});if(v.length<2)return{s:'→',c:'trend-stable'};var d=v[0]-v[v.length-1];return d>.3?{s:'↑',c:'trend-up'}:d<-.3?{s:'↓',c:'trend-down'}:{s:'→',c:'trend-stable'};}
 function setTrend(id,t){var el=document.getElementById(id);if(el){el.textContent=t.s;el.className='trend '+t.c;}}
 
-// ─── CORRELATION ───
+// ─── корреляция (темп vs мутность) ───
 function updateCorrelation(feeds){
-  var pts=feeds.map(function(f){return{x:parseFloat(f.field1)||0,y:parseFloat(f.field2)||0};}).filter(function(p){return p.x&&p.y;});
+  var pts=feeds.map(function(f){return{x:parseFloat(f.field1)||0,y:parseFloat(f.field8)||0};}).filter(function(p){return p.x&&p.y;});
   if(corrChart)corrChart.destroy();
   corrChart=new Chart(document.getElementById('correlationChart'),{type:'scatter',
-    data:{datasets:[{label:'Темп. vs TDS',data:pts,
-      backgroundColor:pts.map(function(p){return p.y>500?'rgba(248,113,113,0.7)':p.y>300?'rgba(251,191,36,0.7)':'rgba(61,158,245,0.7)';}),
+    data:{datasets:[{label:'Темп. vs Мутность',data:pts,
+      backgroundColor:pts.map(function(p){return p.y>200?'rgba(248,113,113,0.7)':p.y>50?'rgba(251,146,60,0.7)':p.y>5?'rgba(251,191,36,0.7)':'rgba(52,211,153,0.7)';}),
       pointRadius:6,pointHoverRadius:8}]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{labels:{color:'rgba(255,255,255,0.4)',font:{size:11}}}},
       scales:{
         x:{title:{display:true,text:'Температура воды (°C)',color:'rgba(255,255,255,0.35)',font:{size:11}},ticks:{color:'rgba(255,255,255,0.3)',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
-        y:{title:{display:true,text:'TDS (ppm)',color:'rgba(255,255,255,0.35)',font:{size:11}},ticks:{color:'rgba(255,255,255,0.3)',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}}
+        y:{title:{display:true,text:'Мутность (NTU)',color:'rgba(255,255,255,0.35)',font:{size:11}},ticks:{color:'rgba(255,255,255,0.3)',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}}
       }
     }
   });
 }
 
-// ─── FORECAST ───
+// ─── прогноз ───
 function updateForecast(history){
   var recent=history.slice(0,10).reverse().map(function(h){return parseFloat(h.wt);}).filter(function(v){return !isNaN(v);});
   if(recent.length<3)return;
   var n=recent.length,sx=0,sy=0,sxy=0,sx2=0;
   recent.forEach(function(y,x){sx+=x;sy+=y;sxy+=x*y;sx2+=x*x;});
   var slope=(n*sxy-sx*sy)/(n*sx2-sx*sx),intercept=(sy-slope*sx)/n;
-  var hLabels=recent.map(function(_,i){return '-'+(recent.length-i)*15+'м';});
-  var fLabels=Array.from({length:8},function(_,i){return '+'+(i+1)*3+'ч';});
-  var fData=Array.from({length:8},function(_,i){return +(intercept+slope*(n+i)).toFixed(1);});
+  var hL=recent.map(function(_,i){return '-'+(recent.length-i)*15+'м';});
+  var fL=Array.from({length:8},function(_,i){return '+'+(i+1)*3+'ч';});
+  var fD=Array.from({length:8},function(_,i){return +(intercept+slope*(n+i)).toFixed(1);});
   if(forecastChart)forecastChart.destroy();
   forecastChart=new Chart(document.getElementById('forecastChart'),{type:'line',
-    data:{labels:hLabels.concat(fLabels),datasets:[
+    data:{labels:hL.concat(fL),datasets:[
       {label:'История',data:recent.concat(Array(8).fill(null)),borderColor:'#3d9ef5',backgroundColor:'rgba(61,158,245,0.06)',tension:.4,fill:true,borderWidth:2,pointRadius:3,spanGaps:false},
-      {label:'Прогноз',data:Array(recent.length).fill(null).concat(fData),borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,0.04)',tension:.4,fill:false,borderDash:[6,4],borderWidth:2,pointRadius:3,spanGaps:false}
+      {label:'Прогноз',data:Array(recent.length).fill(null).concat(fD),borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,0.04)',tension:.4,fill:false,borderDash:[6,4],borderWidth:2,pointRadius:3,spanGaps:false}
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{labels:{color:'rgba(255,255,255,0.4)',font:{size:11},boxWidth:10,boxHeight:2}}},
@@ -602,7 +672,7 @@ function updateForecast(history){
   });
 }
 
-// ─── PERIOD ───
+// ─── период ───
 window.switchPeriod=async function(period,el){
   document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');
   await loadPeriodData(period);
@@ -617,13 +687,20 @@ async function loadPeriodData(period){
     var data=await res.json();var feeds=data.feeds||[];
     if(!feeds.length){document.getElementById('periodLoading').textContent='Нет данных';return;}
     var gv=function(n){return feeds.map(function(f){return parseFloat(f[n]);}).filter(function(v){return !isNaN(v);});};
-    var stats=[{label:'💧 Вода',vals:gv('field1'),unit:'°C'},{label:'🌡️ Воздух',vals:gv('field3'),unit:'°C'},{label:'💨 Влажность',vals:gv('field4'),unit:'%'},{label:'🔬 TDS',vals:gv('field2'),unit:' ppm'},{label:'📈 ИКВ',vals:gv('field6'),unit:''}];
+    var stats=[
+      {label:'💧 Вода',vals:gv('field1'),unit:'°C'},
+      {label:'🌡️ Воздух',vals:gv('field3'),unit:'°C'},
+      {label:'💨 Влажность',vals:gv('field4'),unit:'%'},
+      {label:'🔬 TDS',vals:gv('field2'),unit:' ppm'},
+      {label:'👁 Мутность',vals:gv('field8'),unit:' NTU'},
+      {label:'📈 ИКВ',vals:gv('field6'),unit:''}
+    ];
     var grid=document.getElementById('statsGrid');grid.innerHTML='';
     stats.forEach(function(s){
       if(!s.vals.length)return;
-      var min=Math.min.apply(null,s.vals).toFixed(1),max=Math.max.apply(null,s.vals).toFixed(1),avg=(s.vals.reduce(function(a,b){return a+b;},0)/s.vals.length).toFixed(1);
+      var mn=Math.min.apply(null,s.vals).toFixed(1),mx=Math.max.apply(null,s.vals).toFixed(1),av=(s.vals.reduce(function(a,b){return a+b;},0)/s.vals.length).toFixed(1);
       var div=document.createElement('div');div.className='stat-card';
-      div.innerHTML='<div class="stat-lbl">'+s.label+'</div><div class="stat-row"><div class="stat-item"><div class="stat-val sv-min">'+min+s.unit+'</div><div class="stat-name">Мин</div></div><div class="stat-item"><div class="stat-val sv-avg">'+avg+s.unit+'</div><div class="stat-name">Среднее</div></div><div class="stat-item"><div class="stat-val sv-max">'+max+s.unit+'</div><div class="stat-name">Макс</div></div></div>';
+      div.innerHTML='<div class="stat-lbl">'+s.label+'</div><div class="stat-row"><div class="stat-item"><div class="stat-val sv-min">'+mn+s.unit+'</div><div class="stat-name">Мин</div></div><div class="stat-item"><div class="stat-val sv-avg">'+av+s.unit+'</div><div class="stat-name">Среднее</div></div><div class="stat-item"><div class="stat-val sv-max">'+mx+s.unit+'</div><div class="stat-name">Макс</div></div></div>';
       grid.appendChild(div);
     });
     var labels,datasets;
@@ -631,18 +708,18 @@ async function loadPeriodData(period){
       labels=feeds.map(function(f){return new Date(f.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});});
       datasets=[
         {label:'Вода °C',data:feeds.map(function(f){return parseFloat(f.field1)||null;}),borderColor:'#3d9ef5',tension:.4,fill:false,borderWidth:2,pointRadius:0},
-        {label:'Воздух °C',data:feeds.map(function(f){return parseFloat(f.field3)||null;}),borderColor:'#fbbf24',tension:.4,fill:false,borderWidth:2,pointRadius:0},
-        {label:'ИКВ',data:feeds.map(function(f){return parseFloat(f.field6)||null;}),borderColor:'#34d399',tension:.4,fill:false,borderWidth:2,pointRadius:0,yAxisID:'y2'}
+        {label:'Мутность NTU',data:feeds.map(function(f){return parseFloat(f.field8)||null;}),borderColor:'#fb923c',tension:.4,fill:false,borderWidth:2,pointRadius:0,yAxisID:'y2'},
+        {label:'ИКВ',data:feeds.map(function(f){return parseFloat(f.field6)||null;}),borderColor:'#34d399',tension:.4,fill:false,borderWidth:2,pointRadius:0,yAxisID:'y3'}
       ];
-    } else {
+    }else{
       var byDay={};
-      feeds.forEach(function(f){var d=new Date(f.created_at).toLocaleDateString('ru-RU');if(!byDay[d])byDay[d]={wt:[],at:[],wqi:[]};if(f.field1)byDay[d].wt.push(parseFloat(f.field1));if(f.field3)byDay[d].at.push(parseFloat(f.field3));if(f.field6)byDay[d].wqi.push(parseFloat(f.field6));});
+      feeds.forEach(function(f){var d=new Date(f.created_at).toLocaleDateString('ru-RU');if(!byDay[d])byDay[d]={wt:[],turb:[],wqi:[]};if(f.field1)byDay[d].wt.push(parseFloat(f.field1));if(f.field8)byDay[d].turb.push(parseFloat(f.field8));if(f.field6)byDay[d].wqi.push(parseFloat(f.field6));});
       labels=Object.keys(byDay);
       var avg2=function(arr){return arr.length?(arr.reduce(function(a,b){return a+b;},0)/arr.length).toFixed(1):null;};
       datasets=[
         {label:'Вода °C',data:labels.map(function(d){return avg2(byDay[d].wt);}),borderColor:'#3d9ef5',tension:.4,fill:false,borderWidth:2,pointRadius:3},
-        {label:'Воздух °C',data:labels.map(function(d){return avg2(byDay[d].at);}),borderColor:'#fbbf24',tension:.4,fill:false,borderWidth:2,pointRadius:3},
-        {label:'ИКВ',data:labels.map(function(d){return avg2(byDay[d].wqi);}),borderColor:'#34d399',tension:.4,fill:false,borderWidth:2,pointRadius:3,yAxisID:'y2'}
+        {label:'Мутность NTU',data:labels.map(function(d){return avg2(byDay[d].turb);}),borderColor:'#fb923c',tension:.4,fill:false,borderWidth:2,pointRadius:3,yAxisID:'y2'},
+        {label:'ИКВ',data:labels.map(function(d){return avg2(byDay[d].wqi);}),borderColor:'#34d399',tension:.4,fill:false,borderWidth:2,pointRadius:3,yAxisID:'y3'}
       ];
     }
     if(periodChart)periodChart.destroy();
@@ -652,46 +729,47 @@ async function loadPeriodData(period){
         scales:{
           x:{ticks:{color:'rgba(255,255,255,0.3)',maxTicksLimit:10,font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
           y:{ticks:{color:'rgba(255,255,255,0.3)',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}},
-          y2:{ticks:{color:'rgba(52,211,153,0.5)',font:{size:10}},position:'right',min:0,max:100,grid:{drawOnChartArea:false}}
+          y2:{ticks:{color:'rgba(251,146,60,0.6)',font:{size:10}},position:'right',grid:{drawOnChartArea:false}},
+          y3:{ticks:{color:'rgba(52,211,153,0.5)',font:{size:10}},position:'right',min:0,max:100,grid:{drawOnChartArea:false},display:false}
         }
       }
     });
     document.getElementById('periodLoading').style.display='none';
     document.getElementById('periodContent').style.display='block';
-  } catch(e){document.getElementById('periodLoading').textContent='Ошибка загрузки';}
+  }catch(e){document.getElementById('periodLoading').textContent='Ошибка загрузки';}
 }
 
-// ─── ECOLOGY ───
+// ─── экология ───
 function updateFish(wt,tds){
-  var set=function(id,cid,status,cls){
-    document.getElementById(id).textContent=status;
-    document.getElementById(id).className='fish-status fs-'+cls;
-    document.getElementById(cid).className='fish-card fish-'+cls;
-  };
+  var set=function(id,cid,status,cls){document.getElementById(id).textContent=status;document.getElementById(id).className='fish-status fs-'+cls;document.getElementById(cid).className='fish-card fish-'+cls;};
   set('fishStatus','fishCard',wt<=25&&tds<=500?'✓ Безопасно':wt<=30&&tds<=800?'⚠ Умеренный риск':'✕ Высокий риск',wt<=25&&tds<=500?'safe':wt<=30&&tds<=800?'warn':'danger');
   set('birdStatus','birdCard',wt<=30?'✓ Безопасно':'⚠ Умеренный риск',wt<=30?'safe':'warn');
   set('algaeStatus','algaeCard',wt>25&&tds>300?'✕ Высокий риск':wt>20&&tds>200?'⚠ Умеренный риск':'✓ Риск низкий',wt>25&&tds>300?'danger':wt>20&&tds>200?'warn':'safe');
 }
-function updateWaterUse(wt,tds,wqi){
+function updateWaterUse(wt,tds,wqi,ntu){
   var se=function(id,val,ok){var e=document.getElementById(id);e.textContent=val;e.className=ok?'wu-ok':'wu-warn';};
-  se('drinkTemp',wt.toFixed(1)+'°C',wt<=25);se('drinkTds',tds.toFixed(0)+' ppm',tds<=500);se('drinkDew','норм',true);
-  se('swimTemp',wt.toFixed(1)+'°C',wt<=30);se('swimTds',tds.toFixed(0)+' ppm',tds<=1000);se('swimWqi',wqi,wqi>=60);
-  var drOk=wt<=25&&tds<=500,swOk=wt<=30&&wqi>=60;
+  se('drinkTemp',wt.toFixed(1)+'°C',wt<=25);
+  se('drinkTds',tds.toFixed(0)+' ppm',tds<=500);
+  se('drinkTurb',ntu.toFixed(0)+' NTU',ntu<=5);
+  se('swimTemp',wt.toFixed(1)+'°C',wt<=30);
+  se('swimTds',tds.toFixed(0)+' ppm',tds<=1000);
+  se('swimTurb',ntu.toFixed(0)+' NTU',ntu<=200);
+  var drOk=wt<=25&&tds<=500&&ntu<=5;
+  var swOk=wt<=30&&ntu<=200&&wqi>=60;
   var dr=document.getElementById('drinkResult');dr.textContent=drOk?'✓ Пригодна для питья':'✕ Не пригодна';dr.className='wu-result '+(drOk?'wr-ok':'wr-warn');
   var sr=document.getElementById('swimResult');sr.textContent=swOk?'✓ Пригодна для купания':'✕ Не рекомендуется';sr.className='wu-result '+(swOk?'wr-ok':'wr-warn');
 }
 function detectAnomalies(history){
   var a=[];
   for(var i=1;i<Math.min(history.length,50);i++){
-    var c=history[i-1],prev=history[i];
-    if(Math.abs(parseFloat(c.wt)-parseFloat(prev.wt))>2) a.push({time:c.time,text:'Резкое изм. температуры воды: '+(parseFloat(c.wt)-parseFloat(prev.wt)).toFixed(1)+'°C',color:'#f87171'});
-    if(Math.abs(parseFloat(c.tds)-parseFloat(prev.tds))>100) a.push({time:c.time,text:'Резкое изм. TDS: '+Math.abs(parseFloat(c.tds)-parseFloat(prev.tds)).toFixed(0)+' ppm',color:'#fbbf24'});
-    if(Math.abs(parseFloat(c.hum)-parseFloat(prev.hum))>15) a.push({time:c.time,text:'Резкое изм. влажности: '+Math.abs(parseFloat(c.hum)-parseFloat(prev.hum)).toFixed(1)+'%',color:'#a78bfa'});
+    var c=history[i-1],pv=history[i];
+    if(Math.abs(parseFloat(c.wt)-parseFloat(pv.wt))>2)a.push({time:c.time,text:'Резкое изм. температуры воды: '+(parseFloat(c.wt)-parseFloat(pv.wt)).toFixed(1)+'°C',color:'#f87171'});
+    if(Math.abs(parseFloat(c.tds)-parseFloat(pv.tds))>100)a.push({time:c.time,text:'Резкое изм. TDS: '+Math.abs(parseFloat(c.tds)-parseFloat(pv.tds)).toFixed(0)+' ppm',color:'#fbbf24'});
+    if(Math.abs(parseFloat(c.hum)-parseFloat(pv.hum))>15)a.push({time:c.time,text:'Резкое изм. влажности: '+Math.abs(parseFloat(c.hum)-parseFloat(pv.hum)).toFixed(1)+'%',color:'#a78bfa'});
+    if(c.turb&&pv.turb&&Math.abs(parseFloat(c.turb)-parseFloat(pv.turb))>100)a.push({time:c.time,text:'Резкое изм. мутности: '+Math.abs(parseFloat(c.turb)-parseFloat(pv.turb)).toFixed(0)+' NTU',color:'#fb923c'});
   }
   var list=document.getElementById('anomalyList');
-  list.innerHTML=a.length===0
-    ?'<div class="anomaly-item"><div class="a-dot" style="background:var(--green)"></div><div class="a-text">Аномалий не обнаружено ✓</div></div>'
-    :a.slice(0,12).map(function(x){return '<div class="anomaly-item"><div class="a-dot" style="background:'+x.color+'"></div><span class="a-time">'+(x.time.split(',')[1]||'').trim()+'</span><div class="a-text">'+x.text+'</div></div>';}).join('');
+  list.innerHTML=a.length===0?'<div class="anomaly-item"><div class="a-dot" style="background:var(--green)"></div><div class="a-text">Аномалий не обнаружено ✓</div></div>':a.slice(0,12).map(function(x){return '<div class="anomaly-item"><div class="a-dot" style="background:'+x.color+'"></div><span class="a-time">'+(x.time.split(',')[1]||'').trim()+'</span><div class="a-text">'+x.text+'</div></div>';}).join('');
 }
 function updateDayRating(history){
   var byDay={};
@@ -703,11 +781,11 @@ function updateDayRating(history){
   render(document.getElementById('worstDays'),avgs.slice().reverse());
 }
 
-// ─── JOURNAL ───
+// ─── журнал ───
 function exportCSV(){
   var h=loadHistory();if(!h.length){alert('История пуста!');return;}
-  var csv='Время,Вода°C,Воздух°C,Влажность%,TDS ppm,Роса°C,Поток°C,ИКВ\n';
-  h.forEach(function(e){csv+=e.time+','+e.wt+','+e.at+','+e.hum+','+e.tds+','+e.dew+','+e.flux+','+e.wqi+'\n';});
+  var csv='Время,Вода°C,Воздух°C,Влажность%,TDS ppm,Мутность NTU,Роса°C,ИКВ\n';
+  h.forEach(function(e){csv+=e.time+','+e.wt+','+e.at+','+e.hum+','+e.tds+','+(e.turb||'--')+','+e.dew+','+e.wqi+'\n';});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
   a.download='lake_'+new Date().toLocaleDateString('ru-RU').replace(/\./g,'-')+'.csv';
@@ -720,13 +798,15 @@ function renderHistory(){
   var tbody=document.getElementById('historyBody');tbody.innerHTML='';
   filtered.slice(0,100).forEach(function(e){
     var wqi=parseFloat(e.wqi);
-    var c=wqi>=80?'var(--green)':wqi>=60?'var(--amber)':'var(--red)';
+    var ntu=parseFloat(e.turb)||0;
+    var wc=wqi>=80?'var(--green)':wqi>=60?'var(--amber)':'var(--red)';
+    var tc=ntu<5?'var(--green)':ntu<50?'var(--amber)':ntu<200?'var(--orange)':'var(--red)';
     var tr=document.createElement('tr');
-    tr.innerHTML='<td style="font-size:10px;color:var(--text1);white-space:nowrap">'+e.time+'</td><td>'+e.wt+'</td><td>'+e.at+'</td><td>'+e.hum+'</td><td>'+e.tds+'</td><td>'+e.dew+'</td><td>'+e.flux+'</td><td style="color:'+c+';font-weight:600">'+e.wqi+'</td>';
+    tr.innerHTML='<td style="font-size:10px;color:var(--text1);white-space:nowrap">'+e.time+'</td><td>'+e.wt+'</td><td>'+e.at+'</td><td>'+e.hum+'</td><td>'+e.tds+'</td><td style="color:'+tc+';font-weight:600">'+(e.turb||'--')+'</td><td>'+e.dew+'</td><td style="color:'+wc+';font-weight:600">'+e.wqi+'</td>';
     tbody.appendChild(tr);
   });
   var sc=document.getElementById('showingCount');
-  if(sc) sc.textContent='Показано '+Math.min(filtered.length,100)+' из '+filtered.length+' записей';
+  if(sc)sc.textContent='Показано '+Math.min(filtered.length,100)+' из '+filtered.length+' записей';
 }
 function updateSummary(){
   var h=loadHistory();
@@ -735,8 +815,8 @@ function updateSummary(){
   document.getElementById('j-avgWqi').textContent=wqis.length?(wqis.reduce(function(a,b){return a+b;},0)/wqis.length).toFixed(1):'--';
   var wts=h.map(function(e){return parseFloat(e.wt);}).filter(function(v){return !isNaN(v);});
   document.getElementById('j-avgWater').textContent=wts.length?(wts.reduce(function(a,b){return a+b;},0)/wts.length).toFixed(1)+'°C':'--';
-  var today=new Date().toLocaleDateString('ru-RU');
-  document.getElementById('j-todayRec').textContent=h.filter(function(e){return e.time.indexOf(today)===0;}).length;
+  var turbs=h.map(function(e){return parseFloat(e.turb);}).filter(function(v){return !isNaN(v);});
+  document.getElementById('j-avgTurb').textContent=turbs.length?(turbs.reduce(function(a,b){return a+b;},0)/turbs.length).toFixed(0)+' NTU':'-- NTU';
 }
 
 // ─── MAIN FETCH ───
@@ -749,12 +829,12 @@ async function fetchData(){
     var wt=parseFloat(last.field1),tds=parseFloat(last.field2),at=parseFloat(last.field3);
     var hum=parseFloat(last.field4),light=parseFloat(last.field5),wqi=parseFloat(last.field6)||0;
     var dew=parseFloat(last.field7)||calcDewPoint(at,hum);
-    var flux=parseFloat(last.field8)||(wt-at);
+    var ntu=parseFloat(last.field8)||0;  // field8 = мутность NTU
     var evap=calcEvaporation(wt,at,hum,light);
     var comfort=calcComfort(at,hum,wt);
     var eutro=calcEutro(wt,tds,light);
 
-    // HOME
+    // ГЛАВНАЯ
     uv('h-waterTemp',wt.toFixed(1));uv('h-airTemp',at.toFixed(1));uv('h-humidity',hum.toFixed(1));
     uv('h-tds',tds.toFixed(0));uv('h-light',light.toFixed(0));uv('h-wqiScore',wqi);
     document.getElementById('h-wqiFill').style.width=wqi+'%';
@@ -770,16 +850,19 @@ async function fetchData(){
     document.getElementById('h-wqiFill').style.background='linear-gradient(90deg,'+wqiC+'88,'+wqiC+')';
 
     var labels=feeds.map(function(f){return new Date(f.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});});
-    if(miniChart) miniChart.destroy();
+    if(miniChart)miniChart.destroy();
     miniChart=new Chart(document.getElementById('h-miniWqi'),{type:'line',
       data:{labels:labels,datasets:[{data:feeds.map(function(f){return parseFloat(f.field6)||null;}),borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.08)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{min:0,max:100,display:false}}}
     });
 
-    // SENSORS
+    // МУТНОСТЬ везде
+    updateTurbCard(ntu);
+
+    // ДАТЧИКИ
     uv('s-waterTemp',wt.toFixed(1));uv('s-airTemp',at.toFixed(1));uv('s-humidity',hum.toFixed(1));
     uv('s-tds',tds.toFixed(0));uv('s-light',light.toFixed(0));
-    uv('s-dewPoint',dew.toFixed(1));uv('s-thermalFlux',flux.toFixed(1));
+    uv('s-dewPoint',dew.toFixed(1));uv('s-thermalFlux',(wt-at).toFixed(1));
     uv('s-evaporation',evap.toFixed(2));uv('s-comfortIndex',comfort.toFixed(0));uv('s-eutroIndex',eutro.toFixed(0));
     whoSet(wt<=25,'s-whoWater');whoSet(hum>=40&&hum<=70,'s-whoHum');whoSet(tds<=500,'s-whoTds');
     whoTbl(wt.toFixed(1)+'°C',wt<=25,'s-whoTblWater','s-whoTblWaterSt');
@@ -789,45 +872,49 @@ async function fetchData(){
 
     var history=loadHistory();
     ['Water','Air','Hum','Tds','Light'].forEach(function(k,i){
-      setTrend('s-trend'+k, getTrend(history,['wt','at','hum','tds','light'][i]));
+      setTrend('s-trend'+k,getTrend(history,['wt','at','hum','tds','light'][i]));
     });
 
-    // ECOLOGY
-    if(wt>25) sendAlert('Температура воды '+wt.toFixed(1)+'°C превышает норму ВОЗ');
-    if(tds>500) sendAlert('TDS '+tds.toFixed(0)+' ppm превышает норму ВОЗ');
-    if(eutro>70) sendAlert('Высокий риск эвтрофикации: '+eutro.toFixed(0)+'/100');
-    updateFish(wt,tds);
-    updateWaterUse(wt,tds,wqi);
+    // АЛЕРТЫ
+    if(wt>25)sendAlert('Температура воды '+wt.toFixed(1)+'°C превышает норму ВОЗ');
+    if(tds>500)sendAlert('TDS '+tds.toFixed(0)+' ppm превышает норму ВОЗ');
+    if(ntu>200)sendAlert('Мутность '+ntu.toFixed(0)+' NTU — вода очень мутная!');
+    if(eutro>70)sendAlert('Высокий риск эвтрофикации: '+eutro.toFixed(0)+'/100');
 
-    // CHARTS — только если уже инициализированы
+    // ЭКОЛОГИЯ
+    updateFish(wt,tds);
+    updateWaterUse(wt,tds,wqi,ntu);
+
+    // ГРАФИКИ
     if(chartsInited){
       var cl=feeds.map(function(f){return new Date(f.created_at).toLocaleTimeString('ru-RU');});
       tempChart.data.labels=cl;tempChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field1)||null;});tempChart.data.datasets[1].data=feeds.map(function(f){return parseFloat(f.field3)||null;});tempChart.update();
       humChart.data.labels=cl;humChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field4)||null;});humChart.update();
       tdsChart.data.labels=cl;tdsChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field2)||null;});tdsChart.update();
       wqiChart.data.labels=cl;wqiChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field6)||null;});wqiChart.update();
+      turbChart.data.labels=cl;turbChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field8)||null;});turbChart.update();
       dewChart.data.labels=cl;dewChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field7)||null;});dewChart.update();
-      fluxChart.data.labels=cl;fluxChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field8)||null;});fluxChart.update();
       updateCorrelation(feeds);
     }
 
-    saveHistory({time:new Date().toLocaleString('ru-RU'),wt:wt.toFixed(1),at:at.toFixed(1),hum:hum.toFixed(1),tds:tds.toFixed(0),light:light.toFixed(0),dew:dew.toFixed(1),flux:flux.toFixed(1),wqi:wqi});
+    // СОХРАНЕНИЕ (теперь с мутностью)
+    saveHistory({time:new Date().toLocaleString('ru-RU'),wt:wt.toFixed(1),at:at.toFixed(1),hum:hum.toFixed(1),tds:tds.toFixed(0),light:light.toFixed(0),turb:ntu.toFixed(0),dew:dew.toFixed(1),wqi:wqi});
     var hist=loadHistory();
     detectAnomalies(hist);
     updateDayRating(hist);
-    if(chartsInited) updateForecast(hist);
+    if(chartsInited)updateForecast(hist);
 
+    // ЖУРНАЛ ВОЗ
     whoTbl(wt.toFixed(1)+'°C',wt<=25,'j-whoWater','j-whoWaterSt');
     whoTbl(tds.toFixed(0)+' ppm',tds<=500,'j-whoTds','j-whoTdsSt');
     whoTbl(hum.toFixed(1)+'%',hum>=40&&hum<=70,'j-whoHum','j-whoHumSt');
-    whoTbl(dew.toFixed(1)+'°C',dew<at,'j-whoDew','j-whoDewSt');
 
     document.getElementById('lastUpdate').textContent=new Date().toLocaleTimeString('ru-RU');
-  } catch(e){ console.error(e); }
+  }catch(e){console.error(e);}
 }
 
 fetchData();
-setInterval(fetchData, 15e3);
+setInterval(fetchData,15e3);
 </script>
 </body>
 </html>
