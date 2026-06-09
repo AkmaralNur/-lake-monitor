@@ -163,7 +163,32 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
 .hm-label{font-size:9px;color:var(--text3);margin-bottom:4px;display:flex;justify-content:space-between}
 
 /* FISH */
-.fish-card{border-radius:10px;padding:16px;text-align:center;border:1px solid var(--border);background:var(--surface);transition:border-color .3s}
+.fish-card{border-radius:10px;padding:16px;text-align:center;border:1px solid var(--border);background:var(--surface);transition:border-color .3s,background .3s,transform .18s;cursor:pointer}
+.fish-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+.fish-safe{background:rgba(52,211,153,0.04)!important;border-color:rgba(52,211,153,0.25)!important}
+.fish-warn{background:rgba(251,191,36,0.04)!important;border-color:rgba(251,191,36,0.25)!important}
+.fish-danger{background:rgba(248,113,113,0.04)!important;border-color:rgba(248,113,113,0.25)!important}
+
+/* МОДАЛЬНОЕ ОКНО */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:28px;max-width:480px;width:100%;position:relative;transform:translateY(20px);transition:transform .2s;max-height:90vh;overflow-y:auto}
+.modal-overlay.show .modal{transform:translateY(0)}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text2);transition:all .18s;font-family:inherit}
+.modal-close:hover{background:var(--surface);color:var(--text1)}
+.modal-emoji{font-size:48px;text-align:center;margin-bottom:12px}
+.modal-title{font-size:18px;font-weight:600;text-align:center;margin-bottom:4px}
+.modal-subtitle{font-size:11px;color:var(--text2);text-align:center;margin-bottom:16px}
+.modal-status{text-align:center;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;margin-bottom:16px}
+.modal-status-safe{background:rgba(52,211,153,0.1);color:var(--green);border:1px solid rgba(52,211,153,0.25)}
+.modal-status-warn{background:rgba(251,191,36,0.1);color:var(--amber);border:1px solid rgba(251,191,36,0.25)}
+.modal-status-danger{background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.25)}
+.modal-section-title{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.modal-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+.modal-row:last-child{border:none}
+.modal-key{color:var(--text2)}
+.modal-val{font-family:'JetBrains Mono',monospace;font-weight:600}
+.modal-explain{font-size:12px;color:var(--text2);line-height:1.6;background:var(--surface);border-radius:10px;padding:12px;margin-top:12px}
 .fish-emoji{font-size:28px;display:block;margin-bottom:7px}
 .fish-name{font-size:12px;font-weight:600}
 .fish-desc{font-size:10px;color:var(--text2);margin:3px 0 7px;line-height:1.4}
@@ -455,16 +480,74 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
 <!-- ЭКОЛОГИЯ -->
 <div class="page" id="page-ecology">
   <div class="page-title">Экология Иссык-Куля</div>
-  <div class="page-sub">Редкие и уникальные обитатели озера</div>
-  <div class="sec"><i class="fas fa-fish" style="color:var(--teal)"></i> Эндемичные рыбы</div>
+  <div class="page-sub">Редкие и уникальные обитатели озера · индикаторы риска по данным датчиков в реальном времени</div>
+
+  <!-- РЫБЫ -->
+  <div class="sec"><i class="fas fa-fish" style="color:var(--teal)"></i> 🔴 Эндемичные рыбы (только в Иссык-Куле)</div>
   <div class="card" style="margin-bottom:12px">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:14px;padding:10px;background:rgba(248,113,113,0.06);border-radius:8px;border-left:3px solid var(--red)">
+      ⚠️ Из 26 видов рыб озера — 12 эндемиков, нигде больше не существуют. Осман и маринка в Красной книге Кыргызстана.
+    </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-      <div class="fish-card" id="fc-osman"><span class="fish-emoji">🐡</span><div class="fish-name">Осман голый</div><div style="font-size:9px;font-weight:700;color:var(--red);margin:2px 0">🔴 КРАСНАЯ КНИГА КР</div><div class="fish-desc">Эндемик · глубины до 20м<br>Оптимум: 12–20°C</div><div class="fish-status" id="fs-osman">—</div></div>
-      <div class="fish-card" id="fc-marinka"><span class="fish-emoji">🐟</span><div class="fish-name">Маринка иссык-кульская</div><div style="font-size:9px;font-weight:700;color:var(--red);margin:2px 0">🔴 КРАСНАЯ КНИГА КР</div><div class="fish-desc">Эндемик · уникальный вид<br>Оптимум: 12–20°C</div><div class="fish-status" id="fs-marinka">—</div></div>
-      <div class="fish-card" id="fc-chebak"><span class="fish-emoji">🐠</span><div class="fish-name">Чебачок иссык-кульский</div><div style="font-size:9px;font-weight:700;color:var(--amber);margin:2px 0">⚠️ ПОД УГРОЗОЙ</div><div class="fish-desc">90% биомассы озера<br>Оптимум: 15–22°C</div><div class="fish-status" id="fs-chebak">—</div></div>
-      <div class="fish-card" id="fc-trout"><span class="fish-emoji">🎣</span><div class="fish-name">Форель севанская</div><div style="font-size:9px;font-weight:700;color:var(--accent);margin:2px 0">📍 АККЛИМАТИЗИРОВАН</div><div class="fish-desc">С оз. Севан · ценная<br>Оптимум: 10–18°C</div><div class="fish-status" id="fs-trout">—</div></div>
+      <div class="fish-card" id="fc-osman" onclick="openEcoModal('fc-osman')"><span class="fish-emoji">🐡</span><div class="fish-name">Осман голый</div><div style="font-size:9px;font-weight:700;color:var(--red);margin:2px 0">🔴 КРАСНАЯ КНИГА КР</div><div class="fish-desc">Эндемик · глубины до 20м<br>Оптимум: 12–20°C<br>Икра ядовита для птиц</div><div class="fish-status" id="fs-osman">—</div></div>
+      <div class="fish-card" id="fc-marinka" onclick="openEcoModal('fc-marinka')"><span class="fish-emoji">🐟</span><div class="fish-name">Маринка иссык-кульская</div><div style="font-size:9px;font-weight:700;color:var(--red);margin:2px 0">🔴 КРАСНАЯ КНИГА КР</div><div class="fish-desc">Эндемик · уникальный вид<br>Оптимум: 12–20°C<br>Брюшина ядовита!</div><div class="fish-status" id="fs-marinka">—</div></div>
+      <div class="fish-card" id="fc-chebak" onclick="openEcoModal('fc-chebak')"><span class="fish-emoji">🐠</span><div class="fish-name">Чебачок иссык-кульский</div><div style="font-size:9px;font-weight:700;color:var(--amber);margin:2px 0">⚠️ ПОД УГРОЗОЙ</div><div class="fish-desc">90% биомассы озера<br>Оптимум: 15–22°C<br>Исчезает из улова</div><div class="fish-status" id="fs-chebak">—</div></div>
+      <div class="fish-card" id="fc-peskar" onclick="openEcoModal('fc-peskar')"><span class="fish-emoji">🐟</span><div class="fish-name">Пескарь иссык-кульский</div><div style="font-size:9px;font-weight:700;color:var(--amber);margin:2px 0">⚠️ ЭНДЕМИК</div><div class="fish-desc">Уникальный донный вид<br>Оптимум: 14–20°C<br>Нигде больше нет</div><div class="fish-status" id="fs-peskar">—</div></div>
+      <div class="fish-card" id="fc-gubach" onclick="openEcoModal('fc-gubach')"><span class="fish-emoji">🐟</span><div class="fish-name">Губач иссык-кульский</div><div style="font-size:9px;font-weight:700;color:var(--amber);margin:2px 0">⚠️ ЭНДЕМИК</div><div class="fish-desc">Только в Иссык-Куле<br>Оптимум: 14–22°C<br>Питается водорослями</div><div class="fish-status" id="fs-gubach">—</div></div>
+      <div class="fish-card" id="fc-golyan" onclick="openEcoModal('fc-golyan')"><span class="fish-emoji">🐟</span><div class="fish-name">Гольян иссык-кульский</div><div style="font-size:9px;font-weight:700;color:var(--amber);margin:2px 0">⚠️ ЭНДЕМИК</div><div class="fish-desc">Мелководные зоны<br>Оптимум: 14–22°C<br>Уникальный вид</div><div class="fish-status" id="fs-golyan">—</div></div>
+      <div class="fish-card" id="fc-trout" onclick="openEcoModal('fc-trout')"><span class="fish-emoji">🎣</span><div class="fish-name">Форель севанская</div><div style="font-size:9px;font-weight:700;color:var(--accent);margin:2px 0">📍 АККЛИМАТИЗИРОВАН</div><div class="fish-desc">С оз. Севан (Армения)<br>Оптимум: 10–18°C<br>Ценная промысловая</div><div class="fish-status" id="fs-trout">—</div></div>
+      <div class="fish-card" id="fc-turb-fish" onclick="openEcoModal('fc-turb-fish')"><span class="fish-emoji">👁</span><div class="fish-name">Прозрачность воды</div><div style="font-size:9px;font-weight:700;color:var(--teal);margin:2px 0">🌊 УНИКАЛЬНО — до 30м</div><div class="fish-desc">Иссык-Куль — одно из<br>прозрачнейших озёр мира<br>Харовые водоросли до 40м</div><div class="fish-status" id="fs-turb-fish">—</div></div>
     </div>
   </div>
+
+  <!-- ПТИЦЫ -->
+  <div class="sec"><i class="fas fa-dove" style="color:var(--accent)"></i> 🦢 Редкие птицы · Иссык-Куль — место зимовки</div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:14px;padding:10px;background:rgba(61,158,245,0.06);border-radius:8px;border-left:3px solid var(--accent)">
+      🦢 Каждый год 20–65 тысяч птиц зимуют на незамерзающем Иссык-Куле. ~850 лебедей — охраняемый вид. 33 вида птиц в Красной книге КР.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+      <div class="fish-card" id="bc-swan" onclick="openEcoModal('bc-swan')"><span class="fish-emoji">🦢</span><div class="fish-name">Лебедь-шипун</div><div style="font-size:9px;font-weight:700;color:var(--red);margin:2px 0">🔴 КРАСНАЯ КНИГА КР</div><div class="fish-desc">~850 особей зимует<br>Охраняется законом<br>Нужна чистая вода</div><div class="fish-status" id="bs-swan">—</div></div>
+      <div class="fish-card" id="bc-whooper" onclick="openEcoModal('bc-whooper')"><span class="fish-emoji">🦢</span><div class="fish-name">Лебедь-кликун</div><div style="font-size:9px;font-weight:700;color:var(--red);margin:2px 0">🔴 КРАСНАЯ КНИГА КР</div><div class="fish-desc">Зимует на зап. берегу<br>Редкий перелётный вид<br>Питается рдестами</div><div class="fish-status" id="bs-whooper">—</div></div>
+      <div class="fish-card" id="bc-heron" onclick="openEcoModal('bc-heron')"><span class="fish-emoji">🦩</span><div class="fish-name">Серая цапля</div><div style="font-size:9px;font-weight:700;color:var(--amber);margin:2px 0">⚠️ ОХРАНЯЕМЫЙ ВИД</div><div class="fish-desc">Гнездится на берегах<br>Питается рыбой<br>Нужна прозрачность воды</div><div class="fish-status" id="bs-heron">—</div></div>
+      <div class="fish-card" id="bc-duck" onclick="openEcoModal('bc-duck')"><span class="fish-emoji">🦆</span><div class="fish-name">Красноносый нырок</div><div style="font-size:9px;font-weight:700;color:var(--teal);margin:2px 0">📍 МАССОВЫЙ ЗИМОВЩИК</div><div class="fish-desc">До 50 тыс. зимует<br>Ныряет до 2м за едой<br>Питается рдестами</div><div class="fish-status" id="bs-duck">—</div></div>
+    </div>
+  </div>
+
+  <!-- РАСТЕНИЯ -->
+  <div class="sec"><i class="fas fa-seedling" style="color:var(--green)"></i> 🌿 Уникальные растения озера</div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:11px;color:var(--text2);margin-bottom:14px;padding:10px;background:rgba(52,211,153,0.06);border-radius:8px;border-left:3px solid var(--green)">
+      🌿 Харовые водоросли Иссык-Куля образуют сплошной ковёр до глубины 35–40 метров. Они естественный фильтр озера и причина его легендарной прозрачности.
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div class="fish-card" id="pc-chara" onclick="openEcoModal('pc-chara')"><span class="fish-emoji">🌿</span><div class="fish-name">Харовые водоросли</div><div style="font-size:9px;font-weight:700;color:var(--green);margin:2px 0">✨ УНИКАЛЬНЫЙ ФЕНОМЕН</div><div class="fish-desc">Ковёр до глубины 40м<br>Естественный биофильтр<br>Поддерживают прозрачность</div><div class="fish-status" id="ps-chara">—</div></div>
+      <div class="fish-card" id="pc-rdest" onclick="openEcoModal('pc-rdest')"><span class="fish-emoji">🌱</span><div class="fish-name">Рдест гребенчатый</div><div style="font-size:9px;font-weight:700;color:var(--accent);margin:2px 0">🌊 КОРМ ЗИМУЮЩИХ ПТИЦ</div><div class="fish-desc">В заливах до 5м глубины<br>Главный корм нырков<br>Кормит 50 тыс. птиц зимой</div><div class="fish-status" id="ps-rdest">—</div></div>
+      <div class="fish-card" id="pc-algae" onclick="openEcoModal('pc-algae')"><span class="fish-emoji">⚗️</span><div class="fish-name">Риск эвтрофикации</div><div style="font-size:9px;font-weight:700;color:var(--amber);margin:2px 0">📊 ИНДИКАТОР ЗДОРОВЬЯ</div><div class="fish-desc">Цветение водорослей<br>Темп + TDS + свет<br>Иссык-Куль — исторически чист</div><div class="fish-status" id="ps-algae">—</div></div>
+    </div>
+  </div>
+
+  <!-- ПРИГОДНОСТЬ ВОДЫ -->
+  <div class="sec"><i class="fas fa-tint" style="color:var(--accent)"></i> Пригодность воды</div>
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:600;margin-bottom:10px">🚰 Для питья (справка)</div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px"><span style="color:var(--text2)">Температура</span><span id="drinkTemp" style="font-family:'JetBrains Mono',monospace">--</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px"><span style="color:var(--text2)">TDS</span><span id="drinkTds" style="font-family:'JetBrains Mono',monospace">--</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:11px"><span style="color:var(--text2)">Мутность</span><span id="drinkTurb" style="font-family:'JetBrains Mono',monospace">--</span></div>
+        <div style="text-align:center;padding:9px;border-radius:8px;margin-top:8px;font-size:12px;font-weight:600;background:rgba(248,113,113,0.1);color:var(--red);border:1px solid rgba(248,113,113,0.2)">✕ Не питьевая (солоноватое озеро)</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div style="font-size:11px;font-weight:600;margin-bottom:10px">🏊 Для купания (Иссык-Куль)</div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px"><span style="color:var(--text2)">Температура</span><span id="swimTemp" style="font-family:'JetBrains Mono',monospace">--</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px"><span style="color:var(--text2)">Мутность</span><span id="swimTurb" style="font-family:'JetBrains Mono',monospace">--</span></div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:11px"><span style="color:var(--text2)">ИКВ</span><span id="swimWqi" style="font-family:'JetBrains Mono',monospace">--</span></div>
+        <div style="text-align:center;padding:9px;border-radius:8px;margin-top:8px;font-size:12px;font-weight:600" id="swimResult">—</div>
+      </div>
+    </div>
+  </div>
+
   <div class="g2">
     <div class="card"><div class="card-title"><i class="fas fa-bolt"></i> Аномалии</div><div class="anomaly-list" id="anomalyList"><div class="loading">Анализ...</div></div></div>
     <div class="card">
@@ -797,13 +880,41 @@ async function loadPeriodData(period){
   }catch(e){document.getElementById('periodLoading').textContent='Ошибка загрузки';}
 }
 
-// ─── РЫБЫ ───
-function setSpecies(sid,cid,status,cls){var s=document.getElementById(sid);if(s){s.textContent=status;s.className='fish-status fs-'+cls;}}
-function updateFish(wt,ntu){
+// ─── РЫБЫ, ПТИЦЫ, РАСТЕНИЯ ───
+function setSpecies(sid,cid,status,cls){
+  var s=document.getElementById(sid);if(s){s.textContent=status;s.className='fish-status fs-'+cls;}
+  var c=document.getElementById(cid);if(c){c.className='fish-card fish-'+cls;}
+}
+function updateEcology(wt,ntu,tds){
+  var eutro=calcEutro(wt,tds,0);
   setSpecies('fs-osman','fc-osman',wt>=12&&wt<=20&&ntu<=5?'✓ Условия подходят':wt<=23&&ntu<=15?'⚠ Осторожно':'✕ Критический риск!',wt>=12&&wt<=20&&ntu<=5?'safe':wt<=23&&ntu<=15?'warn':'danger');
   setSpecies('fs-marinka','fc-marinka',wt>=12&&wt<=20&&ntu<=5?'✓ Условия подходят':wt<=23&&ntu<=15?'⚠ Осторожно':'✕ Критический риск!',wt>=12&&wt<=20&&ntu<=5?'safe':wt<=23&&ntu<=15?'warn':'danger');
   setSpecies('fs-chebak','fc-chebak',wt>=15&&wt<=22&&ntu<=10?'✓ Оптимальные условия':wt<=25&&ntu<=30?'⚠ Условия терпимые':'✕ Риск для эндемика!',wt>=15&&wt<=22&&ntu<=10?'safe':wt<=25&&ntu<=30?'warn':'danger');
+  setSpecies('fs-peskar','fc-peskar',wt>=14&&wt<=20&&ntu<=8?'✓ Хорошие условия':wt<=23&&ntu<=20?'⚠ Умеренный риск':'✕ Неблагоприятно',wt>=14&&wt<=20&&ntu<=8?'safe':wt<=23&&ntu<=20?'warn':'danger');
+  setSpecies('fs-gubach','fc-gubach',wt>=14&&wt<=22&&ntu<=10?'✓ Хорошие условия':wt<=25&&ntu<=25?'⚠ Умеренный риск':'✕ Неблагоприятно',wt>=14&&wt<=22&&ntu<=10?'safe':wt<=25&&ntu<=25?'warn':'danger');
+  setSpecies('fs-golyan','fc-golyan',wt>=14&&wt<=22&&ntu<=10?'✓ Хорошие условия':wt<=25&&ntu<=25?'⚠ Умеренный риск':'✕ Неблагоприятно',wt>=14&&wt<=22&&ntu<=10?'safe':wt<=25&&ntu<=25?'warn':'danger');
   setSpecies('fs-trout','fc-trout',wt<=18?'✓ Идеальные условия':wt<=22?'⚠ Немного тепло':'✕ Слишком тепло',wt<=18?'safe':wt<=22?'warn':'danger');
+  var sec=ntu>0?(1.13/Math.sqrt(ntu)).toFixed(1):'30+';
+  setSpecies('fs-turb-fish','fc-turb-fish',ntu<=5?'✓ '+sec+'м · отлично':ntu<=50?'⚠ '+sec+'м · мутновато':'✕ '+sec+'м · мутная',ntu<=5?'safe':ntu<=50?'warn':'danger');
+  setSpecies('bs-swan','bc-swan',ntu<=10&&wt<=18?'✓ Благоприятные условия':ntu<=30?'⚠ Умеренный риск':'✕ Неблагоприятно',ntu<=10&&wt<=18?'safe':ntu<=30?'warn':'danger');
+  setSpecies('bs-whooper','bc-whooper',ntu<=10&&wt<=18?'✓ Благоприятные условия':ntu<=30?'⚠ Умеренный риск':'✕ Неблагоприятно',ntu<=10&&wt<=18?'safe':ntu<=30?'warn':'danger');
+  setSpecies('bs-heron','bc-heron',ntu<=10?'✓ Видит рыбу хорошо':ntu<=40?'⚠ Охота затруднена':'✕ Не видит добычу',ntu<=10?'safe':ntu<=40?'warn':'danger');
+  setSpecies('bs-duck','bc-duck',ntu<=20?'✓ Видимость хорошая':ntu<=80?'⚠ Видимость слабая':'✕ Охота затруднена',ntu<=20?'safe':ntu<=80?'warn':'danger');
+  setSpecies('ps-chara','pc-chara',ntu<=5&&eutro<=30?'✓ Условия хорошие':ntu<=20&&eutro<=60?'⚠ Условия ухудшаются':'✕ Риск деградации',ntu<=5&&eutro<=30?'safe':ntu<=20&&eutro<=60?'warn':'danger');
+  setSpecies('ps-rdest','pc-rdest',ntu<=10&&eutro<=40?'✓ Растёт нормально':ntu<=30?'⚠ Умеренный риск':'✕ Угроза зарастания',ntu<=10&&eutro<=40?'safe':ntu<=30?'warn':'danger');
+  setSpecies('ps-algae','pc-algae',eutro<=30?'✓ Риск низкий · норма':eutro<=60?'⚠ Умеренный риск':'✕ Высокий риск!',eutro<=30?'safe':eutro<=60?'warn':'danger');
+}
+function updateWaterUse(wt,tds,wqi,ntu){
+  var se=function(id,val,color){var e=document.getElementById(id);if(e){e.textContent=val;e.style.color=color;}};
+  se('drinkTemp',wt.toFixed(1)+'°C',wt<=25?'var(--green)':'var(--red)');
+  se('drinkTds',tds.toFixed(1)+' ppm','var(--red)');
+  se('drinkTurb',ntu.toFixed(2)+' NTU',ntu<=5?'var(--green)':'var(--red)');
+  se('swimTemp',wt.toFixed(1)+'°C',wt>=16&&wt<=26?'var(--green)':'var(--red)');
+  se('swimTurb',ntu.toFixed(2)+' NTU',ntu<=200?'var(--green)':'var(--red)');
+  se('swimWqi',wqi,wqi>=60?'var(--green)':'var(--amber)');
+  var swOk=wt>=16&&wt<=28&&ntu<=200&&wqi>=50;
+  var sr=document.getElementById('swimResult');
+  if(sr){sr.textContent=swOk?'✓ Отлично для купания':'⚠ Условия не оптимальны';sr.style.cssText='text-align:center;padding:9px;border-radius:8px;font-size:12px;font-weight:600;background:'+(swOk?'rgba(52,211,153,0.1)':'rgba(248,113,113,0.1)')+';color:'+(swOk?'var(--green)':'var(--red)')+';border:1px solid '+(swOk?'rgba(52,211,153,0.2)':'rgba(248,113,113,0.2)');}
 }
 
 // ─── АНОМАЛИИ ───
@@ -874,6 +985,7 @@ async function fetchData(){
 
     var tds=getSimTDS();
     var ntu=getSimNTU();
+    _modalData={wt:wt,at:at,hum:hum,tds:tds,ntu:ntu,wqi:wqi,light:light};
     var sal=calcSalinity(tds);
     var evap=calcEvaporation(wt,at,hum,light);
     var comfort=calcComfort(at,hum,wt);
@@ -929,7 +1041,8 @@ async function fetchData(){
     updateSeason(wt);updateSwimDays();
 
     // Экология
-    updateFish(wt,ntu);
+    updateEcology(wt,ntu,tds);
+    updateWaterUse(wt,tds,wqi,ntu);
 
     // Графики
     if(chartsInited){
@@ -955,6 +1068,166 @@ fetchData();
 setInterval(fetchData,15e3);
 fetchWeather();
 setInterval(fetchWeather,600e3);
+</script>
+
+<!-- МОДАЛЬНОЕ ОКНО ЭКОЛОГИИ -->
+<div class="modal-overlay" id="ecoModal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-emoji" id="modalEmoji">🐟</div>
+    <div class="modal-title" id="modalTitle">—</div>
+    <div class="modal-subtitle" id="modalSubtitle">—</div>
+    <div class="modal-status" id="modalStatus">—</div>
+    <div class="modal-section-title">Текущие условия</div>
+    <div id="modalRows"></div>
+    <div class="modal-explain" id="modalExplain">—</div>
+  </div>
+</div>
+
+<script>
+// ─── МОДАЛЬНОЕ ОКНО ───
+var _modalData = {};
+
+var ECO_INFO = {
+  'fc-osman':    {emoji:'🐡', name:'Осман голый', subtitle:'Эндемик Иссык-Куля · Красная книга КР',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','12–20°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 5 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Температура воды '+d.wt.toFixed(1)+'°C находится в оптимальном диапазоне 12–20°C для османа. Мутность '+d.ntu.toFixed(2)+' NTU ниже критической отметки 5 NTU — вода достаточно прозрачна для жизни этого редкого эндемика.';
+      if(cls==='warn') return '⚠ Температура воды '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU приближаются к критическим значениям. Осман голый — краснокнижный вид, очень чувствительный к изменениям среды. Необходим мониторинг.';
+      return '✕ Условия критические для османа голого. Температура воды '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU существенно превышают норму. Этот исчезающий вид может покинуть данный участок озера.';
+    }},
+  'fc-marinka':  {emoji:'🐟', name:'Маринка иссык-кульская', subtitle:'Эндемик · Красная книга КР · Брюшина ядовита',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','12–20°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 5 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Температура '+d.wt.toFixed(1)+'°C и мутность '+d.ntu.toFixed(2)+' NTU оптимальны для маринки иссык-кульской. Этот уникальный эндемик существует только в Иссык-Куле — важно поддерживать чистоту воды.';
+      if(cls==='warn') return '⚠ Условия на грани допустимых для маринки. Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU отклоняются от нормы. Маринка — краснокнижный вид, требует чистой прохладной воды.';
+      return '✕ Опасные условия для маринки иссык-кульской. При температуре '+d.wt.toFixed(1)+'°C и мутности '+d.ntu.toFixed(2)+' NTU этот краснокнижный эндемик испытывает критический стресс.';
+    }},
+  'fc-chebak':   {emoji:'🐠', name:'Чебачок иссык-кульский', subtitle:'90% биомассы озера · Под угрозой исчезновения',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','15–22°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Температура '+d.wt.toFixed(1)+'°C в оптимуме 15–22°C для чебачка. Мутность '+d.ntu.toFixed(2)+' NTU хорошая. Чебачок составляет 90% биомассы рыб озера — его благополучие критично для всей экосистемы Иссык-Куля.';
+      if(cls==='warn') return '⚠ Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU выходят за оптимальные границы для чебачка. Этот вид уже исчезает из промыслового улова — важно не допускать ухудшения условий.';
+      return '✕ Условия неблагоприятны для чебачка иссык-кульского. Температура '+d.wt.toFixed(1)+'°C и мутность '+d.ntu.toFixed(2)+' NTU за пределами допустимого. Без чебачка рухнет вся пищевая цепочка озера.';
+    }},
+  'fc-peskar':   {emoji:'🐟', name:'Пескарь иссык-кульский', subtitle:'Уникальный донный эндемик',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','14–20°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 8 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Температура '+d.wt.toFixed(1)+'°C и мутность '+d.ntu.toFixed(2)+' NTU создают хорошие условия для пескаря. Донный вид чувствителен к качеству придонного слоя воды.';
+      if(cls==='warn') return '⚠ Параметры воды на грани для пескаря иссык-кульского. Донный образ жизни делает его особенно уязвимым к изменениям мутности и температуры.';
+      return '✕ Неблагоприятные условия для пескаря. Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU критические для этого эндемичного донного вида.';
+    }},
+  'fc-gubach':   {emoji:'🐟', name:'Губач иссык-кульский', subtitle:'Эндемик · Питается водорослями',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','14–22°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Условия подходят для губача. При температуре '+d.wt.toFixed(1)+'°C и мутности '+d.ntu.toFixed(2)+' NTU водоросли — основа питания губача — растут нормально.';
+      if(cls==='warn') return '⚠ Условия для губача ухудшаются. Рост харовых водорослей — основной пищи этого эндемика — может снижаться при текущих параметрах.';
+      return '✕ Критические условия для губача иссык-кульского. Нарушение кормовой базы при температуре '+d.wt.toFixed(1)+'°C и мутности '+d.ntu.toFixed(2)+' NTU.';
+    }},
+  'fc-golyan':   {emoji:'🐟', name:'Гольян иссык-кульский', subtitle:'Мелководный эндемик',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','14–22°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Мелководные зоны с температурой '+d.wt.toFixed(1)+'°C и мутностью '+d.ntu.toFixed(2)+' NTU хорошо подходят для гольяна иссык-кульского.';
+      if(cls==='warn') return '⚠ Условия на грани для гольяна. Мелководные зоны более подвержены прогреву и загрязнению, что создаёт риск для этого эндемика.';
+      return '✕ Неблагоприятные условия для гольяна. Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU за пределами нормы для мелководного вида.';
+    }},
+  'fc-trout':    {emoji:'🎣', name:'Форель севанская', subtitle:'Акклиматизирован с оз. Севан (Армения)',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','10–18°C']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Температура '+d.wt.toFixed(1)+'°C идеальна для форели. Холодолюбивая рыба из Армении хорошо прижилась в холодных глубинах Иссык-Куля.';
+      if(cls==='warn') return '⚠ Температура '+d.wt.toFixed(1)+'°C немного выше оптимума для форели (10–18°C). Рыба уходит на большие глубины где вода холоднее.';
+      return '✕ Температура '+d.wt.toFixed(1)+'°C слишком высокая для форели. При перегреве поверхностного слоя форель уходит на глубину 50–100м.';
+    }},
+  'fc-turb-fish':{emoji:'👁', name:'Прозрачность воды', subtitle:'Уникальная особенность Иссык-Куля — до 30 метров',
+    params: function(d){var sec=d.ntu>0?(1.13/Math.sqrt(d.ntu)).toFixed(1):'30+';return[['Мутность',d.ntu.toFixed(2)+' NTU','< 5 NTU'],['Глубина Секки',sec+' м','> 10 м']];},
+    explain: function(d,cls){
+      var sec=d.ntu>0?(1.13/Math.sqrt(d.ntu)).toFixed(1):'30+';
+      if(cls==='safe') return '✓ При мутности '+d.ntu.toFixed(2)+' NTU прозрачность воды достигает '+sec+' м. Иссык-Куль — одно из прозрачнейших озёр мира. Харовые водоросли на дне поглощают взвесь и поддерживают прозрачность.';
+      if(cls==='warn') return '⚠ Прозрачность снизилась до '+sec+' м при мутности '+d.ntu.toFixed(2)+' NTU. Норма Иссык-Куля — более 10 метров. Может влиять на подводную растительность и рыбу.';
+      return '✕ Прозрачность всего '+sec+' м — значительно ниже нормы Иссык-Куля. Мутность '+d.ntu.toFixed(2)+' NTU нарушает фотосинтез харовых водорослей на глубинах до 40м.';
+    }},
+  'bc-swan':     {emoji:'🦢', name:'Лебедь-шипун', subtitle:'Красная книга КР · ~850 особей зимуют',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','< 18°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Условия благоприятны для зимовки лебедей. Температура '+d.wt.toFixed(1)+'°C и чистая вода ('+d.ntu.toFixed(2)+' NTU) обеспечивают кормовую базу. Иссык-Куль незамерзает — это главная причина зимовки ~850 лебедей.';
+      if(cls==='warn') return '⚠ Условия умеренно подходят для лебедей. При текущих параметрах кормовая база (рдест, мелкая рыба) может снижаться. Лебеди чувствительны к загрязнению воды.';
+      return '✕ Неблагоприятные условия для зимовки лебедей. Высокая мутность '+d.ntu.toFixed(2)+' NTU затрудняет поиск пищи на мелководье. Краснокнижный вид под угрозой.';
+    }},
+  'bc-whooper':  {emoji:'🦢', name:'Лебедь-кликун', subtitle:'Красная книга КР · Редкий перелётный вид',
+    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','< 18°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Хорошие условия для лебедя-кликуна. Питается рдестами на мелководье — чистая вода ('+d.ntu.toFixed(2)+' NTU) позволяет найти корм.';
+      if(cls==='warn') return '⚠ Условия для лебедя-кликуна ухудшаются. Мутность или температура затрудняют поиск водных растений на мелководье.';
+      return '✕ Неблагоприятные условия для краснокнижного лебедя-кликуна. Высокая мутность воды ('+d.ntu.toFixed(2)+' NTU) не позволяет эффективно кормиться.';
+    }},
+  'bc-heron':    {emoji:'🦩', name:'Серая цапля', subtitle:'Охраняемый вид · Охотится визуально',
+    params: function(d){return[['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Мутность '+d.ntu.toFixed(2)+' NTU отличная для охоты цапли. Цапля охотится визуально — стоя неподвижно у берега, она видит рыбу на глубине до 0.5м.';
+      if(cls==='warn') return '⚠ При мутности '+d.ntu.toFixed(2)+' NTU охота цапли затруднена. Птица не может разглядеть рыбу в мутной воде — эффективность охоты снижается.';
+      return '✕ Мутность '+d.ntu.toFixed(2)+' NTU делает охоту цапли почти невозможной. Птица не видит добычу в мутной воде и вынуждена искать другие водоёмы.';
+    }},
+  'bc-duck':     {emoji:'🦆', name:'Красноносый нырок', subtitle:'До 50 тысяч зимует на Иссык-Куле',
+    params: function(d){return[['Мутность',d.ntu.toFixed(2)+' NTU','< 20 NTU']];},
+    explain: function(d,cls){
+      if(cls==='safe') return '✓ Отличные условия для нырков. При мутности '+d.ntu.toFixed(2)+' NTU ныряя до 2м нырок хорошо видит рдесты и водоросли — основу своего питания.';
+      if(cls==='warn') return '⚠ Видимость под водой снижена. При мутности '+d.ntu.toFixed(2)+' NTU нырку сложнее находить рдесты на дне — кормовая эффективность падает.';
+      return '✕ Высокая мутность '+d.ntu.toFixed(2)+' NTU серьёзно затрудняет питание нырков. 50 тысяч зимующих птиц зависят от доступности подводной растительности.';
+    }},
+  'pc-chara':    {emoji:'🌿', name:'Харовые водоросли', subtitle:'Уникальный феномен · Ковёр до 40м глубины',
+    params: function(d){var eutro=calcEutro(d.wt,d.tds,0);return[['Мутность',d.ntu.toFixed(2)+' NTU','< 5 NTU'],['Риск эвтроф.',eutro.toFixed(0)+'/100','< 30']];},
+    explain: function(d,cls){
+      var eutro=calcEutro(d.wt,d.tds,0);
+      if(cls==='safe') return '✓ Прекрасные условия для харовых водорослей. Мутность '+d.ntu.toFixed(2)+' NTU обеспечивает достаточное проникновение света на глубину. Эти водоросли — главный биофильтр озера, поддерживающий его уникальную прозрачность.';
+      if(cls==='warn') return '⚠ Условия для харовых водорослей ухудшаются. Рост мутности или риска эвтрофикации ('+eutro.toFixed(0)+'/100) снижает проникновение света — водоросли теряют продуктивность.';
+      return '✕ Критические условия для харовых водорослей. При мутности '+d.ntu.toFixed(2)+' NTU и риске эвтрофикации '+eutro.toFixed(0)+'/100 световой поток на глубины 35–40м минимален. Деградация биофильтра приведёт к помутнению всего озера.';
+    }},
+  'pc-rdest':    {emoji:'🌱', name:'Рдест гребенчатый', subtitle:'Главный корм 50 тысяч зимующих птиц',
+    params: function(d){var eutro=calcEutro(d.wt,d.tds,0);return[['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU'],['Риск эвтроф.',eutro.toFixed(0)+'/100','< 40']];},
+    explain: function(d,cls){
+      var eutro=calcEutro(d.wt,d.tds,0);
+      if(cls==='safe') return '✓ Хорошие условия для роста рдеста. При мутности '+d.ntu.toFixed(2)+' NTU и риске эвтрофикации '+eutro.toFixed(0)+' растение нормально развивается на глубинах до 5м — обеспечивая корм для тысяч зимующих птиц.';
+      if(cls==='warn') return '⚠ Условия для рдеста ухудшаются. Снижение прозрачности или усиление эвтрофикации ('+eutro.toFixed(0)+'/100) может подавить рост этого ключевого кормового растения.';
+      return '✕ Неблагоприятные условия для рдеста. Высокие значения мутности или эвтрофикации ('+eutro.toFixed(0)+'/100) угрожают основному источнику корма для 50 тысяч зимующих птиц.';
+    }},
+  'pc-algae':    {emoji:'⚗️', name:'Риск эвтрофикации', subtitle:'Индикатор экологического здоровья озера',
+    params: function(d){var eutro=calcEutro(d.wt,d.tds,0);return[['Температура',d.wt.toFixed(1)+'°C','< 25°C'],['TDS',d.tds.toFixed(0)+' ppm','< 7000'],['Риск',eutro.toFixed(0)+'/100','< 30']];},
+    explain: function(d,cls){
+      var eutro=calcEutro(d.wt,d.tds,0);
+      if(cls==='safe') return '✓ Риск эвтрофикации '+eutro.toFixed(0)+'/100 — низкий. Температура '+d.wt.toFixed(1)+'°C и TDS '+d.tds.toFixed(0)+' ppm в норме. Иссык-Куль исторически чист — мощное течение и харовые водоросли предотвращают цветение воды.';
+      if(cls==='warn') return '⚠ Умеренный риск эвтрофикации: '+eutro.toFixed(0)+'/100. Сочетание температуры '+d.wt.toFixed(1)+'°C и TDS '+d.tds.toFixed(0)+' ppm создаёт условия для возможного роста водорослей. Необходим мониторинг.';
+      return '✕ Высокий риск эвтрофикации: '+eutro.toFixed(0)+'/100! Температура '+d.wt.toFixed(1)+'°C и TDS '+d.tds.toFixed(0)+' ppm превышают безопасные значения. Возможно цветение сине-зелёных водорослей, опасных для купальщиков и рыбы.';
+    }}
+};
+
+function openEcoModal(cardId){
+  var info=ECO_INFO[cardId];if(!info)return;
+  var el=document.getElementById(cardId);
+  var cls=el&&el.className.includes('fish-safe')?'safe':el&&el.className.includes('fish-warn')?'warn':'danger';
+  var d=_modalData;
+  document.getElementById('modalEmoji').textContent=info.emoji;
+  document.getElementById('modalTitle').textContent=info.name;
+  document.getElementById('modalSubtitle').textContent=info.subtitle;
+  var st=document.getElementById('modalStatus');
+  var statusText=cls==='safe'?'✓ Условия благоприятные':cls==='warn'?'⚠ Требует внимания':'✕ Критическое состояние';
+  st.textContent=statusText;
+  st.className='modal-status modal-status-'+cls;
+  var rows=document.getElementById('modalRows');
+  rows.innerHTML='<div class="modal-section-title">Текущие условия</div>';
+  info.params(d).forEach(function(p){
+    var row=document.createElement('div');row.className='modal-row';
+    row.innerHTML='<span class="modal-key">'+p[0]+'</span><div style="text-align:right"><span class="modal-val">'+p[1]+'</span><div style="font-size:9px;color:var(--text3)">Норма: '+p[2]+'</div></div>';
+    rows.appendChild(row);
+  });
+  document.getElementById('modalExplain').textContent=info.explain(d,cls);
+  document.getElementById('ecoModal').classList.add('show');
+}
+
+function closeModal(e){
+  if(!e||e.target===document.getElementById('ecoModal'))
+    document.getElementById('ecoModal').classList.remove('show');
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
 </script>
 </body>
 </html>
