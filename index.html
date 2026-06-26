@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
+/* Стили остаются без изменений, их полная версия ниже */
 :root,[data-theme="dark"]{
   --bg:#060d1a;--bg2:#0c1829;--bg3:#111f35;
   --surface:rgba(255,255,255,0.04);--surface2:rgba(255,255,255,0.07);
@@ -264,6 +265,55 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
 
 /* FULLSCREEN */
 :fullscreen body,:fullscreen .nav{background:var(--bg)}
+
+/* Уведомление */
+.notification {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--bg2);
+  border: 1px solid var(--red);
+  border-left: 6px solid var(--red);
+  border-radius: 12px;
+  padding: 18px 24px;
+  max-width: 400px;
+  z-index: 2000;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  transform: translateY(120px);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+.notification.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+.notification-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--red);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.notification-text {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+.notification-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 18px;
+  cursor: pointer;
+  font-family: inherit;
+}
 </style>
 </head>
 <body>
@@ -635,599 +685,841 @@ body{background:var(--bg);color:var(--text1);font-family:'Space Grotesk',sans-se
 
 <div class="footer">Озеро Иссык-Куль · ESP32 · DS18B20 · DHT22 · TDS V1.0 · ThingSpeak · Кыргызстан 🇰🇬</div>
 
+<!-- УВЕДОМЛЕНИЕ -->
+<div class="notification" id="notification">
+  <button class="notification-close" onclick="closeNotification()">✕</button>
+  <div class="notification-title">⚠️ Ухудшение качества воды</div>
+  <div class="notification-text" id="notificationText">
+    Резкое повышение TDS и мутности. Качество воды ухудшается!
+  </div>
+</div>
+
 <script>
-const CHANNEL_ID='3368346', READ_KEY='HSTJ5HD1JZ9Q5G2G', STORAGE_KEY='Lake Monitor';
-const OWM_KEY=''; // OpenWeatherMap API ключ (бесплатный на openweathermap.org)
-const LAT=42.45, LON=77.35;
-const START=Date.now();
+// ============================================================
+// 1. НАСТРОЙКИ И ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ============================================================
+const CHANNEL_ID = '3368346';
+const READ_KEY = 'HSTJ5HD1JZ9Q5G2G';
+const STORAGE_KEY = 'Lake Monitor';
+const OWM_KEY = ''; // OpenWeatherMap API ключ (бесплатный на openweathermap.org)
+const LAT = 42.45, LON = 77.35;
+const START = Date.now();
 
-var _tdsBase=1230, _ntuBase=2.5;
-function getSimTDS(){return +(_tdsBase+(Math.random()-0.5)*0.3).toFixed(1);}
-function getSimNTU(){return +(_ntuBase+(Math.random()-0.5)*0.2).toFixed(2);}
+// Состояние ухудшения
+let waterQualityOK = true;          // true = норма, false = ухудшено
+let firstUpdate = true;            // первый вызов fetchData
+let notificationShown = false;     // чтобы не спамить уведомлениями
 
-let miniChart=null, periodChart=null, forecastChart=null;
-let tempChart=null, humChart=null, tdsChart=null, wqiChart=null;
-let chartsInited=false, mapInited=false;
+// Базовые значения (норма)
+const BASE_TDS = 6200;   // норма TDS для Иссык-Куля ~6000–7000 ppm
+const BASE_NTU = 2.5;    // норма мутности ~2–5 NTU
 
-// ─── ТЕМА (авто по времени суток) ───
+// Текущие значения (будут меняться)
+var _tdsBase = BASE_TDS;
+var _ntuBase = BASE_NTU;
+
+function getSimTDS(){
+    return +(_tdsBase + (Math.random() - 0.5) * 0.3).toFixed(1);
+}
+function getSimNTU(){
+    return +(_ntuBase + (Math.random() - 0.5) * 0.2).toFixed(2);
+}
+
+let miniChart = null, periodChart = null, forecastChart = null;
+let tempChart = null, humChart = null, tdsChart = null, wqiChart = null;
+let chartsInited = false, mapInited = false;
+
+// ============================================================
+// 2. ТЕМА (авто по времени суток)
+// ============================================================
 function autoTheme(){
-  var h=new Date().getHours();
-  return(h>=7&&h<20)?'light':'dark';
+  var h = new Date().getHours();
+  return (h >= 7 && h < 20) ? 'light' : 'dark';
 }
 function applyTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  var btn=document.getElementById('themeBtn');
-  if(btn)btn.textContent=t==='dark'?'🌙':'☀️';
+  document.documentElement.setAttribute('data-theme', t);
+  var btn = document.getElementById('themeBtn');
+  if(btn) btn.textContent = t === 'dark' ? '🌙' : '☀️';
 }
 function toggleTheme(){
-  var cur=document.documentElement.getAttribute('data-theme');
-  var next=cur==='dark'?'light':'dark';
-  localStorage.setItem('lake_theme_override',next);
+  var cur = document.documentElement.getAttribute('data-theme');
+  var next = cur === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('lake_theme_override', next);
   applyTheme(next);
 }
 (function(){
-  var override=localStorage.getItem('lake_theme_override');
-  applyTheme(override||autoTheme());
-  // авто-переключение каждую минуту
+  var override = localStorage.getItem('lake_theme_override');
+  applyTheme(override || autoTheme());
   setInterval(function(){
-    if(!localStorage.getItem('lake_theme_override'))applyTheme(autoTheme());
-  },60000);
+    if(!localStorage.getItem('lake_theme_override')) applyTheme(autoTheme());
+  }, 60000);
 })();
 
-// ─── ПОЛНЫЙ ЭКРАН ───
+// ============================================================
+// 3. ПОЛНЫЙ ЭКРАН
+// ============================================================
 function toggleFullscreen(){
-  if(!document.fullscreenElement)document.documentElement.requestFullscreen();
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen();
   else document.exitFullscreen();
 }
 
-// ─── НАВИГАЦИЯ ───
-function showPage(name,tabEl){
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
+// ============================================================
+// 4. НАВИГАЦИЯ
+// ============================================================
+function showPage(name, tabEl){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.remove('active'); });
   document.getElementById('page-'+name).classList.add('active');
-  if(tabEl)tabEl.classList.add('active');
-  if(name==='charts'&&!chartsInited){chartsInited=true;initCharts();loadPeriodData('day');}
-  if(name==='journal'){renderHistory();updateSummary();}
-  if(name==='map'&&!mapInited){mapInited=true;initMap();}
+  if(tabEl) tabEl.classList.add('active');
+  if(name === 'charts' && !chartsInited){ chartsInited = true; initCharts(); loadPeriodData('day'); }
+  if(name === 'journal'){ renderHistory(); updateSummary(); }
+  if(name === 'map' && !mapInited){ mapInited = true; initMap(); }
 }
 
-// ─── КАРТА ───
+// ============================================================
+// 5. КАРТА
+// ============================================================
 function initMap(){
-  var map=L.map('map').setView([LAT,LON],11);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
-  var icon=L.divIcon({html:'<div style="background:#3d9ef5;border:3px solid white;border-radius:50%;width:20px;height:20px;box-shadow:0 0 10px rgba(61,158,245,0.8)"></div>',iconSize:[20,20],iconAnchor:[10,10]});
-  L.marker([LAT,LON],{icon:icon}).addTo(map).bindPopup('<b>🌊 Буй мониторинга</b><br>Иссык-Куль · 1607 м н.у.м.').openPopup();
+  var map = L.map('map').setView([LAT, LON], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+  var icon = L.divIcon({
+    html: '<div style="background:#3d9ef5;border:3px solid white;border-radius:50%;width:20px;height:20px;box-shadow:0 0 10px rgba(61,158,245,0.8)"></div>',
+    iconSize: [20,20],
+    iconAnchor: [10,10]
+  });
+  L.marker([LAT, LON], { icon: icon }).addTo(map)
+    .bindPopup('<b>🌊 Буй мониторинга</b><br>Иссык-Куль · 1607 м н.у.м.').openPopup();
 }
 
-// ─── ПОГОДА ───
+// ============================================================
+// 6. ПОГОДА (заглушка если нет ключа)
+// ============================================================
 async function fetchWeather(){
   if(!OWM_KEY){
-    // Заглушка если нет ключа
-    document.getElementById('w-temp').textContent='22°C';
-    document.getElementById('w-hum').textContent='48%';
-    document.getElementById('w-wind').textContent='3.2 м/с';
-    document.getElementById('w-press').textContent='857 гПа';
-    document.getElementById('w-icon').textContent='⛅';
+    document.getElementById('w-temp').textContent = '22°C';
+    document.getElementById('w-hum').textContent = '48%';
+    document.getElementById('w-wind').textContent = '3.2 м/с';
+    document.getElementById('w-press').textContent = '857 гПа';
+    document.getElementById('w-icon').textContent = '⛅';
     return;
   }
   try{
-    var r=await fetch('https://api.openweathermap.org/data/2.5/weather?lat='+LAT+'&lon='+LON+'&appid='+OWM_KEY+'&units=metric&lang=ru');
-    var d=await r.json();
-    var icons={'01d':'☀️','01n':'🌙','02d':'⛅','02n':'⛅','03d':'☁️','03n':'☁️','04d':'☁️','04n':'☁️','09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌧️','11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️','50d':'🌫️','50n':'🌫️'};
-    document.getElementById('w-icon').textContent=icons[d.weather[0].icon]||'🌤️';
-    document.getElementById('w-temp').textContent=Math.round(d.main.temp)+'°C';
-    document.getElementById('w-hum').textContent=d.main.humidity+'%';
-    document.getElementById('w-wind').textContent=d.wind.speed.toFixed(1)+' м/с';
-    document.getElementById('w-press').textContent=d.main.pressure+' гПа';
-  }catch(e){}
+    var r = await fetch('https://api.openweathermap.org/data/2.5/weather?lat='+LAT+'&lon='+LON+'&appid='+OWM_KEY+'&units=metric&lang=ru');
+    var d = await r.json();
+    var icons = {'01d':'☀️','01n':'🌙','02d':'⛅','02n':'⛅','03d':'☁️','03n':'☁️','04d':'☁️','04n':'☁️','09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌧️','11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️','50d':'🌫️','50n':'🌫️'};
+    document.getElementById('w-icon').textContent = icons[d.weather[0].icon] || '🌤️';
+    document.getElementById('w-temp').textContent = Math.round(d.main.temp) + '°C';
+    document.getElementById('w-hum').textContent = d.main.humidity + '%';
+    document.getElementById('w-wind').textContent = d.wind.speed.toFixed(1) + ' м/с';
+    document.getElementById('w-press').textContent = d.main.pressure + ' гПа';
+  } catch(e){}
 }
 
-// ─── СЕЗОН ───
+// ============================================================
+// 7. СЕЗОН
+// ============================================================
 function updateSeason(wt){
-  var m=new Date().getMonth();
-  var seasons=[
-    {name:'Зима',icon:'❄️',desc:'Вода холодная · Зимовка птиц',bg:'rgba(61,158,245,0.08)',months:[11,0,1]},
-    {name:'Весна',icon:'🌸',desc:'Вода прогревается · Нерест рыб',bg:'rgba(52,211,153,0.08)',months:[2,3,4]},
-    {name:'Лето',icon:'☀️',desc:'Купальный сезон · Пик туризма',bg:'rgba(251,191,36,0.08)',months:[5,6,7]},
-    {name:'Осень',icon:'🍂',desc:'Вода остывает · Перелётные птицы',bg:'rgba(251,146,60,0.08)',months:[8,9,10]}
+  var m = new Date().getMonth();
+  var seasons = [
+    { name: 'Зима', icon: '❄️', desc: 'Вода холодная · Зимовка птиц', bg: 'rgba(61,158,245,0.08)', months: [11,0,1] },
+    { name: 'Весна', icon: '🌸', desc: 'Вода прогревается · Нерест рыб', bg: 'rgba(52,211,153,0.08)', months: [2,3,4] },
+    { name: 'Лето', icon: '☀️', desc: 'Купальный сезон · Пик туризма', bg: 'rgba(251,191,36,0.08)', months: [5,6,7] },
+    { name: 'Осень', icon: '🍂', desc: 'Вода остывает · Перелётные птицы', bg: 'rgba(251,146,60,0.08)', months: [8,9,10] }
   ];
-  var s=seasons.find(function(s){return s.months.indexOf(m)>=0;})||seasons[0];
-  var banner=document.getElementById('seasonBanner');
-  banner.style.background=s.bg;
-  document.getElementById('seasonIcon').textContent=s.icon;
-  document.getElementById('seasonName').textContent=s.name+' · '+new Date().toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
-  document.getElementById('seasonDesc').textContent=s.desc;
+  var s = seasons.find(function(s){ return s.months.indexOf(m) >= 0; }) || seasons[0];
+  var banner = document.getElementById('seasonBanner');
+  banner.style.background = s.bg;
+  document.getElementById('seasonIcon').textContent = s.icon;
+  document.getElementById('seasonName').textContent = s.name + ' · ' + new Date().toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
+  document.getElementById('seasonDesc').textContent = s.desc;
 }
 
-// ─── СЧЁТЧИК ДНЕЙ ДЛЯ КУПАНИЯ ───
+// ============================================================
+// 8. СЧЁТЧИК ДНЕЙ ДЛЯ КУПАНИЯ
+// ============================================================
 function updateSwimDays(){
-  var h=loadHistory();
-  var count=0;
-  for(var i=0;i<h.length;i++){
-    var wt=parseFloat(h[i].wt);
-    var ntu=parseFloat(h[i].turb);
-    if(wt>=16&&wt<=28&&ntu<=200)count++;
+  var h = loadHistory();
+  var count = 0;
+  for(var i = 0; i < h.length; i++){
+    var wt = parseFloat(h[i].wt);
+    var ntu = parseFloat(h[i].turb);
+    if(wt >= 16 && wt <= 28 && ntu <= 200) count++;
     else break;
   }
-  document.getElementById('swimDays').textContent=count;
+  document.getElementById('swimDays').textContent = count;
 }
 
-// ─── ТЕПЛОВАЯ КАРТА ───
+// ============================================================
+// 9. ТЕПЛОВАЯ КАРТА
+// ============================================================
 function buildHeatmap(feeds){
-  var grid=document.getElementById('heatmapGrid');grid.innerHTML='';
-  var byHour=new Array(24).fill(null);
+  var grid = document.getElementById('heatmapGrid');
+  grid.innerHTML = '';
+  var byHour = new Array(24).fill(null);
   feeds.forEach(function(f){
-    var h=new Date(f.created_at).getHours();
-    var v=parseFloat(f.field1);
-    if(!isNaN(v))byHour[h]=v;
+    var h = new Date(f.created_at).getHours();
+    var v = parseFloat(f.field1);
+    if(!isNaN(v)) byHour[h] = v;
   });
-  var vals=byHour.filter(function(v){return v!==null;});
-  var mn=vals.length?Math.min.apply(null,vals):10;
-  var mx=vals.length?Math.max.apply(null,vals):30;
-  for(var i=0;i<24;i++){
-    var cell=document.createElement('div');
-    cell.className='hm-cell';
-    var v=byHour[i];
-    if(v===null){
-      cell.style.background='var(--surface2)';
-      cell.title=i+':00 — нет данных';
-    }else{
-      var pct=(v-mn)/(mx-mn||1);
-      var r=Math.round(61+pct*(248-61));
-      var g=Math.round(158+pct*(113-158));
-      var b=Math.round(245+pct*(113-245));
-      cell.style.background='rgb('+r+','+g+','+b+')';
-      cell.title=i+':00 — '+v.toFixed(1)+'°C';
+  var vals = byHour.filter(function(v){ return v !== null; });
+  var mn = vals.length ? Math.min.apply(null, vals) : 10;
+  var mx = vals.length ? Math.max.apply(null, vals) : 30;
+  for(var i = 0; i < 24; i++){
+    var cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    var v = byHour[i];
+    if(v === null){
+      cell.style.background = 'var(--surface2)';
+      cell.title = i + ':00 — нет данных';
+    } else {
+      var pct = (v - mn) / (mx - mn || 1);
+      var r = Math.round(61 + pct * (248 - 61));
+      var g = Math.round(158 + pct * (113 - 158));
+      var b = Math.round(245 + pct * (113 - 245));
+      cell.style.background = 'rgb(' + r + ',' + g + ',' + b + ')';
+      cell.title = i + ':00 — ' + v.toFixed(1) + '°C';
     }
     grid.appendChild(cell);
   }
 }
 
-// ─── ПРОГНОЗ ───
+// ============================================================
+// 10. ПРОГНОЗ
+// ============================================================
 function buildForecast(history){
-  var recent=history.slice(0,10).reverse().map(function(h){return parseFloat(h.wt);}).filter(function(v){return !isNaN(v);});
-  if(recent.length<3)return;
-  var n=recent.length,sx=0,sy=0,sxy=0,sx2=0;
-  recent.forEach(function(y,x){sx+=x;sy+=y;sxy+=x*y;sx2+=x*x;});
-  var slope=(n*sxy-sx*sy)/(n*sx2-sx*sx),intercept=(sy-slope*sx)/n;
-  var hL=recent.map(function(_,i){return'-'+(recent.length-i)*15+'м';});
-  var fL=Array.from({length:8},function(_,i){return'+'+(i+1)*3+'ч';});
-  var fD=Array.from({length:8},function(_,i){return+(intercept+slope*(n+i)).toFixed(1);});
-  if(forecastChart)forecastChart.destroy();
-  var cl=chartColors();
-  forecastChart=new Chart(document.getElementById('forecastChart'),{type:'line',
-    data:{labels:hL.concat(fL),datasets:[
-      {label:'История',data:recent.concat(Array(8).fill(null)),borderColor:'#3d9ef5',backgroundColor:'rgba(61,158,245,0.06)',tension:.4,fill:true,borderWidth:2,pointRadius:3,spanGaps:false},
-      {label:'Прогноз',data:Array(recent.length).fill(null).concat(fD),borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,0.04)',tension:.4,fill:false,borderDash:[6,4],borderWidth:2,pointRadius:3,spanGaps:false}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:cl.legend,font:{size:11},boxWidth:10,boxHeight:2}}},
-      scales:{x:{ticks:{color:cl.tick,font:{size:10}},grid:{color:cl.grid}},y:{ticks:{color:cl.tick,font:{size:10}},grid:{color:cl.grid}}}
+  var recent = history.slice(0, 10).reverse().map(function(h){ return parseFloat(h.wt); }).filter(function(v){ return !isNaN(v); });
+  if(recent.length < 3) return;
+  var n = recent.length, sx = 0, sy = 0, sxy = 0, sx2 = 0;
+  recent.forEach(function(y, x){ sx += x; sy += y; sxy += x * y; sx2 += x * x; });
+  var slope = (n * sxy - sx * sy) / (n * sx2 - sx * sx);
+  var intercept = (sy - slope * sx) / n;
+  var hL = recent.map(function(_, i){ return '-' + (recent.length - i) * 15 + 'м'; });
+  var fL = Array.from({ length: 8 }, function(_, i){ return '+' + (i + 1) * 3 + 'ч'; });
+  var fD = Array.from({ length: 8 }, function(_, i){ return +(intercept + slope * (n + i)).toFixed(1); });
+  if(forecastChart) forecastChart.destroy();
+  var cl = chartColors();
+  forecastChart = new Chart(document.getElementById('forecastChart'), {
+    type: 'line',
+    data: {
+      labels: hL.concat(fL),
+      datasets: [
+        { label: 'История', data: recent.concat(Array(8).fill(null)), borderColor: '#3d9ef5', backgroundColor: 'rgba(61,158,245,0.06)', tension: .4, fill: true, borderWidth: 2, pointRadius: 3, spanGaps: false },
+        { label: 'Прогноз', data: Array(recent.length).fill(null).concat(fD), borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.04)', tension: .4, fill: false, borderDash: [6,4], borderWidth: 2, pointRadius: 3, spanGaps: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: cl.legend, font: { size: 11 }, boxWidth: 10, boxHeight: 2 } } },
+      scales: { x: { ticks: { color: cl.tick, font: { size: 10 } }, grid: { color: cl.grid } }, y: { ticks: { color: cl.tick, font: { size: 10 } }, grid: { color: cl.grid } } }
     }
   });
 }
 
-// ─── GAUGE ───
-function updateGauge(id,pct,color){
-  var el=document.getElementById(id);
-  if(!el)return;
-  var total=157;
-  el.style.strokeDashoffset=total-(total*Math.min(1,Math.max(0,pct)));
-  el.style.stroke=color;
+// ============================================================
+// 11. GAUGE
+// ============================================================
+function updateGauge(id, pct, color){
+  var el = document.getElementById(id);
+  if(!el) return;
+  var total = 157;
+  el.style.strokeDashoffset = total - (total * Math.min(1, Math.max(0, pct)));
+  el.style.stroke = color;
 }
 
-// ─── UPTIME ───
+// ============================================================
+// 12. UPTIME
+// ============================================================
 setInterval(function(){
-  var e=Math.floor((Date.now()-START)/1e3);
-  document.getElementById('uptime').textContent=String(Math.floor(e/3600)).padStart(2,'0')+':'+String(Math.floor((e%3600)/60)).padStart(2,'0')+':'+String(e%60).padStart(2,'0');
-},1000);
+  var e = Math.floor((Date.now() - START) / 1e3);
+  document.getElementById('uptime').textContent =
+    String(Math.floor(e / 3600)).padStart(2, '0') + ':' +
+    String(Math.floor((e % 3600) / 60)).padStart(2, '0') + ':' +
+    String(e % 60).padStart(2, '0');
+}, 1000);
 
-// ─── РАСЧЁТЫ ───
-function calcSalinity(tds){return tds*0.001;}
-function salinityType(sal){if(sal<0.5)return'Пресная';if(sal<5.0)return'Слабосолёная';if(sal<=7.0)return'Норма озера';if(sal<10)return'Повышенная';return'Солёная';}
-function secchiDepth(ntu){if(ntu<=0)return'—';return(1.13/Math.sqrt(ntu)).toFixed(1);}
-function calcDewPoint(t,h){var a=17.27,b=237.7,al=((a*t)/(b+t))+Math.log(h/100);return(b*al)/(a-al);}
-function calcEvaporation(wt,at,hum,lux){var sat=0.6108*Math.exp(17.27*wt/(wt+237.3)),act=sat*hum/100,vpd=sat-act,rad=lux*0.0079;return Math.max(0,(0.408*rad+vpd*0.066)/(1+0.34*2));}
-function calcComfort(at,hum,wt){return Math.max(0,Math.min(100,((100-Math.abs(at-22)*5)+(100-Math.abs(hum-55)*2)+(100-Math.abs(wt-22)*5))/3));}
-function calcEutro(wt,tds,lux){return Math.min(100,Math.max(0,wt-15)*5+Math.min(40,tds/10)+Math.min(20,lux/1000));}
-function calcHeatIndex(t,h){if(t<27)return t;return -8.78469475556+1.61139411*t+2.33854883889*h-0.14611605*t*h-0.012308094*t*t-0.0164248277778*h*h+0.002211732*t*t*h+0.00072546*t*h*h-0.000003582*t*t*h*h;}
+// ============================================================
+// 13. РАСЧЁТЫ
+// ============================================================
+function calcSalinity(tds){ return tds * 0.001; }
+function salinityType(sal){ if(sal < 0.5) return 'Пресная'; if(sal < 5.0) return 'Слабосолёная'; if(sal <= 7.0) return 'Норма озера'; if(sal < 10) return 'Повышенная'; return 'Солёная'; }
+function secchiDepth(ntu){ if(ntu <= 0) return '—'; return (1.13 / Math.sqrt(ntu)).toFixed(1); }
+function calcDewPoint(t, h){ var a = 17.27, b = 237.7, al = ((a * t) / (b + t)) + Math.log(h / 100); return (b * al) / (a - al); }
+function calcEvaporation(wt, at, hum, lux){ var sat = 0.6108 * Math.exp(17.27 * wt / (wt + 237.3)), act = sat * hum / 100, vpd = sat - act, rad = lux * 0.0079; return Math.max(0, (0.408 * rad + vpd * 0.066) / (1 + 0.34 * 2)); }
+function calcComfort(at, hum, wt){ return Math.max(0, Math.min(100, ((100 - Math.abs(at - 22) * 5) + (100 - Math.abs(hum - 55) * 2) + (100 - Math.abs(wt - 22) * 5)) / 3)); }
+function calcEutro(wt, tds, lux){ return Math.min(100, Math.max(0, (wt - 15) * 5 + Math.min(40, tds / 10) + Math.min(20, lux / 1000))); }
+function calcHeatIndex(t, h){ if(t < 27) return t; return -8.78469475556 + 1.61139411 * t + 2.33854883889 * h - 0.14611605 * t * h - 0.012308094 * t * t - 0.0164248277778 * h * h + 0.002211732 * t * t * h + 0.00072546 * t * h * h - 0.000003582 * t * t * h * h; }
 
-// ─── STORAGE ───
-function loadHistory(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch(e){return[];}}
-function saveHistory(e){var h=loadHistory();h.unshift(e);if(h.length>500)h=h.slice(0,500);localStorage.setItem(STORAGE_KEY,JSON.stringify(h));}
-function clearHistory(){if(confirm('Очистить всю историю?')){localStorage.removeItem(STORAGE_KEY);renderHistory();updateSummary();}}
+// ============================================================
+// 14. STORAGE
+// ============================================================
+function loadHistory(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e){ return []; } }
+function saveHistory(e){ var h = loadHistory(); h.unshift(e); if(h.length > 500) h = h.slice(0, 500); localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); }
+function clearHistory(){ if(confirm('Очистить всю историю?')){ localStorage.removeItem(STORAGE_KEY); renderHistory(); updateSummary(); } }
 
-// ─── HELPERS ───
-function uv(id,val){var el=document.getElementById(id);if(el&&el.textContent!==String(val)){el.textContent=val;el.classList.remove('val-updated');void el.offsetWidth;el.classList.add('val-updated');}}
-function getTrend(h,f){var v=h.slice(0,5).map(function(x){return parseFloat(x[f]);}).filter(function(n){return !isNaN(n);});if(v.length<2)return{s:'→',c:'trend-stable'};var d=v[0]-v[v.length-1];return d>.3?{s:'↑',c:'trend-up'}:d<-.3?{s:'↓',c:'trend-down'}:{s:'→',c:'trend-stable'};}
-function setTrend(id,t){var el=document.getElementById(id);if(el){el.textContent=t.s;el.className='trend '+t.c;}}
-function chartColors(){var dark=document.documentElement.getAttribute('data-theme')==='dark';return{grid:dark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.06)',tick:dark?'rgba(255,255,255,0.3)':'rgba(0,0,0,0.4)',legend:dark?'rgba(255,255,255,0.45)':'rgba(0,0,0,0.55)'};}
+// ============================================================
+// 15. HELPERS
+// ============================================================
+function uv(id, val){ var el = document.getElementById(id); if(el && el.textContent !== String(val)){ el.textContent = val; el.classList.remove('val-updated'); void el.offsetWidth; el.classList.add('val-updated'); } }
+function getTrend(h, f){ var v = h.slice(0, 5).map(function(x){ return parseFloat(x[f]); }).filter(function(n){ return !isNaN(n); }); if(v.length < 2) return { s: '→', c: 'trend-stable' }; var d = v[0] - v[v.length - 1]; return d > .3 ? { s: '↑', c: 'trend-up' } : d < -.3 ? { s: '↓', c: 'trend-down' } : { s: '→', c: 'trend-stable' }; }
+function setTrend(id, t){ var el = document.getElementById(id); if(el){ el.textContent = t.s; el.className = 'trend ' + t.c; } }
+function chartColors(){ var dark = document.documentElement.getAttribute('data-theme') === 'dark'; return { grid: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)', tick: dark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.4)', legend: dark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.55)' }; }
 
-// ─── ГРАФИКИ ───
+// ============================================================
+// 16. ГРАФИКИ
+// ============================================================
 function initCharts(){
-  var cl=chartColors();
-  var CO=function(extra){extra=extra||{};var base={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:cl.legend,font:{family:"'JetBrains Mono',monospace",size:11},boxWidth:10,boxHeight:10}}},scales:{x:{ticks:{color:cl.tick,maxTicksLimit:6,font:{size:10}},grid:{color:cl.grid}},y:{ticks:{color:cl.tick,font:{size:10}},grid:{color:cl.grid}}}};if(extra.scales){base.scales=Object.assign({},base.scales,extra.scales);delete extra.scales;}return Object.assign(base,extra);};
-  tempChart=new Chart(document.getElementById('tempChart'),{type:'line',data:{labels:[],datasets:[{label:'Вода °C',data:[],borderColor:'#3d9ef5',backgroundColor:'rgba(61,158,245,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0},{label:'Воздух °C',data:[],borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,0.06)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO()});
-  humChart=new Chart(document.getElementById('humChart'),{type:'line',data:{labels:[],datasets:[{label:'Влажность %',data:[],borderColor:'#00c9a7',backgroundColor:'rgba(0,201,167,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO()});
-  tdsChart=new Chart(document.getElementById('tdsChart'),{type:'line',data:{labels:[],datasets:[{label:'TDS ppm',data:[],borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO()});
-  wqiChart=new Chart(document.getElementById('wqiChart'),{type:'line',data:{labels:[],datasets:[{label:'ИКВ',data:[],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.07)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:CO({scales:{x:{ticks:{color:cl.tick,maxTicksLimit:6,font:{size:10}},grid:{color:cl.grid}},y:{min:0,max:100,ticks:{color:cl.tick,font:{size:10}},grid:{color:cl.grid}}}})});
+  var cl = chartColors();
+  function CO(extra){ extra = extra || {}; var base = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: cl.legend, font: { family: "'JetBrains Mono',monospace", size: 11 }, boxWidth: 10, boxHeight: 10 } } }, scales: { x: { ticks: { color: cl.tick, maxTicksLimit: 6, font: { size: 10 } }, grid: { color: cl.grid } }, y: { ticks: { color: cl.tick, font: { size: 10 } }, grid: { color: cl.grid } } } }; if(extra.scales){ base.scales = Object.assign({}, base.scales, extra.scales); delete extra.scales; } return Object.assign(base, extra); }
+  tempChart = new Chart(document.getElementById('tempChart'), {
+    type: 'line',
+    data: { labels: [], datasets: [
+      { label: 'Вода °C', data: [], borderColor: '#3d9ef5', backgroundColor: 'rgba(61,158,245,0.07)', tension: .4, fill: true, borderWidth: 2, pointRadius: 0 },
+      { label: 'Воздух °C', data: [], borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.06)', tension: .4, fill: true, borderWidth: 2, pointRadius: 0 }
+    ] },
+    options: CO()
+  });
+  humChart = new Chart(document.getElementById('humChart'), {
+    type: 'line',
+    data: { labels: [], datasets: [ { label: 'Влажность %', data: [], borderColor: '#00c9a7', backgroundColor: 'rgba(0,201,167,0.07)', tension: .4, fill: true, borderWidth: 2, pointRadius: 0 } ] },
+    options: CO()
+  });
+  tdsChart = new Chart(document.getElementById('tdsChart'), {
+    type: 'line',
+    data: { labels: [], datasets: [ { label: 'TDS ppm', data: [], borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.07)', tension: .4, fill: true, borderWidth: 2, pointRadius: 0 } ] },
+    options: CO()
+  });
+  wqiChart = new Chart(document.getElementById('wqiChart'), {
+    type: 'line',
+    data: { labels: [], datasets: [ { label: 'ИКВ', data: [], borderColor: '#34d399', backgroundColor: 'rgba(52,211,153,0.07)', tension: .4, fill: true, borderWidth: 2, pointRadius: 0 } ] },
+    options: CO({ scales: { x: { ticks: { color: cl.tick, maxTicksLimit: 6, font: { size: 10 } }, grid: { color: cl.grid } }, y: { min: 0, max: 100, ticks: { color: cl.tick, font: { size: 10 } }, grid: { color: cl.grid } } } })
+  });
 }
 
-window.switchPeriod=async function(period,el){
-  document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');
+window.switchPeriod = async function(period, el){
+  document.querySelectorAll('.ptab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
   await loadPeriodData(period);
 };
 async function loadPeriodData(period){
-  document.getElementById('periodLoading').style.display='block';
-  document.getElementById('periodContent').style.display='none';
-  var days=period==='day'?1:period==='week'?7:30;
-  var start=new Date(Date.now()-days*24*3600*1e3).toISOString();
+  document.getElementById('periodLoading').style.display = 'block';
+  document.getElementById('periodContent').style.display = 'none';
+  var days = period === 'day' ? 1 : period === 'week' ? 7 : 30;
+  var start = new Date(Date.now() - days * 24 * 3600 * 1e3).toISOString();
   try{
-    var res=await fetch('https://api.thingspeak.com/channels/'+CHANNEL_ID+'/feeds.json?api_key='+READ_KEY+'&results=8000&start='+start);
-    var data=await res.json();var feeds=data.feeds||[];
-    if(!feeds.length){document.getElementById('periodLoading').textContent='Нет данных';return;}
-    var gv=function(n){return feeds.map(function(f){return parseFloat(f[n]);}).filter(function(v){return !isNaN(v);});};
-    var stats=[{label:'💧 Вода',vals:gv('field1'),unit:'°C'},{label:'🌡️ Воздух',vals:gv('field3'),unit:'°C'},{label:'💨 Влажность',vals:gv('field4'),unit:'%'},{label:'📈 ИКВ',vals:gv('field6'),unit:''}];
-    var grid=document.getElementById('statsGrid');grid.innerHTML='';
-    stats.forEach(function(s){if(!s.vals.length)return;var mn=Math.min.apply(null,s.vals).toFixed(1),mx=Math.max.apply(null,s.vals).toFixed(1),av=(s.vals.reduce(function(a,b){return a+b;},0)/s.vals.length).toFixed(1);var div=document.createElement('div');div.className='stat-card';div.innerHTML='<div class="stat-lbl">'+s.label+'</div><div class="stat-row"><div class="stat-item"><div class="stat-val sv-min">'+mn+s.unit+'</div><div class="stat-name">Мин</div></div><div class="stat-item"><div class="stat-val sv-avg">'+av+s.unit+'</div><div class="stat-name">Среднее</div></div><div class="stat-item"><div class="stat-val sv-max">'+mx+s.unit+'</div><div class="stat-name">Макс</div></div></div>';grid.appendChild(div);});
-    var labels=feeds.map(function(f){return new Date(f.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});});
-    var cl=chartColors();
-    if(periodChart)periodChart.destroy();
-    periodChart=new Chart(document.getElementById('periodChart'),{type:'line',data:{labels:labels,datasets:[{label:'Вода °C',data:feeds.map(function(f){return parseFloat(f.field1)||null;}),borderColor:'#3d9ef5',tension:.4,fill:false,borderWidth:2,pointRadius:0},{label:'ИКВ',data:feeds.map(function(f){return parseFloat(f.field6)||null;}),borderColor:'#34d399',tension:.4,fill:false,borderWidth:2,pointRadius:0,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:cl.legend,font:{size:11},boxWidth:10,boxHeight:2}}},scales:{x:{ticks:{color:cl.tick,maxTicksLimit:10,font:{size:10}},grid:{color:cl.grid}},y:{ticks:{color:cl.tick,font:{size:10}},grid:{color:cl.grid}},y2:{ticks:{color:'rgba(52,211,153,0.7)',font:{size:10}},position:'right',min:0,max:100,grid:{drawOnChartArea:false}}}}});
-    if(chartsInited)buildHeatmap(feeds);
-    document.getElementById('periodLoading').style.display='none';
-    document.getElementById('periodContent').style.display='block';
-  }catch(e){document.getElementById('periodLoading').textContent='Ошибка загрузки';}
+    var res = await fetch('https://api.thingspeak.com/channels/' + CHANNEL_ID + '/feeds.json?api_key=' + READ_KEY + '&results=8000&start=' + start);
+    var data = await res.json();
+    var feeds = data.feeds || [];
+    if(!feeds.length){ document.getElementById('periodLoading').textContent = 'Нет данных'; return; }
+    function gv(n){ return feeds.map(function(f){ return parseFloat(f[n]); }).filter(function(v){ return !isNaN(v); }); }
+    var stats = [
+      { label: '💧 Вода', vals: gv('field1'), unit: '°C' },
+      { label: '🌡️ Воздух', vals: gv('field3'), unit: '°C' },
+      { label: '💨 Влажность', vals: gv('field4'), unit: '%' },
+      { label: '📈 ИКВ', vals: gv('field6'), unit: '' }
+    ];
+    var grid = document.getElementById('statsGrid');
+    grid.innerHTML = '';
+    stats.forEach(function(s){
+      if(!s.vals.length) return;
+      var mn = Math.min.apply(null, s.vals).toFixed(1);
+      var mx = Math.max.apply(null, s.vals).toFixed(1);
+      var av = (s.vals.reduce(function(a,b){ return a + b; }, 0) / s.vals.length).toFixed(1);
+      var div = document.createElement('div');
+      div.className = 'stat-card';
+      div.innerHTML = '<div class="stat-lbl">' + s.label + '</div><div class="stat-row"><div class="stat-item"><div class="stat-val sv-min">' + mn + s.unit + '</div><div class="stat-name">Мин</div></div><div class="stat-item"><div class="stat-val sv-avg">' + av + s.unit + '</div><div class="stat-name">Среднее</div></div><div class="stat-item"><div class="stat-val sv-max">' + mx + s.unit + '</div><div class="stat-name">Макс</div></div></div>';
+      grid.appendChild(div);
+    });
+    var labels = feeds.map(function(f){ return new Date(f.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }); });
+    var cl = chartColors();
+    if(periodChart) periodChart.destroy();
+    periodChart = new Chart(document.getElementById('periodChart'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Вода °C', data: feeds.map(function(f){ return parseFloat(f.field1) || null; }), borderColor: '#3d9ef5', tension: .4, fill: false, borderWidth: 2, pointRadius: 0 },
+          { label: 'ИКВ', data: feeds.map(function(f){ return parseFloat(f.field6) || null; }), borderColor: '#34d399', tension: .4, fill: false, borderWidth: 2, pointRadius: 0, yAxisID: 'y2' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: cl.legend, font: { size: 11 }, boxWidth: 10, boxHeight: 2 } } },
+        scales: { x: { ticks: { color: cl.tick, maxTicksLimit: 10, font: { size: 10 } }, grid: { color: cl.grid } }, y: { ticks: { color: cl.tick, font: { size: 10 } }, grid: { color: cl.grid } }, y2: { ticks: { color: 'rgba(52,211,153,0.7)', font: { size: 10 } }, position: 'right', min: 0, max: 100, grid: { drawOnChartArea: false } } }
+      }
+    });
+    if(chartsInited) buildHeatmap(feeds);
+    document.getElementById('periodLoading').style.display = 'none';
+    document.getElementById('periodContent').style.display = 'block';
+  } catch(e){ document.getElementById('periodLoading').textContent = 'Ошибка загрузки'; }
 }
 
-// ─── РЫБЫ, ПТИЦЫ, РАСТЕНИЯ ───
-function setSpecies(sid,cid,status,cls){
-  var s=document.getElementById(sid);if(s){s.textContent=status;s.className='fish-status fs-'+cls;}
-  var c=document.getElementById(cid);if(c){c.className='fish-card fish-'+cls;}
+// ============================================================
+// 17. РЫБЫ, ПТИЦЫ, РАСТЕНИЯ
+// ============================================================
+function setSpecies(sid, cid, status, cls){
+  var s = document.getElementById(sid); if(s){ s.textContent = status; s.className = 'fish-status fs-' + cls; }
+  var c = document.getElementById(cid); if(c){ c.className = 'fish-card fish-' + cls; }
 }
-function updateEcology(wt,ntu,tds){
-  var eutro=calcEutro(wt,tds,0);
-  setSpecies('fs-osman','fc-osman',wt>=12&&wt<=20&&ntu<=5?'✓ Условия подходят':wt<=23&&ntu<=15?'⚠ Осторожно':'✕ Критический риск!',wt>=12&&wt<=20&&ntu<=5?'safe':wt<=23&&ntu<=15?'warn':'danger');
-  setSpecies('fs-marinka','fc-marinka',wt>=12&&wt<=20&&ntu<=5?'✓ Условия подходят':wt<=23&&ntu<=15?'⚠ Осторожно':'✕ Критический риск!',wt>=12&&wt<=20&&ntu<=5?'safe':wt<=23&&ntu<=15?'warn':'danger');
-  setSpecies('fs-chebak','fc-chebak',wt>=15&&wt<=22&&ntu<=10?'✓ Оптимальные условия':wt<=25&&ntu<=30?'⚠ Условия терпимые':'✕ Риск для эндемика!',wt>=15&&wt<=22&&ntu<=10?'safe':wt<=25&&ntu<=30?'warn':'danger');
-  setSpecies('fs-peskar','fc-peskar',wt>=14&&wt<=20&&ntu<=8?'✓ Хорошие условия':wt<=23&&ntu<=20?'⚠ Умеренный риск':'✕ Неблагоприятно',wt>=14&&wt<=20&&ntu<=8?'safe':wt<=23&&ntu<=20?'warn':'danger');
-  setSpecies('fs-gubach','fc-gubach',wt>=14&&wt<=22&&ntu<=10?'✓ Хорошие условия':wt<=25&&ntu<=25?'⚠ Умеренный риск':'✕ Неблагоприятно',wt>=14&&wt<=22&&ntu<=10?'safe':wt<=25&&ntu<=25?'warn':'danger');
-  setSpecies('fs-golyan','fc-golyan',wt>=14&&wt<=22&&ntu<=10?'✓ Хорошие условия':wt<=25&&ntu<=25?'⚠ Умеренный риск':'✕ Неблагоприятно',wt>=14&&wt<=22&&ntu<=10?'safe':wt<=25&&ntu<=25?'warn':'danger');
-  setSpecies('fs-trout','fc-trout',wt<=18?'✓ Идеальные условия':wt<=22?'⚠ Немного тепло':'✕ Слишком тепло',wt<=18?'safe':wt<=22?'warn':'danger');
-  var sec=ntu>0?(1.13/Math.sqrt(ntu)).toFixed(1):'30+';
-  setSpecies('fs-turb-fish','fc-turb-fish',ntu<=5?'✓ '+sec+'м · отлично':ntu<=50?'⚠ '+sec+'м · мутновато':'✕ '+sec+'м · мутная',ntu<=5?'safe':ntu<=50?'warn':'danger');
-  setSpecies('bs-swan','bc-swan',ntu<=10&&wt<=18?'✓ Благоприятные условия':ntu<=30?'⚠ Умеренный риск':'✕ Неблагоприятно',ntu<=10&&wt<=18?'safe':ntu<=30?'warn':'danger');
-  setSpecies('bs-whooper','bc-whooper',ntu<=10&&wt<=18?'✓ Благоприятные условия':ntu<=30?'⚠ Умеренный риск':'✕ Неблагоприятно',ntu<=10&&wt<=18?'safe':ntu<=30?'warn':'danger');
-  setSpecies('bs-heron','bc-heron',ntu<=10?'✓ Видит рыбу хорошо':ntu<=40?'⚠ Охота затруднена':'✕ Не видит добычу',ntu<=10?'safe':ntu<=40?'warn':'danger');
-  setSpecies('bs-duck','bc-duck',ntu<=20?'✓ Видимость хорошая':ntu<=80?'⚠ Видимость слабая':'✕ Охота затруднена',ntu<=20?'safe':ntu<=80?'warn':'danger');
-  setSpecies('ps-chara','pc-chara',ntu<=5&&eutro<=30?'✓ Условия хорошие':ntu<=20&&eutro<=60?'⚠ Условия ухудшаются':'✕ Риск деградации',ntu<=5&&eutro<=30?'safe':ntu<=20&&eutro<=60?'warn':'danger');
-  setSpecies('ps-rdest','pc-rdest',ntu<=10&&eutro<=40?'✓ Растёт нормально':ntu<=30?'⚠ Умеренный риск':'✕ Угроза зарастания',ntu<=10&&eutro<=40?'safe':ntu<=30?'warn':'danger');
-  setSpecies('ps-algae','pc-algae',eutro<=30?'✓ Риск низкий · норма':eutro<=60?'⚠ Умеренный риск':'✕ Высокий риск!',eutro<=30?'safe':eutro<=60?'warn':'danger');
+function updateEcology(wt, ntu, tds){
+  var eutro = calcEutro(wt, tds, 0);
+  setSpecies('fs-osman', 'fc-osman', wt >= 12 && wt <= 20 && ntu <= 5 ? '✓ Условия подходят' : wt <= 23 && ntu <= 15 ? '⚠ Осторожно' : '✕ Критический риск!', wt >= 12 && wt <= 20 && ntu <= 5 ? 'safe' : wt <= 23 && ntu <= 15 ? 'warn' : 'danger');
+  setSpecies('fs-marinka', 'fc-marinka', wt >= 12 && wt <= 20 && ntu <= 5 ? '✓ Условия подходят' : wt <= 23 && ntu <= 15 ? '⚠ Осторожно' : '✕ Критический риск!', wt >= 12 && wt <= 20 && ntu <= 5 ? 'safe' : wt <= 23 && ntu <= 15 ? 'warn' : 'danger');
+  setSpecies('fs-chebak', 'fc-chebak', wt >= 15 && wt <= 22 && ntu <= 10 ? '✓ Оптимальные условия' : wt <= 25 && ntu <= 30 ? '⚠ Условия терпимые' : '✕ Риск для эндемика!', wt >= 15 && wt <= 22 && ntu <= 10 ? 'safe' : wt <= 25 && ntu <= 30 ? 'warn' : 'danger');
+  setSpecies('fs-peskar', 'fc-peskar', wt >= 14 && wt <= 20 && ntu <= 8 ? '✓ Хорошие условия' : wt <= 23 && ntu <= 20 ? '⚠ Умеренный риск' : '✕ Неблагоприятно', wt >= 14 && wt <= 20 && ntu <= 8 ? 'safe' : wt <= 23 && ntu <= 20 ? 'warn' : 'danger');
+  setSpecies('fs-gubach', 'fc-gubach', wt >= 14 && wt <= 22 && ntu <= 10 ? '✓ Хорошие условия' : wt <= 25 && ntu <= 25 ? '⚠ Умеренный риск' : '✕ Неблагоприятно', wt >= 14 && wt <= 22 && ntu <= 10 ? 'safe' : wt <= 25 && ntu <= 25 ? 'warn' : 'danger');
+  setSpecies('fs-golyan', 'fc-golyan', wt >= 14 && wt <= 22 && ntu <= 10 ? '✓ Хорошие условия' : wt <= 25 && ntu <= 25 ? '⚠ Умеренный риск' : '✕ Неблагоприятно', wt >= 14 && wt <= 22 && ntu <= 10 ? 'safe' : wt <= 25 && ntu <= 25 ? 'warn' : 'danger');
+  setSpecies('fs-trout', 'fc-trout', wt <= 18 ? '✓ Идеальные условия' : wt <= 22 ? '⚠ Немного тепло' : '✕ Слишком тепло', wt <= 18 ? 'safe' : wt <= 22 ? 'warn' : 'danger');
+  var sec = ntu > 0 ? (1.13 / Math.sqrt(ntu)).toFixed(1) : '30+';
+  setSpecies('fs-turb-fish', 'fc-turb-fish', ntu <= 5 ? '✓ '+sec+'м · отлично' : ntu <= 50 ? '⚠ '+sec+'м · мутновато' : '✕ '+sec+'м · мутная', ntu <= 5 ? 'safe' : ntu <= 50 ? 'warn' : 'danger');
+  setSpecies('bs-swan', 'bc-swan', ntu <= 10 && wt <= 18 ? '✓ Благоприятные условия' : ntu <= 30 ? '⚠ Умеренный риск' : '✕ Неблагоприятно', ntu <= 10 && wt <= 18 ? 'safe' : ntu <= 30 ? 'warn' : 'danger');
+  setSpecies('bs-whooper', 'bc-whooper', ntu <= 10 && wt <= 18 ? '✓ Благоприятные условия' : ntu <= 30 ? '⚠ Умеренный риск' : '✕ Неблагоприятно', ntu <= 10 && wt <= 18 ? 'safe' : ntu <= 30 ? 'warn' : 'danger');
+  setSpecies('bs-heron', 'bc-heron', ntu <= 10 ? '✓ Видит рыбу хорошо' : ntu <= 40 ? '⚠ Охота затруднена' : '✕ Не видит добычу', ntu <= 10 ? 'safe' : ntu <= 40 ? 'warn' : 'danger');
+  setSpecies('bs-duck', 'bc-duck', ntu <= 20 ? '✓ Видимость хорошая' : ntu <= 80 ? '⚠ Видимость слабая' : '✕ Охота затруднена', ntu <= 20 ? 'safe' : ntu <= 80 ? 'warn' : 'danger');
+  setSpecies('ps-chara', 'pc-chara', ntu <= 5 && eutro <= 30 ? '✓ Условия хорошие' : ntu <= 20 && eutro <= 60 ? '⚠ Условия ухудшаются' : '✕ Риск деградации', ntu <= 5 && eutro <= 30 ? 'safe' : ntu <= 20 && eutro <= 60 ? 'warn' : 'danger');
+  setSpecies('ps-rdest', 'pc-rdest', ntu <= 10 && eutro <= 40 ? '✓ Растёт нормально' : ntu <= 30 ? '⚠ Умеренный риск' : '✕ Угроза зарастания', ntu <= 10 && eutro <= 40 ? 'safe' : ntu <= 30 ? 'warn' : 'danger');
+  setSpecies('ps-algae', 'pc-algae', eutro <= 30 ? '✓ Риск низкий · норма' : eutro <= 60 ? '⚠ Умеренный риск' : '✕ Высокий риск!', eutro <= 30 ? 'safe' : eutro <= 60 ? 'warn' : 'danger');
 }
-function updateWaterUse(wt,tds,wqi,ntu){
-  var se=function(id,val,color){var e=document.getElementById(id);if(e){e.textContent=val;e.style.color=color;}};
-  se('drinkTemp',wt.toFixed(1)+'°C',wt<=25?'var(--green)':'var(--red)');
-  se('drinkTds',tds.toFixed(1)+' ppm','var(--red)');
-  se('drinkTurb',ntu.toFixed(2)+' NTU',ntu<=5?'var(--green)':'var(--red)');
-  se('swimTemp',wt.toFixed(1)+'°C',wt>=16&&wt<=26?'var(--green)':'var(--red)');
-  se('swimTurb',ntu.toFixed(2)+' NTU',ntu<=200?'var(--green)':'var(--red)');
-  se('swimWqi',wqi,wqi>=60?'var(--green)':'var(--amber)');
-  var swOk=wt>=16&&wt<=28&&ntu<=200&&wqi>=50;
-  var sr=document.getElementById('swimResult');
-  if(sr){sr.textContent=swOk?'✓ Отлично для купания':'⚠ Условия не оптимальны';sr.style.cssText='text-align:center;padding:9px;border-radius:8px;font-size:12px;font-weight:600;background:'+(swOk?'rgba(52,211,153,0.1)':'rgba(248,113,113,0.1)')+';color:'+(swOk?'var(--green)':'var(--red)')+';border:1px solid '+(swOk?'rgba(52,211,153,0.2)':'rgba(248,113,113,0.2)');}
+function updateWaterUse(wt, tds, wqi, ntu){
+  function se(id, val, color){ var e = document.getElementById(id); if(e){ e.textContent = val; e.style.color = color; } }
+  se('drinkTemp', wt.toFixed(1) + '°C', wt <= 25 ? 'var(--green)' : 'var(--red)');
+  se('drinkTds', tds.toFixed(1) + ' ppm', 'var(--red)');
+  se('drinkTurb', ntu.toFixed(2) + ' NTU', ntu <= 5 ? 'var(--green)' : 'var(--red)');
+  se('swimTemp', wt.toFixed(1) + '°C', wt >= 16 && wt <= 26 ? 'var(--green)' : 'var(--red)');
+  se('swimTurb', ntu.toFixed(2) + ' NTU', ntu <= 200 ? 'var(--green)' : 'var(--red)');
+  se('swimWqi', wqi, wqi >= 60 ? 'var(--green)' : 'var(--amber)');
+  var swOk = wt >= 16 && wt <= 28 && ntu <= 200 && wqi >= 50;
+  var sr = document.getElementById('swimResult');
+  if(sr){ sr.textContent = swOk ? '✓ Отлично для купания' : '⚠ Условия не оптимальны'; sr.style.cssText = 'text-align:center;padding:9px;border-radius:8px;font-size:12px;font-weight:600;background:' + (swOk ? 'rgba(52,211,153,0.1)' : 'rgba(248,113,113,0.1)') + ';color:' + (swOk ? 'var(--green)' : 'var(--red)') + ';border:1px solid ' + (swOk ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.2)'); }
 }
 
-// ─── АНОМАЛИИ ───
+// ============================================================
+// 18. АНОМАЛИИ
+// ============================================================
 function detectAnomalies(history){
-  var a=[];
-  for(var i=1;i<Math.min(history.length,50);i++){
-    var c=history[i-1],pv=history[i];
-    if(Math.abs(parseFloat(c.wt)-parseFloat(pv.wt))>2)a.push({time:c.time,text:'Резкое изм. температуры: '+(parseFloat(c.wt)-parseFloat(pv.wt)).toFixed(1)+'°C',color:'#f87171'});
-    if(Math.abs(parseFloat(c.hum)-parseFloat(pv.hum))>15)a.push({time:c.time,text:'Резкое изм. влажности: '+Math.abs(parseFloat(c.hum)-parseFloat(pv.hum)).toFixed(1)+'%',color:'#a78bfa'});
+  var a = [];
+  for(var i = 1; i < Math.min(history.length, 50); i++){
+    var c = history[i-1], pv = history[i];
+    if(Math.abs(parseFloat(c.wt) - parseFloat(pv.wt)) > 2) a.push({ time: c.time, text: 'Резкое изм. температуры: ' + (parseFloat(c.wt) - parseFloat(pv.wt)).toFixed(1) + '°C', color: '#f87171' });
+    if(Math.abs(parseFloat(c.hum) - parseFloat(pv.hum)) > 15) a.push({ time: c.time, text: 'Резкое изм. влажности: ' + Math.abs(parseFloat(c.hum) - parseFloat(pv.hum)).toFixed(1) + '%', color: '#a78bfa' });
   }
-  var list=document.getElementById('anomalyList');
-  list.innerHTML=a.length===0?'<div class="anomaly-item"><div class="a-dot" style="background:var(--green)"></div><div class="a-text">Аномалий не обнаружено ✓</div></div>':a.slice(0,12).map(function(x){return'<div class="anomaly-item"><div class="a-dot" style="background:'+x.color+'"></div><span class="a-time">'+(x.time.split(',')[1]||'').trim()+'</span><div class="a-text">'+x.text+'</div></div>';}).join('');
+  var list = document.getElementById('anomalyList');
+  list.innerHTML = a.length === 0 ? '<div class="anomaly-item"><div class="a-dot" style="background:var(--green)"></div><div class="a-text">Аномалий не обнаружено ✓</div></div>' : a.slice(0, 12).map(function(x){ return '<div class="anomaly-item"><div class="a-dot" style="background:' + x.color + '"></div><span class="a-time">' + (x.time.split(',')[1] || '').trim() + '</span><div class="a-text">' + x.text + '</div></div>'; }).join('');
 }
 function updateDayRating(history){
-  var byDay={};history.forEach(function(e){var d=e.time.split(',')[0];if(!byDay[d])byDay[d]=[];byDay[d].push(parseFloat(e.wqi));});
-  var avgs=Object.keys(byDay).map(function(d){var v=byDay[d];return{d:d,avg:(v.reduce(function(a,b){return a+b;},0)/v.length).toFixed(1)};}).sort(function(a,b){return b.avg-a.avg;});
-  var medals=['🥇','🥈','🥉','4️⃣','5️⃣'];
-  var render=function(el,items){el.innerHTML=items.length?items.slice(0,5).map(function(x,i){return'<div class="rating-item"><span class="r-rank">'+(medals[i]||'·')+'</span><span class="r-date">'+x.d+'</span><span class="r-score '+(parseFloat(x.avg)>=70?'rs-ok':'rs-warn')+'">'+x.avg+'</span></div>';}).join(''):'<div class="loading">—</div>';};
-  render(document.getElementById('bestDays'),avgs);
-  render(document.getElementById('worstDays'),avgs.slice().reverse());
+  var byDay = {};
+  history.forEach(function(e){ var d = e.time.split(',')[0]; if(!byDay[d]) byDay[d] = []; byDay[d].push(parseFloat(e.wqi)); });
+  var avgs = Object.keys(byDay).map(function(d){ var v = byDay[d]; return { d: d, avg: (v.reduce(function(a,b){ return a + b; }, 0) / v.length).toFixed(1) }; }).sort(function(a,b){ return b.avg - a.avg; });
+  var medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+  function render(el, items){ el.innerHTML = items.length ? items.slice(0, 5).map(function(x, i){ return '<div class="rating-item"><span class="r-rank">' + (medals[i] || '·') + '</span><span class="r-date">' + x.d + '</span><span class="r-score ' + (parseFloat(x.avg) >= 70 ? 'rs-ok' : 'rs-warn') + '">' + x.avg + '</span></div>'; }).join('') : '<div class="loading">—</div>'; }
+  render(document.getElementById('bestDays'), avgs);
+  render(document.getElementById('worstDays'), avgs.slice().reverse());
 }
 
-// ─── ЖУРНАЛ ───
+// ============================================================
+// 19. ЖУРНАЛ
+// ============================================================
 function exportCSV(){
-  var h=loadHistory();if(!h.length){alert('История пуста!');return;}
-  var csv='Время,Вода°C,Воздух°C,Влажность%,TDS ppm,NTU,Солёность г/л,Роса°C,ИКВ\n';
-  h.forEach(function(e){csv+=e.time+','+e.wt+','+e.at+','+e.hum+','+e.tds+','+(e.turb||'--')+','+(e.sal||'--')+','+e.dew+','+e.wqi+'\n';});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
-  a.download='lake_'+new Date().toLocaleDateString('ru-RU').replace(/\./g,'-')+'.csv';a.click();
+  var h = loadHistory(); if(!h.length){ alert('История пуста!'); return; }
+  var csv = 'Время,Вода°C,Воздух°C,Влажность%,TDS ppm,NTU,Солёность г/л,Роса°C,ИКВ\n';
+  h.forEach(function(e){ csv += e.time + ',' + e.wt + ',' + e.at + ',' + e.hum + ',' + e.tds + ',' + (e.turb || '--') + ',' + (e.sal || '--') + ',' + e.dew + ',' + e.wqi + '\n'; });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' }));
+  a.download = 'lake_' + new Date().toLocaleDateString('ru-RU').replace(/\./g, '-') + '.csv'; a.click();
 }
 function renderHistory(){
-  var h=loadHistory();
-  var q=(document.getElementById('searchInput')?document.getElementById('searchInput').value||'':'').toLowerCase();
-  var filtered=q?h.filter(function(e){return e.time.toLowerCase().indexOf(q)>=0;}):h;
-  var tbody=document.getElementById('historyBody');tbody.innerHTML='';
-  filtered.slice(0,100).forEach(function(e){
-    var wqi=parseFloat(e.wqi),ntu=parseFloat(e.turb)||0;
-    var wc=wqi>=80?'var(--green)':wqi>=60?'var(--amber)':'var(--red)';
-    var tc=ntu<5?'var(--green)':ntu<50?'var(--amber)':'var(--red)';
-    var tr=document.createElement('tr');
-    tr.innerHTML='<td style="font-size:10px;color:var(--text1);white-space:nowrap">'+e.time+'</td><td>'+e.wt+'</td><td>'+e.at+'</td><td>'+e.hum+'</td><td>'+e.tds+'</td><td style="color:'+tc+';font-weight:600">'+(e.turb||'--')+'</td><td>'+(e.sal||'--')+'</td><td>'+e.dew+'</td><td style="color:'+wc+';font-weight:600">'+e.wqi+'</td>';
+  var h = loadHistory();
+  var q = (document.getElementById('searchInput') ? document.getElementById('searchInput').value || '' : '').toLowerCase();
+  var filtered = q ? h.filter(function(e){ return e.time.toLowerCase().indexOf(q) >= 0; }) : h;
+  var tbody = document.getElementById('historyBody'); tbody.innerHTML = '';
+  filtered.slice(0, 100).forEach(function(e){
+    var wqi = parseFloat(e.wqi), ntu = parseFloat(e.turb) || 0;
+    var wc = wqi >= 80 ? 'var(--green)' : wqi >= 60 ? 'var(--amber)' : 'var(--red)';
+    var tc = ntu < 5 ? 'var(--green)' : ntu < 50 ? 'var(--amber)' : 'var(--red)';
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td style="font-size:10px;color:var(--text1);white-space:nowrap">' + e.time + '</td><td>' + e.wt + '</td><td>' + e.at + '</td><td>' + e.hum + '</td><td>' + e.tds + '</td><td style="color:' + tc + ';font-weight:600">' + (e.turb || '--') + '</td><td>' + (e.sal || '--') + '</td><td>' + e.dew + '</td><td style="color:' + wc + ';font-weight:600">' + e.wqi + '</td>';
     tbody.appendChild(tr);
   });
-  var sc=document.getElementById('showingCount');if(sc)sc.textContent='Показано '+Math.min(filtered.length,100)+' из '+filtered.length+' записей';
+  var sc = document.getElementById('showingCount'); if(sc) sc.textContent = 'Показано ' + Math.min(filtered.length, 100) + ' из ' + filtered.length + ' записей';
 }
 function updateSummary(){
-  var h=loadHistory();
-  document.getElementById('j-totalRec').textContent=h.length;
-  var wqis=h.map(function(e){return parseFloat(e.wqi);}).filter(function(v){return !isNaN(v);});
-  document.getElementById('j-avgWqi').textContent=wqis.length?(wqis.reduce(function(a,b){return a+b;},0)/wqis.length).toFixed(1):'--';
-  var wts=h.map(function(e){return parseFloat(e.wt);}).filter(function(v){return !isNaN(v);});
-  document.getElementById('j-avgWater').textContent=wts.length?(wts.reduce(function(a,b){return a+b;},0)/wts.length).toFixed(1)+'°C':'--';
-  var turbs=h.map(function(e){return parseFloat(e.turb);}).filter(function(v){return !isNaN(v);});
-  document.getElementById('j-avgTurb').textContent=turbs.length?(turbs.reduce(function(a,b){return a+b;},0)/turbs.length).toFixed(1)+' NTU':'-- NTU';
+  var h = loadHistory();
+  document.getElementById('j-totalRec').textContent = h.length;
+  var wqis = h.map(function(e){ return parseFloat(e.wqi); }).filter(function(v){ return !isNaN(v); });
+  document.getElementById('j-avgWqi').textContent = wqis.length ? (wqis.reduce(function(a,b){ return a + b; }, 0) / wqis.length).toFixed(1) : '--';
+  var wts = h.map(function(e){ return parseFloat(e.wt); }).filter(function(v){ return !isNaN(v); });
+  document.getElementById('j-avgWater').textContent = wts.length ? (wts.reduce(function(a,b){ return a + b; }, 0) / wts.length).toFixed(1) + '°C' : '--';
+  var turbs = h.map(function(e){ return parseFloat(e.turb); }).filter(function(v){ return !isNaN(v); });
+  document.getElementById('j-avgTurb').textContent = turbs.length ? (turbs.reduce(function(a,b){ return a + b; }, 0) / turbs.length).toFixed(1) + ' NTU' : '-- NTU';
 }
 
-// ─── ГЛАВНЫЙ ФЕТЧ ───
+// ============================================================
+// 20. УВЕДОМЛЕНИЕ
+// ============================================================
+function showNotification(text){
+  var el = document.getElementById('notification');
+  document.getElementById('notificationText').textContent = text;
+  el.classList.add('show');
+  notificationShown = true;
+  // Автоматически скрыть через 8 секунд
+  clearTimeout(window.notifyTimeout);
+  window.notifyTimeout = setTimeout(function(){
+    el.classList.remove('show');
+    notificationShown = false;
+  }, 8000);
+}
+function closeNotification(){
+  document.getElementById('notification').classList.remove('show');
+  notificationShown = false;
+  clearTimeout(window.notifyTimeout);
+}
+
+// ============================================================
+// 21. ГЛАВНЫЙ ФЕТЧ (С ЛОГИКОЙ УХУДШЕНИЯ)
+// ============================================================
 async function fetchData(){
-  try{
-    var res=await fetch('https://api.thingspeak.com/channels/'+CHANNEL_ID+'/feeds.json?api_key='+READ_KEY+'&results=20');
-    var data=await res.json();
-    var feeds=data.feeds;if(!feeds||!feeds.length)return;
-    var last=feeds[feeds.length-1];
-    var wt=parseFloat(last.field1),at=parseFloat(last.field3);
-    var hum=parseFloat(last.field4),light=parseFloat(last.field5),wqi=parseFloat(last.field6)||0;
-    var dew=parseFloat(last.field7)||calcDewPoint(at,hum);
+  try {
+    // Если это первый вызов — используем нормальные значения
+    if (firstUpdate) {
+      _tdsBase = BASE_TDS;
+      _ntuBase = BASE_NTU;
+      waterQualityOK = true;
+      firstUpdate = false;
+    } else {
+      // Следующие вызовы: через 15 секунд после старта ухудшаем качество
+      // (проверяем, прошло ли 15 секунд с момента первого обновления)
+      // Для простоты используем глобальный флаг, который переключается
+      // при первом вызове после 15 секунд.
+      if (waterQualityOK) {
+        // Переключаем на плохие значения
+        _tdsBase = 12000;   // резкое повышение TDS (норма ~6000)
+        _ntuBase = 45.0;    // резкое повышение мутности (норма ~2.5)
+        waterQualityOK = false;
+        // Показываем уведомление
+        if (!notificationShown) {
+          showNotification('⚠️ Резкое ухудшение качества воды! TDS повысился до 12000 ppm, мутность — до 45 NTU. Рекомендуется воздержаться от купания.');
+        }
+      } else {
+        // Уже ухудшено — оставляем плохие значения
+        // (можно добавить небольшие колебания)
+        _tdsBase += (Math.random() - 0.5) * 0.5;
+        _ntuBase += (Math.random() - 0.5) * 0.3;
+        // Не даём уйти слишком далеко от плохих значений
+        if (_tdsBase < 11000) _tdsBase = 11000;
+        if (_tdsBase > 13000) _tdsBase = 13000;
+        if (_ntuBase < 40) _ntuBase = 40;
+        if (_ntuBase > 50) _ntuBase = 50;
+      }
+    }
 
-    var tds=getSimTDS();
-    var ntu=getSimNTU();
-    _modalData={wt:wt,at:at,hum:hum,tds:tds,ntu:ntu,wqi:wqi,light:light};
-    var sal=calcSalinity(tds);
-    var evap=calcEvaporation(wt,at,hum,light);
-    var comfort=calcComfort(at,hum,wt);
-    var eutro=calcEutro(wt,tds,light);
-    var heatIdx=calcHeatIndex(at,hum);
+    // Запрос к ThingSpeak для получения реальных данных (температура, влажность, WQI)
+    var res = await fetch('https://api.thingspeak.com/channels/' + CHANNEL_ID + '/feeds.json?api_key=' + READ_KEY + '&results=20');
+    var data = await res.json();
+    var feeds = data.feeds;
+    if(!feeds || !feeds.length) return;
 
-    // Карточки
-    uv('h-waterTemp',wt.toFixed(1));uv('h-airTemp',at.toFixed(1));uv('h-humidity',hum.toFixed(1));
-    uv('h-tds',tds.toFixed(1));uv('h-light',light.toFixed(0));uv('h-turb',ntu.toFixed(2));
-    uv('h-salinity',sal.toFixed(2));uv('h-wqiScore',wqi);
-    uv('h-wqiLabel',wqi>=80?'Отлично':wqi>=60?'Хорошо':wqi>=40?'Удовл.':'Плохо');
+    var last = feeds[feeds.length - 1];
+    var wt = parseFloat(last.field1);      // температура воды
+    var at = parseFloat(last.field3);      // температура воздуха
+    var hum = parseFloat(last.field4);     // влажность
+    var light = parseFloat(last.field5);   // освещённость
+    var wqi = parseFloat(last.field6) || 0;// ИКВ
+
+    // Пересчитываем WQI на основе ухудшенных данных
+    // Если качество ухудшено — снижаем WQI пропорционально
+    if (!waterQualityOK) {
+      // Сильно занижаем WQI из-за высокой мутности и TDS
+      var tdsFactor = Math.min(1, (_tdsBase - 6000) / 6000);
+      var ntuFactor = Math.min(1, (_ntuBase - 2) / 50);
+      var penalty = (tdsFactor * 0.5 + ntuFactor * 0.5) * 70;
+      wqi = Math.max(0, Math.min(100, wqi - penalty));
+    }
+
+    var dew = parseFloat(last.field7) || calcDewPoint(at, hum);
+
+    var tds = getSimTDS();
+    var ntu = getSimNTU();
+    _modalData = { wt: wt, at: at, hum: hum, tds: tds, ntu: ntu, wqi: wqi, light: light };
+
+    var sal = calcSalinity(tds);
+    var evap = calcEvaporation(wt, at, hum, light);
+    var comfort = calcComfort(at, hum, wt);
+    var eutro = calcEutro(wt, tds, light);
+    var heatIdx = calcHeatIndex(at, hum);
+
+    // Обновление UI
+    uv('h-waterTemp', wt.toFixed(1));
+    uv('h-airTemp', at.toFixed(1));
+    uv('h-humidity', hum.toFixed(1));
+    uv('h-tds', tds.toFixed(1));
+    uv('h-light', light.toFixed(0));
+    uv('h-turb', ntu.toFixed(2));
+    uv('h-salinity', sal.toFixed(2));
+    uv('h-wqiScore', wqi);
+    uv('h-wqiLabel', wqi >= 80 ? 'Отлично' : wqi >= 60 ? 'Хорошо' : wqi >= 40 ? 'Удовл.' : 'Плохо');
 
     // Gauges
-    updateGauge('gWater',(wt-10)/25,'#3d9ef5');
-    document.getElementById('gWaterVal').textContent=wt.toFixed(1)+'°C';
-    updateGauge('gHum',hum/100,'#00c9a7');
-    document.getElementById('gHumVal').textContent=hum.toFixed(0)+'%';
-    updateGauge('gWqi',wqi/100,'#34d399');
-    document.getElementById('gWqiVal').textContent=wqi;
-    updateGauge('gTurb',Math.min(ntu/50,1),'#fb923c');
-    document.getElementById('gTurbVal').textContent=ntu.toFixed(2)+' NTU';
+    updateGauge('gWater', (wt - 10) / 25, '#3d9ef5');
+    document.getElementById('gWaterVal').textContent = wt.toFixed(1) + '°C';
+    updateGauge('gHum', hum / 100, '#00c9a7');
+    document.getElementById('gHumVal').textContent = hum.toFixed(0) + '%';
+    updateGauge('gWqi', wqi / 100, '#34d399');
+    document.getElementById('gWqiVal').textContent = wqi;
+    updateGauge('gTurb', Math.min(ntu / 50, 1), '#fb923c');
+    document.getElementById('gTurbVal').textContent = ntu.toFixed(2) + ' NTU';
 
     // Тренды
-    var history=loadHistory();
-    setTrend('trendWater',getTrend(history,'wt'));setTrend('trendAir',getTrend(history,'at'));
-    setTrend('trendHum',getTrend(history,'hum'));setTrend('trendTds',getTrend(history,'tds'));setTrend('trendLight',getTrend(history,'light'));
+    var history = loadHistory();
+    setTrend('trendWater', getTrend(history, 'wt'));
+    setTrend('trendAir', getTrend(history, 'at'));
+    setTrend('trendHum', getTrend(history, 'hum'));
+    setTrend('trendTds', getTrend(history, 'tds'));
+    setTrend('trendLight', getTrend(history, 'light'));
 
     // WQI полоска
-    document.getElementById('h-wqiFill').style.width=wqi+'%';
-    var wqiC='#34d399',wqiL='Отлично 🟢';
-    if(wqi<80){wqiC='#3d9ef5';wqiL='Хорошо 🔵';}if(wqi<60){wqiC='#fbbf24';wqiL='Удовлетворительно 🟡';}if(wqi<40){wqiC='#f87171';wqiL='Плохо 🔴';}
-    document.getElementById('wqiBig').style.color=wqiC;document.getElementById('wqiBig').textContent=wqi;
-    document.getElementById('wqiLabel').textContent=wqiL;document.getElementById('wqiLabel').style.color=wqiC;
-    document.getElementById('h-wqiFill').style.background='linear-gradient(90deg,'+wqiC+'88,'+wqiC+')';
+    document.getElementById('h-wqiFill').style.width = wqi + '%';
+    var wqiC = '#34d399', wqiL = 'Отлично 🟢';
+    if(wqi < 80){ wqiC = '#3d9ef5'; wqiL = 'Хорошо 🔵'; }
+    if(wqi < 60){ wqiC = '#fbbf24'; wqiL = 'Удовлетворительно 🟡'; }
+    if(wqi < 40){ wqiC = '#f87171'; wqiL = 'Плохо 🔴'; }
+    document.getElementById('wqiBig').style.color = wqiC;
+    document.getElementById('wqiBig').textContent = wqi;
+    document.getElementById('wqiLabel').textContent = wqiL;
+    document.getElementById('wqiLabel').style.color = wqiC;
+    document.getElementById('h-wqiFill').style.background = 'linear-gradient(90deg,' + wqiC + '88,' + wqiC + ')';
 
     // Мини-график
-    var labels=feeds.map(function(f){return new Date(f.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});});
-    if(miniChart)miniChart.destroy();
-    miniChart=new Chart(document.getElementById('h-miniWqi'),{type:'line',data:{labels:labels,datasets:[{data:feeds.map(function(f){return parseFloat(f.field6)||null;}),borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.08)',tension:.4,fill:true,borderWidth:2,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{min:0,max:100,display:false}}}});
+    var labels = feeds.map(function(f){ return new Date(f.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }); });
+    if(miniChart) miniChart.destroy();
+    miniChart = new Chart(document.getElementById('h-miniWqi'), {
+      type: 'line',
+      data: { labels: labels, datasets: [{ data: feeds.map(function(f){ return parseFloat(f.field6) || null; }), borderColor: '#34d399', backgroundColor: 'rgba(52,211,153,0.08)', tension: .4, fill: true, borderWidth: 2, pointRadius: 0 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0, max: 100, display: false } } }
+    });
 
     // Производные
-    uv('h-dewPoint',dew.toFixed(1));uv('h-thermalFlux',(wt-at).toFixed(1));
-    uv('h-evaporation',evap.toFixed(2));uv('h-comfort',comfort.toFixed(0));
-    uv('h-eutro',eutro.toFixed(0));uv('h-secchi',secchiDepth(ntu));
-    uv('h-salType',salinityType(sal));uv('h-heatIdx',heatIdx.toFixed(1));
+    uv('h-dewPoint', dew.toFixed(1));
+    uv('h-thermalFlux', (wt - at).toFixed(1));
+    uv('h-evaporation', evap.toFixed(2));
+    uv('h-comfort', comfort.toFixed(0));
+    uv('h-eutro', eutro.toFixed(0));
+    uv('h-secchi', secchiDepth(ntu));
+    uv('h-salType', salinityType(sal));
+    uv('h-heatIdx', heatIdx.toFixed(1));
 
     // Таблица нормативов
-    uv('whoTblWater',wt.toFixed(1)+'°C');uv('whoTblTds',tds.toFixed(1)+' ppm');
-    uv('whoTblHum',hum.toFixed(1)+'%');uv('whoTblTurb',ntu.toFixed(2)+' NTU');
-    uv('whoTblSal',sal.toFixed(2)+' г/л');uv('whoTblDew',dew.toFixed(1)+'°C');
+    uv('whoTblWater', wt.toFixed(1) + '°C');
+    uv('whoTblTds', tds.toFixed(1) + ' ppm');
+    uv('whoTblHum', hum.toFixed(1) + '%');
+    uv('whoTblTurb', ntu.toFixed(2) + ' NTU');
+    uv('whoTblSal', sal.toFixed(2) + ' г/л');
+    uv('whoTblDew', dew.toFixed(1) + '°C');
 
     // Сезон и счётчик
-    updateSeason(wt);updateSwimDays();
+    updateSeason(wt);
+    updateSwimDays();
 
     // Экология
-    updateEcology(wt,ntu,tds);
-    updateWaterUse(wt,tds,wqi,ntu);
+    updateEcology(wt, ntu, tds);
+    updateWaterUse(wt, tds, wqi, ntu);
 
     // Графики
     if(chartsInited){
-      var cl=feeds.map(function(f){return new Date(f.created_at).toLocaleTimeString('ru-RU');});
-      tempChart.data.labels=cl;tempChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field1)||null;});tempChart.data.datasets[1].data=feeds.map(function(f){return parseFloat(f.field3)||null;});tempChart.update();
-      humChart.data.labels=cl;humChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field4)||null;});humChart.update();
-      tdsChart.data.labels=cl;tdsChart.data.datasets[0].data=feeds.map(function(f){return getSimTDS();});tdsChart.update();
-      wqiChart.data.labels=cl;wqiChart.data.datasets[0].data=feeds.map(function(f){return parseFloat(f.field6)||null;});wqiChart.update();
+      var cl = feeds.map(function(f){ return new Date(f.created_at).toLocaleTimeString('ru-RU'); });
+      tempChart.data.labels = cl;
+      tempChart.data.datasets[0].data = feeds.map(function(f){ return parseFloat(f.field1) || null; });
+      tempChart.data.datasets[1].data = feeds.map(function(f){ return parseFloat(f.field3) || null; });
+      tempChart.update();
+      humChart.data.labels = cl;
+      humChart.data.datasets[0].data = feeds.map(function(f){ return parseFloat(f.field4) || null; });
+      humChart.update();
+      tdsChart.data.labels = cl;
+      tdsChart.data.datasets[0].data = feeds.map(function(f){ return getSimTDS(); });
+      tdsChart.update();
+      wqiChart.data.labels = cl;
+      wqiChart.data.datasets[0].data = feeds.map(function(f){ return parseFloat(f.field6) || null; });
+      wqiChart.update();
       buildHeatmap(feeds);
     }
 
     // История
-    saveHistory({time:new Date().toLocaleString('ru-RU'),wt:wt.toFixed(1),at:at.toFixed(1),hum:hum.toFixed(1),tds:tds.toFixed(1),light:light.toFixed(0),turb:ntu.toFixed(2),sal:sal.toFixed(2),dew:dew.toFixed(1),wqi:wqi});
-    var hist=loadHistory();
-    detectAnomalies(hist);updateDayRating(hist);
-    if(chartsInited)buildForecast(hist);
+    saveHistory({
+      time: new Date().toLocaleString('ru-RU'),
+      wt: wt.toFixed(1),
+      at: at.toFixed(1),
+      hum: hum.toFixed(1),
+      tds: tds.toFixed(1),
+      light: light.toFixed(0),
+      turb: ntu.toFixed(2),
+      sal: sal.toFixed(2),
+      dew: dew.toFixed(1),
+      wqi: wqi
+    });
 
-    document.getElementById('lastUpdate').textContent=new Date().toLocaleTimeString('ru-RU');
-  }catch(e){console.error(e);}
+    var hist = loadHistory();
+    detectAnomalies(hist);
+    updateDayRating(hist);
+    if(chartsInited) buildForecast(hist);
+
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('ru-RU');
+
+  } catch(e) {
+    console.error(e);
+  }
 }
 
+// ============================================================
+// 22. ЗАПУСК
+// ============================================================
 fetchData();
-setInterval(fetchData,15e3);
+setInterval(fetchData, 15000); // каждые 15 секунд
+
 fetchWeather();
-setInterval(fetchWeather,600e3);
-</script>
+setInterval(fetchWeather, 600000); // каждые 10 минут
 
-<!-- МОДАЛЬНОЕ ОКНО ЭКОЛОГИИ -->
-<div class="modal-overlay" id="ecoModal" onclick="closeModal(event)">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-emoji" id="modalEmoji">🐟</div>
-    <div class="modal-title" id="modalTitle">—</div>
-    <div class="modal-subtitle" id="modalSubtitle">—</div>
-    <div class="modal-status" id="modalStatus">—</div>
-    <div class="modal-section-title">Текущие условия</div>
-    <div id="modalRows"></div>
-    <div class="modal-explain" id="modalExplain">—</div>
-  </div>
-</div>
-
-<script>
-// ─── МОДАЛЬНОЕ ОКНО ───
-var _modalData = {};
-
+// ============================================================
+// 23. МОДАЛЬНОЕ ОКНО ЭКОЛОГИИ
+// ============================================================
 var ECO_INFO = {
-  'fc-osman':    {emoji:'🐡', name:'Осман голый', subtitle:'Эндемик Иссык-Куля · Красная книга КР',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','12–20°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 5 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Температура воды '+d.wt.toFixed(1)+'°C находится в оптимальном диапазоне 12–20°C для османа. Мутность '+d.ntu.toFixed(2)+' NTU ниже критической отметки 5 NTU — вода достаточно прозрачна для жизни этого редкого эндемика.';
-      if(cls==='warn') return '⚠ Температура воды '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU приближаются к критическим значениям. Осман голый — краснокнижный вид, очень чувствительный к изменениям среды. Необходим мониторинг.';
+  'fc-osman':    { emoji:'🐡', name:'Осман голый', subtitle:'Эндемик Иссык-Куля · Красная книга КР',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '12–20°C'], ['Мутность', d.ntu.toFixed(2)+' NTU', '< 5 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Температура воды '+d.wt.toFixed(1)+'°C находится в оптимальном диапазоне 12–20°C для османа. Мутность '+d.ntu.toFixed(2)+' NTU ниже критической отметки 5 NTU — вода достаточно прозрачна для жизни этого редкого эндемика.';
+      if(cls === 'warn') return '⚠ Температура воды '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU приближаются к критическим значениям. Осман голый — краснокнижный вид, очень чувствительный к изменениям среды. Необходим мониторинг.';
       return '✕ Условия критические для османа голого. Температура воды '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU существенно превышают норму. Этот исчезающий вид может покинуть данный участок озера.';
     }},
-  'fc-marinka':  {emoji:'🐟', name:'Маринка иссык-кульская', subtitle:'Эндемик · Красная книга КР · Брюшина ядовита',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','12–20°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 5 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Температура '+d.wt.toFixed(1)+'°C и мутность '+d.ntu.toFixed(2)+' NTU оптимальны для маринки иссык-кульской. Этот уникальный эндемик существует только в Иссык-Куле — важно поддерживать чистоту воды.';
-      if(cls==='warn') return '⚠ Условия на грани допустимых для маринки. Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU отклоняются от нормы. Маринка — краснокнижный вид, требует чистой прохладной воды.';
+  'fc-marinka':  { emoji:'🐟', name:'Маринка иссык-кульская', subtitle:'Эндемик · Красная книга КР · Брюшина ядовита',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '12–20°C'], ['Мутность', d.ntu.toFixed(2)+' NTU', '< 5 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Температура '+d.wt.toFixed(1)+'°C и мутность '+d.ntu.toFixed(2)+' NTU оптимальны для маринки иссык-кульской. Этот уникальный эндемик существует только в Иссык-Куле — важно поддерживать чистоту воды.';
+      if(cls === 'warn') return '⚠ Условия на грани допустимых для маринки. Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU отклоняются от нормы. Маринка — краснокнижный вид, требует чистой прохладной воды.';
       return '✕ Опасные условия для маринки иссык-кульской. При температуре '+d.wt.toFixed(1)+'°C и мутности '+d.ntu.toFixed(2)+' NTU этот краснокнижный эндемик испытывает критический стресс.';
     }},
-  'fc-chebak':   {emoji:'🐠', name:'Чебачок иссык-кульский', subtitle:'90% биомассы озера · Под угрозой исчезновения',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','15–22°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Температура '+d.wt.toFixed(1)+'°C в оптимуме 15–22°C для чебачка. Мутность '+d.ntu.toFixed(2)+' NTU хорошая. Чебачок составляет 90% биомассы рыб озера — его благополучие критично для всей экосистемы Иссык-Куля.';
-      if(cls==='warn') return '⚠ Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU выходят за оптимальные границы для чебачка. Этот вид уже исчезает из промыслового улова — важно не допускать ухудшения условий.';
+  'fc-chebak':   { emoji:'🐠', name:'Чебачок иссык-кульский', subtitle:'90% биомассы озера · Под угрозой исчезновения',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '15–22°C'], ['Мутность', d.ntu.toFixed(2)+' NTU', '< 10 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Температура '+d.wt.toFixed(1)+'°C в оптимуме 15–22°C для чебачка. Мутность '+d.ntu.toFixed(2)+' NTU хорошая. Чебачок составляет 90% биомассы рыб озера — его благополучие критично для всей экосистемы Иссык-Куля.';
+      if(cls === 'warn') return '⚠ Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU выходят за оптимальные границы для чебачка. Этот вид уже исчезает из промыслового улова — важно не допускать ухудшения условий.';
       return '✕ Условия неблагоприятны для чебачка иссык-кульского. Температура '+d.wt.toFixed(1)+'°C и мутность '+d.ntu.toFixed(2)+' NTU за пределами допустимого. Без чебачка рухнет вся пищевая цепочка озера.';
     }},
-  'fc-peskar':   {emoji:'🐟', name:'Пескарь иссык-кульский', subtitle:'Уникальный донный эндемик',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','14–20°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 8 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Температура '+d.wt.toFixed(1)+'°C и мутность '+d.ntu.toFixed(2)+' NTU создают хорошие условия для пескаря. Донный вид чувствителен к качеству придонного слоя воды.';
-      if(cls==='warn') return '⚠ Параметры воды на грани для пескаря иссык-кульского. Донный образ жизни делает его особенно уязвимым к изменениям мутности и температуры.';
+  'fc-peskar':   { emoji:'🐟', name:'Пескарь иссык-кульский', subtitle:'Уникальный донный эндемик',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '14–20°C'], ['Мутность', d.ntu.toFixed(2)+' NTU', '< 8 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Температура '+d.wt.toFixed(1)+'°C и мутность '+d.ntu.toFixed(2)+' NTU создают хорошие условия для пескаря. Донный вид чувствителен к качеству придонного слоя воды.';
+      if(cls === 'warn') return '⚠ Параметры воды на грани для пескаря иссык-кульского. Донный образ жизни делает его особенно уязвимым к изменениям мутности и температуры.';
       return '✕ Неблагоприятные условия для пескаря. Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU критические для этого эндемичного донного вида.';
     }},
-  'fc-gubach':   {emoji:'🐟', name:'Губач иссык-кульский', subtitle:'Эндемик · Питается водорослями',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','14–22°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Условия подходят для губача. При температуре '+d.wt.toFixed(1)+'°C и мутности '+d.ntu.toFixed(2)+' NTU водоросли — основа питания губача — растут нормально.';
-      if(cls==='warn') return '⚠ Условия для губача ухудшаются. Рост харовых водорослей — основной пищи этого эндемика — может снижаться при текущих параметрах.';
+  'fc-gubach':   { emoji:'🐟', name:'Губач иссык-кульский', subtitle:'Эндемик · Питается водорослями',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '14–22°C'], ['Мутность', d.ntu.toFixed(2)+' NTU', '< 10 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Условия подходят для губача. При температуре '+d.wt.toFixed(1)+'°C и мутности '+d.ntu.toFixed(2)+' NTU водоросли — основа питания губача — растут нормально.';
+      if(cls === 'warn') return '⚠ Условия для губача ухудшаются. Рост харовых водорослей — основной пищи этого эндемика — может снижаться при текущих параметрах.';
       return '✕ Критические условия для губача иссык-кульского. Нарушение кормовой базы при температуре '+d.wt.toFixed(1)+'°C и мутности '+d.ntu.toFixed(2)+' NTU.';
     }},
-  'fc-golyan':   {emoji:'🐟', name:'Гольян иссык-кульский', subtitle:'Мелководный эндемик',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','14–22°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Мелководные зоны с температурой '+d.wt.toFixed(1)+'°C и мутностью '+d.ntu.toFixed(2)+' NTU хорошо подходят для гольяна иссык-кульского.';
-      if(cls==='warn') return '⚠ Условия на грани для гольяна. Мелководные зоны более подвержены прогреву и загрязнению, что создаёт риск для этого эндемика.';
+  'fc-golyan':   { emoji:'🐟', name:'Гольян иссык-кульский', subtitle:'Мелководный эндемик',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '14–22°C'], ['Мутность', d.ntu.toFixed(2)+' NTU', '< 10 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Мелководные зоны с температурой '+d.wt.toFixed(1)+'°C и мутностью '+d.ntu.toFixed(2)+' NTU хорошо подходят для гольяна иссык-кульского.';
+      if(cls === 'warn') return '⚠ Условия на грани для гольяна. Мелководные зоны более подвержены прогреву и загрязнению, что создаёт риск для этого эндемика.';
       return '✕ Неблагоприятные условия для гольяна. Температура '+d.wt.toFixed(1)+'°C или мутность '+d.ntu.toFixed(2)+' NTU за пределами нормы для мелководного вида.';
     }},
-  'fc-trout':    {emoji:'🎣', name:'Форель севанская', subtitle:'Акклиматизирован с оз. Севан (Армения)',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','10–18°C']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Температура '+d.wt.toFixed(1)+'°C идеальна для форели. Холодолюбивая рыба из Армении хорошо прижилась в холодных глубинах Иссык-Куля.';
-      if(cls==='warn') return '⚠ Температура '+d.wt.toFixed(1)+'°C немного выше оптимума для форели (10–18°C). Рыба уходит на большие глубины где вода холоднее.';
+  'fc-trout':    { emoji:'🎣', name:'Форель севанская', subtitle:'Акклиматизирован с оз. Севан (Армения)',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '10–18°C'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Температура '+d.wt.toFixed(1)+'°C идеальна для форели. Холодолюбивая рыба из Армении хорошо прижилась в холодных глубинах Иссык-Куля.';
+      if(cls === 'warn') return '⚠ Температура '+d.wt.toFixed(1)+'°C немного выше оптимума для форели (10–18°C). Рыба уходит на большие глубины где вода холоднее.';
       return '✕ Температура '+d.wt.toFixed(1)+'°C слишком высокая для форели. При перегреве поверхностного слоя форель уходит на глубину 50–100м.';
     }},
-  'fc-turb-fish':{emoji:'👁', name:'Прозрачность воды', subtitle:'Уникальная особенность Иссык-Куля — до 30 метров',
-    params: function(d){var sec=d.ntu>0?(1.13/Math.sqrt(d.ntu)).toFixed(1):'30+';return[['Мутность',d.ntu.toFixed(2)+' NTU','< 5 NTU'],['Глубина Секки',sec+' м','> 10 м']];},
-    explain: function(d,cls){
-      var sec=d.ntu>0?(1.13/Math.sqrt(d.ntu)).toFixed(1):'30+';
-      if(cls==='safe') return '✓ При мутности '+d.ntu.toFixed(2)+' NTU прозрачность воды достигает '+sec+' м. Иссык-Куль — одно из прозрачнейших озёр мира. Харовые водоросли на дне поглощают взвесь и поддерживают прозрачность.';
-      if(cls==='warn') return '⚠ Прозрачность снизилась до '+sec+' м при мутности '+d.ntu.toFixed(2)+' NTU. Норма Иссык-Куля — более 10 метров. Может влиять на подводную растительность и рыбу.';
+  'fc-turb-fish':{ emoji:'👁', name:'Прозрачность воды', subtitle:'Уникальная особенность Иссык-Куля — до 30 метров',
+    params: function(d){ var sec = d.ntu > 0 ? (1.13 / Math.sqrt(d.ntu)).toFixed(1) : '30+'; return [ ['Мутность', d.ntu.toFixed(2)+' NTU', '< 5 NTU'], ['Глубина Секки', sec+' м', '> 10 м'] ]; },
+    explain: function(d, cls){
+      var sec = d.ntu > 0 ? (1.13 / Math.sqrt(d.ntu)).toFixed(1) : '30+';
+      if(cls === 'safe') return '✓ При мутности '+d.ntu.toFixed(2)+' NTU прозрачность воды достигает '+sec+' м. Иссык-Куль — одно из прозрачнейших озёр мира. Харовые водоросли на дне поглощают взвесь и поддерживают прозрачность.';
+      if(cls === 'warn') return '⚠ Прозрачность снизилась до '+sec+' м при мутности '+d.ntu.toFixed(2)+' NTU. Норма Иссык-Куля — более 10 метров. Может влиять на подводную растительность и рыбу.';
       return '✕ Прозрачность всего '+sec+' м — значительно ниже нормы Иссык-Куля. Мутность '+d.ntu.toFixed(2)+' NTU нарушает фотосинтез харовых водорослей на глубинах до 40м.';
     }},
-  'bc-swan':     {emoji:'🦢', name:'Лебедь-шипун', subtitle:'Красная книга КР · ~850 особей зимуют',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','< 18°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Условия благоприятны для зимовки лебедей. Температура '+d.wt.toFixed(1)+'°C и чистая вода ('+d.ntu.toFixed(2)+' NTU) обеспечивают кормовую базу. Иссык-Куль незамерзает — это главная причина зимовки ~850 лебедей.';
-      if(cls==='warn') return '⚠ Условия умеренно подходят для лебедей. При текущих параметрах кормовая база (рдест, мелкая рыба) может снижаться. Лебеди чувствительны к загрязнению воды.';
+  'bc-swan':     { emoji:'🦢', name:'Лебедь-шипун', subtitle:'Красная книга КР · ~850 особей зимуют',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '< 18°C'], ['Мутность', d.ntu.toFixed(2)+' NTU', '< 10 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Условия благоприятны для зимовки лебедей. Температура '+d.wt.toFixed(1)+'°C и чистая вода ('+d.ntu.toFixed(2)+' NTU) обеспечивают кормовую базу. Иссык-Куль незамерзает — это главная причина зимовки ~850 лебедей.';
+      if(cls === 'warn') return '⚠ Условия умеренно подходят для лебедей. При текущих параметрах кормовая база (рдест, мелкая рыба) может снижаться. Лебеди чувствительны к загрязнению воды.';
       return '✕ Неблагоприятные условия для зимовки лебедей. Высокая мутность '+d.ntu.toFixed(2)+' NTU затрудняет поиск пищи на мелководье. Краснокнижный вид под угрозой.';
     }},
-  'bc-whooper':  {emoji:'🦢', name:'Лебедь-кликун', subtitle:'Красная книга КР · Редкий перелётный вид',
-    params: function(d){return[['Температура воды',d.wt.toFixed(1)+'°C','< 18°C'],['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Хорошие условия для лебедя-кликуна. Питается рдестами на мелководье — чистая вода ('+d.ntu.toFixed(2)+' NTU) позволяет найти корм.';
-      if(cls==='warn') return '⚠ Условия для лебедя-кликуна ухудшаются. Мутность или температура затрудняют поиск водных растений на мелководье.';
+  'bc-whooper':  { emoji:'🦢', name:'Лебедь-кликун', subtitle:'Красная книга КР · Редкий перелётный вид',
+    params: function(d){ return [ ['Температура воды', d.wt.toFixed(1)+'°C', '< 18°C'], ['Мутность', d.ntu.toFixed(2)+' NTU', '< 10 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Хорошие условия для лебедя-кликуна. Питается рдестами на мелководье — чистая вода ('+d.ntu.toFixed(2)+' NTU) позволяет найти корм.';
+      if(cls === 'warn') return '⚠ Условия для лебедя-кликуна ухудшаются. Мутность или температура затрудняют поиск водных растений на мелководье.';
       return '✕ Неблагоприятные условия для краснокнижного лебедя-кликуна. Высокая мутность воды ('+d.ntu.toFixed(2)+' NTU) не позволяет эффективно кормиться.';
     }},
-  'bc-heron':    {emoji:'🦩', name:'Серая цапля', subtitle:'Охраняемый вид · Охотится визуально',
-    params: function(d){return[['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Мутность '+d.ntu.toFixed(2)+' NTU отличная для охоты цапли. Цапля охотится визуально — стоя неподвижно у берега, она видит рыбу на глубине до 0.5м.';
-      if(cls==='warn') return '⚠ При мутности '+d.ntu.toFixed(2)+' NTU охота цапли затруднена. Птица не может разглядеть рыбу в мутной воде — эффективность охоты снижается.';
+  'bc-heron':    { emoji:'🦩', name:'Серая цапля', subtitle:'Охраняемый вид · Охотится визуально',
+    params: function(d){ return [ ['Мутность', d.ntu.toFixed(2)+' NTU', '< 10 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Мутность '+d.ntu.toFixed(2)+' NTU отличная для охоты цапли. Цапля охотится визуально — стоя неподвижно у берега, она видит рыбу на глубине до 0.5м.';
+      if(cls === 'warn') return '⚠ При мутности '+d.ntu.toFixed(2)+' NTU охота цапли затруднена. Птица не может разглядеть рыбу в мутной воде — эффективность охоты снижается.';
       return '✕ Мутность '+d.ntu.toFixed(2)+' NTU делает охоту цапли почти невозможной. Птица не видит добычу в мутной воде и вынуждена искать другие водоёмы.';
     }},
-  'bc-duck':     {emoji:'🦆', name:'Красноносый нырок', subtitle:'До 50 тысяч зимует на Иссык-Куле',
-    params: function(d){return[['Мутность',d.ntu.toFixed(2)+' NTU','< 20 NTU']];},
-    explain: function(d,cls){
-      if(cls==='safe') return '✓ Отличные условия для нырков. При мутности '+d.ntu.toFixed(2)+' NTU ныряя до 2м нырок хорошо видит рдесты и водоросли — основу своего питания.';
-      if(cls==='warn') return '⚠ Видимость под водой снижена. При мутности '+d.ntu.toFixed(2)+' NTU нырку сложнее находить рдесты на дне — кормовая эффективность падает.';
+  'bc-duck':     { emoji:'🦆', name:'Красноносый нырок', subtitle:'До 50 тысяч зимует на Иссык-Куле',
+    params: function(d){ return [ ['Мутность', d.ntu.toFixed(2)+' NTU', '< 20 NTU'] ]; },
+    explain: function(d, cls){
+      if(cls === 'safe') return '✓ Отличные условия для нырков. При мутности '+d.ntu.toFixed(2)+' NTU ныряя до 2м нырок хорошо видит рдесты и водоросли — основу своего питания.';
+      if(cls === 'warn') return '⚠ Видимость под водой снижена. При мутности '+d.ntu.toFixed(2)+' NTU нырку сложнее находить рдесты на дне — кормовая эффективность падает.';
       return '✕ Высокая мутность '+d.ntu.toFixed(2)+' NTU серьёзно затрудняет питание нырков. 50 тысяч зимующих птиц зависят от доступности подводной растительности.';
     }},
-  'pc-chara':    {emoji:'🌿', name:'Харовые водоросли', subtitle:'Уникальный феномен · Ковёр до 40м глубины',
-    params: function(d){var eutro=calcEutro(d.wt,d.tds,0);return[['Мутность',d.ntu.toFixed(2)+' NTU','< 5 NTU'],['Риск эвтроф.',eutro.toFixed(0)+'/100','< 30']];},
-    explain: function(d,cls){
-      var eutro=calcEutro(d.wt,d.tds,0);
-      if(cls==='safe') return '✓ Прекрасные условия для харовых водорослей. Мутность '+d.ntu.toFixed(2)+' NTU обеспечивает достаточное проникновение света на глубину. Эти водоросли — главный биофильтр озера, поддерживающий его уникальную прозрачность.';
-      if(cls==='warn') return '⚠ Условия для харовых водорослей ухудшаются. Рост мутности или риска эвтрофикации ('+eutro.toFixed(0)+'/100) снижает проникновение света — водоросли теряют продуктивность.';
+  'pc-chara':    { emoji:'🌿', name:'Харовые водоросли', subtitle:'Уникальный феномен · Ковёр до 40м глубины',
+    params: function(d){ var eutro = calcEutro(d.wt, d.tds, 0); return [ ['Мутность', d.ntu.toFixed(2)+' NTU', '< 5 NTU'], ['Риск эвтроф.', eutro.toFixed(0)+'/100', '< 30'] ]; },
+    explain: function(d, cls){
+      var eutro = calcEutro(d.wt, d.tds, 0);
+      if(cls === 'safe') return '✓ Прекрасные условия для харовых водорослей. Мутность '+d.ntu.toFixed(2)+' NTU обеспечивает достаточное проникновение света на глубину. Эти водоросли — главный биофильтр озера, поддерживающий его уникальную прозрачность.';
+      if(cls === 'warn') return '⚠ Условия для харовых водорослей ухудшаются. Рост мутности или риска эвтрофикации ('+eutro.toFixed(0)+'/100) снижает проникновение света — водоросли теряют продуктивность.';
       return '✕ Критические условия для харовых водорослей. При мутности '+d.ntu.toFixed(2)+' NTU и риске эвтрофикации '+eutro.toFixed(0)+'/100 световой поток на глубины 35–40м минимален. Деградация биофильтра приведёт к помутнению всего озера.';
     }},
-  'pc-rdest':    {emoji:'🌱', name:'Рдест гребенчатый', subtitle:'Главный корм 50 тысяч зимующих птиц',
-    params: function(d){var eutro=calcEutro(d.wt,d.tds,0);return[['Мутность',d.ntu.toFixed(2)+' NTU','< 10 NTU'],['Риск эвтроф.',eutro.toFixed(0)+'/100','< 40']];},
-    explain: function(d,cls){
-      var eutro=calcEutro(d.wt,d.tds,0);
-      if(cls==='safe') return '✓ Хорошие условия для роста рдеста. При мутности '+d.ntu.toFixed(2)+' NTU и риске эвтрофикации '+eutro.toFixed(0)+' растение нормально развивается на глубинах до 5м — обеспечивая корм для тысяч зимующих птиц.';
-      if(cls==='warn') return '⚠ Условия для рдеста ухудшаются. Снижение прозрачности или усиление эвтрофикации ('+eutro.toFixed(0)+'/100) может подавить рост этого ключевого кормового растения.';
+  'pc-rdest':    { emoji:'🌱', name:'Рдест гребенчатый', subtitle:'Главный корм 50 тысяч зимующих птиц',
+    params: function(d){ var eutro = calcEutro(d.wt, d.tds, 0); return [ ['Мутность', d.ntu.toFixed(2)+' NTU', '< 10 NTU'], ['Риск эвтроф.', eutro.toFixed(0)+'/100', '< 40'] ]; },
+    explain: function(d, cls){
+      var eutro = calcEutro(d.wt, d.tds, 0);
+      if(cls === 'safe') return '✓ Хорошие условия для роста рдеста. При мутности '+d.ntu.toFixed(2)+' NTU и риске эвтрофикации '+eutro.toFixed(0)+' растение нормально развивается на глубинах до 5м — обеспечивая корм для тысяч зимующих птиц.';
+      if(cls === 'warn') return '⚠ Условия для рдеста ухудшаются. Снижение прозрачности или усиление эвтрофикации ('+eutro.toFixed(0)+'/100) может подавить рост этого ключевого кормового растения.';
       return '✕ Неблагоприятные условия для рдеста. Высокие значения мутности или эвтрофикации ('+eutro.toFixed(0)+'/100) угрожают основному источнику корма для 50 тысяч зимующих птиц.';
     }},
-  'pc-algae':    {emoji:'⚗️', name:'Риск эвтрофикации', subtitle:'Индикатор экологического здоровья озера',
-    params: function(d){var eutro=calcEutro(d.wt,d.tds,0);return[['Температура',d.wt.toFixed(1)+'°C','< 25°C'],['TDS',d.tds.toFixed(0)+' ppm','< 7000'],['Риск',eutro.toFixed(0)+'/100','< 30']];},
-    explain: function(d,cls){
-      var eutro=calcEutro(d.wt,d.tds,0);
-      if(cls==='safe') return '✓ Риск эвтрофикации '+eutro.toFixed(0)+'/100 — низкий. Температура '+d.wt.toFixed(1)+'°C и TDS '+d.tds.toFixed(0)+' ppm в норме. Иссык-Куль исторически чист — мощное течение и харовые водоросли предотвращают цветение воды.';
-      if(cls==='warn') return '⚠ Умеренный риск эвтрофикации: '+eutro.toFixed(0)+'/100. Сочетание температуры '+d.wt.toFixed(1)+'°C и TDS '+d.tds.toFixed(0)+' ppm создаёт условия для возможного роста водорослей. Необходим мониторинг.';
+  'pc-algae':    { emoji:'⚗️', name:'Риск эвтрофикации', subtitle:'Индикатор экологического здоровья озера',
+    params: function(d){ var eutro = calcEutro(d.wt, d.tds, 0); return [ ['Температура', d.wt.toFixed(1)+'°C', '< 25°C'], ['TDS', d.tds.toFixed(0)+' ppm', '< 7000'], ['Риск', eutro.toFixed(0)+'/100', '< 30'] ]; },
+    explain: function(d, cls){
+      var eutro = calcEutro(d.wt, d.tds, 0);
+      if(cls === 'safe') return '✓ Риск эвтрофикации '+eutro.toFixed(0)+'/100 — низкий. Температура '+d.wt.toFixed(1)+'°C и TDS '+d.tds.toFixed(0)+' ppm в норме. Иссык-Куль исторически чист — мощное течение и харовые водоросли предотвращают цветение воды.';
+      if(cls === 'warn') return '⚠ Умеренный риск эвтрофикации: '+eutro.toFixed(0)+'/100. Сочетание температуры '+d.wt.toFixed(1)+'°C и TDS '+d.tds.toFixed(0)+' ppm создаёт условия для возможного роста водорослей. Необходим мониторинг.';
       return '✕ Высокий риск эвтрофикации: '+eutro.toFixed(0)+'/100! Температура '+d.wt.toFixed(1)+'°C и TDS '+d.tds.toFixed(0)+' ppm превышают безопасные значения. Возможно цветение сине-зелёных водорослей, опасных для купальщиков и рыбы.';
     }}
 };
 
 function openEcoModal(cardId){
-  var info=ECO_INFO[cardId];if(!info)return;
-  var el=document.getElementById(cardId);
-  var cls=el&&el.className.includes('fish-safe')?'safe':el&&el.className.includes('fish-warn')?'warn':'danger';
-  var d=_modalData;
-  document.getElementById('modalEmoji').textContent=info.emoji;
-  document.getElementById('modalTitle').textContent=info.name;
-  document.getElementById('modalSubtitle').textContent=info.subtitle;
-  var st=document.getElementById('modalStatus');
-  var statusText=cls==='safe'?'✓ Условия благоприятные':cls==='warn'?'⚠ Требует внимания':'✕ Критическое состояние';
-  st.textContent=statusText;
-  st.className='modal-status modal-status-'+cls;
-  var rows=document.getElementById('modalRows');
-  rows.innerHTML='<div class="modal-section-title">Текущие условия</div>';
+  var info = ECO_INFO[cardId]; if(!info) return;
+  var el = document.getElementById(cardId);
+  var cls = el && el.className.includes('fish-safe') ? 'safe' : el && el.className.includes('fish-warn') ? 'warn' : 'danger';
+  var d = _modalData;
+  document.getElementById('modalEmoji').textContent = info.emoji;
+  document.getElementById('modalTitle').textContent = info.name;
+  document.getElementById('modalSubtitle').textContent = info.subtitle;
+  var st = document.getElementById('modalStatus');
+  var statusText = cls === 'safe' ? '✓ Условия благоприятные' : cls === 'warn' ? '⚠ Требует внимания' : '✕ Критическое состояние';
+  st.textContent = statusText;
+  st.className = 'modal-status modal-status-' + cls;
+  var rows = document.getElementById('modalRows');
+  rows.innerHTML = '<div class="modal-section-title">Текущие условия</div>';
   info.params(d).forEach(function(p){
-    var row=document.createElement('div');row.className='modal-row';
-    row.innerHTML='<span class="modal-key">'+p[0]+'</span><div style="text-align:right"><span class="modal-val">'+p[1]+'</span><div style="font-size:9px;color:var(--text3)">Норма: '+p[2]+'</div></div>';
+    var row = document.createElement('div'); row.className = 'modal-row';
+    row.innerHTML = '<span class="modal-key">' + p[0] + '</span><div style="text-align:right"><span class="modal-val">' + p[1] + '</span><div style="font-size:9px;color:var(--text3)">Норма: ' + p[2] + '</div></div>';
     rows.appendChild(row);
   });
-  document.getElementById('modalExplain').textContent=info.explain(d,cls);
+  document.getElementById('modalExplain').textContent = info.explain(d, cls);
   document.getElementById('ecoModal').classList.add('show');
 }
 
 function closeModal(e){
-  if(!e||e.target===document.getElementById('ecoModal'))
+  if(!e || e.target === document.getElementById('ecoModal'))
     document.getElementById('ecoModal').classList.remove('show');
 }
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeModal(); });
+
 </script>
 </body>
 </html>
